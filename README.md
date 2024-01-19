@@ -21,17 +21,6 @@ Who uses cctl ?
 
 CSPR network community.  This encompasses developers, validators, evaluators ... etc.
 
-Requirements
---------------------------------------
-
-    - bash
-    - cargo
-    - jq
-    - make
-    - python3
-
-Plus the requirements to build [casper-node](https://github.com/CasperLabs/casper-node#pre-requisites-for-building)
-
 Setup
 --------------------------------------
 

@@ -2,8 +2,13 @@
 
 ## Step 1: Verify Pre-requisites
 
-1. bash shell.
-2. python3.  
+- bash
+- cargo
+- jq
+- make
+- python3
+
+Plus the requirements to build [casper-node](https://github.com/CasperLabs/casper-node#pre-requisites-for-building)
 
 ## Step 2: Setup System
 
