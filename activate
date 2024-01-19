@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+
+# ###############################################################
+# PATHS
+# ###############################################################
+
+# Set path -> here.
+export CCTL="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Set path -> here -> assets.
+export CCTL_ASSETS="$CCTL/assets"
+
+# Set path -> here -> resources.
+export CCTL_RESOURCES="$CCTL/resources"
+
+# Set path -> root.
+export CCTL_ROOT="$( cd "$( dirname "${CCTL[0]}" )" && pwd )"
+
+# Set path -> root -> casper-client.
+export CCTL_CASPER_CLIENT_HOME="$CCTL_ROOT"/casper-client-rs
+
+# Set path -> root -> casper-node.
+export CCTL_CASPER_NODE_HOME="$CCTL_ROOT"/casper-node
+
+# Set path -> root -> casper-node launcher.
+export CCTL_CASPER_NODE_LAUNCHER_HOME="$CCTL_ROOT"/casper-node-launcher
+
+# ###############################################################
+# UTILS
+# ###############################################################
+
+# Import utility functions.
+source "$CCTL"/utils/main.sh
+
+# ###############################################################
+# COMMANDS
+# ###############################################################
+
+# Infrastructure commands.
+# ... binaries
+alias cctl-infra-bin-compile='source $CCTL/cmds/infra/bin/compile.sh'
+alias cctl-infra-bin-compile-client='source $CCTL/cmds/infra/bin/compile_client.sh'
+alias cctl-infra-bin-compile-contracts='source $CCTL/cmds/infra/bin/compile_contracts.sh'
+alias cctl-infra-bin-compile-node='source $CCTL/cmds/infra/bin/compile_node.sh'
+alias cctl-infra-bin-compile-node-launcher='source $CCTL/cmds/infra/bin/compile_node_launcher.sh'
+
+# ... network
+alias cctl-infra-net-setup='source $CCTL/cmds/infra/net/setup.sh'
+alias cctl-infra-net-start='source $CCTL/cmds/infra/net/start.sh'
+alias cctl-infra-net-status='source $CCTL/cmds/infra/net/status.sh'
+alias cctl-infra-net-stop='source $CCTL/cmds/infra/net/stop.sh'
+alias cctl-infra-net-teardown='source $CCTL/cmds/infra/net/teardown.sh'
+
+# ... node
+alias cctl-infra-node-clean='source $CCTL/cmds/infra/node/clean.sh'
+alias cctl-infra-node-stop='source $CCTL/cmds/infra/node/stop.sh'
+alias cctl-infra-node-restart='source $CCTL/cmds/infra/node/restart.sh'
+
+# ... node views
+alias cctl-infra-node-view-config='source $CCTL/cmds/infra/node/view_config.sh'
+alias cctl-infra-node-view-error-log='source $CCTL/cmds/infra/node/view_log_stderr.sh'
+alias cctl-infra-node-view-log='source $CCTL/cmds/infra/node/view_log_stdout.sh'
+alias cctl-infra-node-view-metrics='source $CCTL/cmds/infra/node/view_metrics.sh'
+alias cctl-infra-node-view-peers='source $CCTL/cmds/infra/node/view_peers.sh'
+alias cctl-infra-node-view-peer-count='source $CCTL/cmds/infra/node/view_peer_count.sh'
+alias cctl-infra-node-view-ports='source $CCTL/cmds/infra/node/view_ports.sh'
+alias cctl-infra-node-view-rpc-endpoint='source $CCTL/cmds/infra/node/view_rpc_endpoint.sh'
+alias cctl-infra-node-view-rpc-schema='source $CCTL/cmds/infra/node/view_rpc_schema.sh'
+alias cctl-infra-node-view-storage='source $CCTL/cmds/infra/node/view_storage.sh'
+alias cctl-infra-node-write-rpc-schema='source $CCTL/cmds/infra/node/write_rpc_schema.sh'
+
+# Chain commands.
+# ... awaiting
+alias cctl-chain-await-n-blocks='source $CCTL/cmds/chain/await_n_blocks.sh'
+alias cctl-chain-await-n-eras='source $CCTL/cmds/chain/await_n_eras.sh'
+alias cctl-chain-await-until-block-n='source $CCTL/cmds/chain/await_until_block_n.sh'
+alias cctl-chain-await-until-era-n='source $CCTL/cmds/chain/await_until_era_n.sh'
+
+# ... views
+alias cctl-chain-view-account='source $CCTL/cmds/chain/view_account.sh'
+alias cctl-chain-view-account-balance='source $CCTL/cmds/chain/view_account_balance.sh'
+alias cctl-chain-view-account-balances='source $CCTL/cmds/chain/view_account_balances.sh'
+alias cctl-chain-view-account-of-faucet='source $CCTL/cmds/chain/view_account_of_faucet.sh'
+alias cctl-chain-view-account-of-user='source $CCTL/cmds/chain/view_account_of_user.sh'
+alias cctl-chain-view-account-of-validator='source $CCTL/cmds/chain/view_account_of_validator.sh'
+alias cctl-chain-view-auction-info='source $CCTL/cmds/chain/view_auction_info.sh'
+alias cctl-chain-view-block='source $CCTL/cmds/chain/view_block.sh'
+alias cctl-chain-view-era='source $CCTL/cmds/chain/view_era.sh'
+alias cctl-chain-view-era-summary='source $CCTL/cmds/chain/view_era_summary.sh'
+alias cctl-chain-view-genesis-accounts='source $CCTL/cmds/chain/view_genesis_accounts.sh'
+alias cctl-chain-view-genesis-chainspec='source $CCTL/cmds/chain/view_genesis_chainspec.sh'
+alias cctl-chain-view-height='source $CCTL/cmds/chain/view_height.sh'
+alias cctl-chain-view-last-finalized-block='source $CCTL/cmds/chain/view_last_finalized_block.sh'
+alias cctl-chain-view-state-root-hash='source $CCTL/cmds/chain/view_state_root_hash.sh'
