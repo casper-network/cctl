@@ -1,4 +1,4 @@
-WORK IN PROGRESS - DO NOT USE !
+WORK IN PROGRESS - FEEDBACK WELCOME !
 ===============
 
 cctl
