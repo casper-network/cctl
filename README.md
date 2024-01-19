@@ -4,7 +4,7 @@ WORK IN PROGRESS - DO NOT USE !
 cctl
 ===============
 
-CLI application to work with a **local** casper-node network.  Stripped down sucessor to nctl.
+Bash application to work with a **local** casper-node network.  Stripped down sucessor to nctl.
 
 What is cctl ?
 --------------------------------------
