@@ -2,11 +2,11 @@
 
 ## Step 1: Verify Pre-requisites
 
-- bash
-- cargo
-- jq
-- make
-- python3
+- [bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell))
+- [cargo](https://doc.rust-lang.org/cargo/)
+- [jq](https://jqlang.github.io/jq/)
+- [make](https://www.gnu.org/software/make/)
+- [python3](https://www.python.org/downloads/)
 
 Plus the requirements to build [casper-node](https://github.com/CasperLabs/casper-node#pre-requisites-for-building)
 
