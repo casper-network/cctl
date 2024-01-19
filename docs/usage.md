@@ -1,5 +1,7 @@
 # CCTL Usage
 
+## Step 0: Activate CCTL
+
 To activate the cctl shell application:
 
 ```
@@ -16,12 +18,6 @@ To view help text for a command, type command name followed by help. For example
 
 ```
 cctl-infra-node-view-config help
-```
-
-To execute a command, type command name followed by command parameters. For example:
-
-```
-cctl-infra-node-view-config node=1
 ```
 
 ## Step 1: Compile network binaries
@@ -108,7 +104,7 @@ cctl-chain-view-genesis-accounts
 cctl-chain-view-genesis-chainspec
 ```
 
-## Step 3: Teardown network
+## Step 5: Teardown network
 
 To teardown a network once a dev/test session is complete:
 
