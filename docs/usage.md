@@ -17,7 +17,7 @@ cctl-[TAB]
 To view help text for a command, type command name followed by help. For example:
 
 ```
-cctl-infra-node-view-config help
+cctl-infra-bin-compile help
 ```
 
 ## Step 1: Compile network binaries
