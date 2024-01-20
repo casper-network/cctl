@@ -71,7 +71,7 @@ export CCTL_INITIAL_DELEGATION_AMOUNT=1000000000000000000   # (1e18)
 export CCTL_VALIDATOR_BASE_WEIGHT=1000000000000000000   # (1e18)
 
 # Name of local cctl network.
-export CCTL_NET_NAME=casper-dev-cctl
+export CCTL_NET_NAME=cspr-dev-cctl
 
 # Name of process group: boostrap validators.
 export CCTL_PROCESS_GROUP_1=validator-group-1
