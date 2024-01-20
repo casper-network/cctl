@@ -20,7 +20,7 @@ python3 -m pip install supervisor toml tomlkit
 cd YOUR_WORKING_DIRECTORY
 git clone https://github.com/casper-network/casper-node.git
 git clone https://github.com/casper-network/casper-node-launcher.git
-git clone https://github.com/casper-network/casper-client.git
+git clone https://github.com/casper-ecosystem/casper-client-rs.git
 git clone https://github.com/casper-network/cctl.git
 
 # Install rust toolchain.
