@@ -96,3 +96,4 @@ alias cctl-chain-view-state-root-hash='source $CCTL/cmds/chain/view_state_root_h
 
 # Deploy dispatch commands.
 alias cctl-dispatch-native-transfer='source $CCTL/cmds/chain/deploys/dispatch_native.sh'
+alias cctl-dispatch-wasm-transfer='source $CCTL/cmds/chain/deploys/dispatch_wasm.sh'

@@ -73,6 +73,18 @@ function get_path_to_faucet()
 }
 
 #######################################
+# Returns path to a wasm file.
+# Arguments:
+#   Wasm file name.
+#######################################
+function get_path_to_wasm()
+{
+    local FILENAME=${1}    
+
+    echo "$(get_path_to_assets)"/bin/wasm/"$FILENAME"
+}
+
+#######################################
 # Returns path to a network's supervisord config file.
 #######################################
 function get_path_net_supervisord_cfg()

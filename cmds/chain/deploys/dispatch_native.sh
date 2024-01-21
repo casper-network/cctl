@@ -8,16 +8,16 @@ function _help() {
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Dispatches a native transfer to a running node.
+    Dispatches a set of native transfers into network.
 
     ARGS
     ----------------------------------------------------------------
-    amount          d
-    interval        d
-    node            d
-    transfers       d
-    user            d
-    verbose         d
+    amount          Amount (motes) to transfer. Optional.
+    interval        Time interval (seconds) between each transfer. Optional.
+    node            Either ordinal identifier of a running node or random. Optional.
+    transfers       Number of transfers to be dispatched. Optional.
+    user            Ordinal identifier of user. Optional.
+    verbose         Flag indicating whether logging output will be verbose or not. Optional.
 
     DEFAULTS
     ----------------------------------------------------------------
@@ -50,6 +50,14 @@ function _main()
     local OUTPUT
     local PATH_TO_CLIENT=$(get_path_to_client)
     local SUCCESSFUL_DISPATCH_COUNT=0
+
+    if [ "$NODE_ID" == "random" ]; then
+        unset NODE_ADDRESS
+    elif [ "$NODE_ID" -eq 0 ]; then
+        NODE_ADDRESS=$(get_node_address_rpc)
+    else
+        NODE_ADDRESS=$(get_node_address_rpc "$NODE_ID")
+    fi
 
     if [ $VERBOSE == true ]; then
         log "dispatching $TRANSFERS native transfers"
@@ -97,7 +105,9 @@ function _main()
         sleep "$INTERVAL"
     done
 
-
+    if [ $VERBOSE == true ]; then
+        log "successfully dispatched $SUCCESSFUL_DISPATCH_COUNT of $DISPATCH_ATTEMPTS transfers"
+    fi
 }
 
 # ----------------------------------------------------------------
