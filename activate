@@ -95,5 +95,7 @@ alias cctl-chain-view-last-finalized-block='source $CCTL/cmds/chain/view_last_fi
 alias cctl-chain-view-state-root-hash='source $CCTL/cmds/chain/view_state_root_hash.sh'
 
 # Deploy dispatch commands.
-alias cctl-dispatch-native-transfer='source $CCTL/cmds/chain/deploys/dispatch_native.sh'
-alias cctl-dispatch-wasm-transfer='source $CCTL/cmds/chain/deploys/dispatch_wasm.sh'
+alias cctl-tx-dispatch-native-transfer='source $CCTL/cmds/chain/tx/dispatch_transfer_native.sh'
+alias cctl-tx-dispatch-wasm-transfer='source $CCTL/cmds/chain/tx/dispatch_transfer_wasm.sh'
+alias cctl-tx-prepare-batch-of-native-transfers='source $CCTL/cmds/chain/tx/prepare_batch_of_native_transfers.sh'
+alias cctl-tx-prepare-batch-of-wasm-transfers='source $CCTL/cmds/chain/tx/prepare_batch_of_wasm_transfers.sh'

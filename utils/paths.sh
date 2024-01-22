@@ -73,6 +73,14 @@ function get_path_to_faucet()
 }
 
 #######################################
+# Returns path to directory containing transactions dispatched into network.
+#######################################
+function get_path_to_transactions()
+{
+    echo "$(get_path_to_assets)"/transactions
+}
+
+#######################################
 # Returns path to a wasm file.
 # Arguments:
 #   Wasm file name.
