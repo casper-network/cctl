@@ -14,6 +14,20 @@ To view full set of commands:
 cctl-[TAB]
 ```
 
+Broadly speaking there are two types of command:
+
+1. To query, await & transact with the blockchain:
+
+    ```
+    cctl-chain-* 
+    ```
+
+2. To start, stop, & set up the network:
+
+    ```
+    cctl-infra-* 
+    ```
+
 To view help text for a command, type command name followed by help. For example:
 
 ```
