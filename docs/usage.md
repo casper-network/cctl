@@ -14,19 +14,41 @@ To view full set of commands:
 cctl-[TAB]
 ```
 
-Broadly speaking there are two types of command:
+To view commands to start, stop, & set up a network:
 
-1. To query, await & transact with the blockchain:
+```
+cctl-infra-net-[TAB]
+```
 
-    ```
-    cctl-chain-* 
-    ```
+To view commands to control or query with a node:
 
-2. To start, stop, & set up the network:
+```
+cctl-infra-node-[TAB]
+```
 
-    ```
-    cctl-infra-* 
-    ```
+To view commands to compile network binaries:
+
+```
+cctl-infra-bin-[TAB]
+```
+
+To view commands to await progression of chain:
+
+```
+cctl-chain-await-[TAB]
+```
+
+To view commands to view chain state:
+
+```
+cctl-chain-view-[TAB]
+```
+
+To view commands to send transactions into the network:
+
+```
+cctl-tx-[TAB]
+```
 
 To view help text for a command, type command name followed by help. For example:
 
