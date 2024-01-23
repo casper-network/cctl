@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-view-node-peer-count
+    cctl-infra-node-view-peer-count
 
     DESCRIPTION
     ----------------------------------------------------------------

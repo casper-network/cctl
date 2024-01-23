@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-view-node-metrics
+    cctl-infra-node-view-metrics
 
     DESCRIPTION
     ----------------------------------------------------------------

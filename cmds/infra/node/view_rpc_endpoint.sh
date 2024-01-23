@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-view-rpc-endpoint
+    cctl-infra-node-view-rpc-endpoint
 
     DESCRIPTION
     ----------------------------------------------------------------

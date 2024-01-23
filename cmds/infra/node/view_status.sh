@@ -1,45 +1,53 @@
 #!/usr/bin/env bash
 
-source "$CCTL"/utils/main.sh
+function _help() {
+    echo "
+    COMMAND
+    ----------------------------------------------------------------
+    cctl-infra-node-view-status
 
-#######################################
-# Renders status at specified node(s).
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function main()
+    DESCRIPTION
+    ----------------------------------------------------------------
+    Displays status at specified node(s).
+
+    ARGS
+    ----------------------------------------------------------------
+    node        Ordinal identifier of a node. Optional.
+
+    DEFAULTS
+    ----------------------------------------------------------------
+    node        all
+    "
+}
+
+function _main()
 {
     local NODE_ID=${1}
 
     if [ "$NODE_ID" = "all" ]; then
         for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
         do
-            if [ "$(get_node_is_up "$NODE_ID")" = true ]; then
+            if [ $(get_node_is_up "$NODE_ID") = true ]; then
                 echo "------------------------------------------------------------------------------------------------------------------------------------"
-                do_render "$NODE_ID"
-            fi        
+                _display_status "$NODE_ID"
+            fi
         done
         echo "------------------------------------------------------------------------------------------------------------------------------------"
     else
-        if [ "$(get_node_is_up "$NODE_ID")" = true ]; then
-            do_render "$NODE_ID"
-        fi        
+        if [ $(get_node_is_up "$NODE_ID") = true ]; then
+            _display_status "$NODE_ID"
+        else
+            log_warning "node $NODE_ID is not running"
+        fi
     fi
 }
 
-#######################################
-# Displays to stdout current node status.
-# Arguments:
-#   Network ordinal identifier.
-#   Node ordinal identifier.
-#######################################
-function do_render()
+function _display_status()
 {
     local NODE_ID=${1}
-    local NODE_ADDRESS_CURL
+    local NODE_ADDRESS_CURL=$(get_node_address_rpc_for_curl "$NODE_ID")
     local NODE_API_RESPONSE
     
-    NODE_ADDRESS_CURL=$(get_node_address_rpc_for_curl "$NODE_ID")
     NODE_API_RESPONSE=$(
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES --header 'Content-Type: application/json' \
             --request POST "$NODE_ADDRESS_CURL" \
@@ -62,16 +70,24 @@ function do_render()
 # ENTRY POINT
 # ----------------------------------------------------------------
 
-unset NODE_ID
+source "$CCTL"/utils/main.sh
+
+unset _HELP
+unset _NODE_ID
 
 for ARGUMENT in "$@"
 do
     KEY=$(echo "$ARGUMENT" | cut -f1 -d=)
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
     case "$KEY" in
-        node) NODE_ID=${VALUE} ;;
+        help) _HELP="show" ;;
+        node) _NODE_ID=${VALUE} ;;
         *)
     esac
 done
 
-main "${NODE_ID:-"all"}"
+if [ "${_HELP:-""}" = "show" ]; then
+    _help
+else
+    _main "${_NODE_ID:-"all"}"
+fi

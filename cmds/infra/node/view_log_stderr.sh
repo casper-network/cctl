@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-view-log-stderr
+    cctl-infra-node-view-log-stderr
 
     DESCRIPTION
     ----------------------------------------------------------------

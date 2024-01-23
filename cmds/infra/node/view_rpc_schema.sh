@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-view-rpc-schema
+    cctl-infra-node-view-rpc-schema
 
     DESCRIPTION
     ----------------------------------------------------------------

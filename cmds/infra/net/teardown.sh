@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-net-teardown
+    cctl-infra-net-teardown
 
     DESCRIPTION
     ----------------------------------------------------------------

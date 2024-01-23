@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-net-setup
+    cctl-infra-net-setup
 
     DESCRIPTION
     ----------------------------------------------------------------
@@ -26,7 +26,8 @@ function _help() {
 
     NOTES
     ----------------------------------------------------------------
-    The network will consist of 5 active nodes plus 5 passive nodes.
+    Initially the network consists of 5 active nodes plus 5 standby nodes.
+    This typology permits node rotation testing scenarios. 
     "
 }
 

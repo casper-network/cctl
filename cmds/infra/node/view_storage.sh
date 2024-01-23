@@ -8,7 +8,7 @@ function _help() {
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Displays node storage ... either all or individual.
+    Displays node storage metrics ... either all nodes or an individual node.
 
     ARGS
     ----------------------------------------------------------------

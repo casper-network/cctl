@@ -63,6 +63,7 @@ alias cctl-infra-node-view-peer-count='source $CCTL/cmds/infra/node/view_peer_co
 alias cctl-infra-node-view-ports='source $CCTL/cmds/infra/node/view_ports.sh'
 alias cctl-infra-node-view-rpc-endpoint='source $CCTL/cmds/infra/node/view_rpc_endpoint.sh'
 alias cctl-infra-node-view-rpc-schema='source $CCTL/cmds/infra/node/view_rpc_schema.sh'
+alias cctl-infra-node-view-status='source $CCTL/cmds/infra/node/view_status.sh'
 alias cctl-infra-node-view-storage='source $CCTL/cmds/infra/node/view_storage.sh'
 alias cctl-infra-node-write-rpc-schema='source $CCTL/cmds/infra/node/write_rpc_schema.sh'
 

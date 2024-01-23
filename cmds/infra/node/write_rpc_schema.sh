@@ -4,11 +4,11 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-write-rpc-schema
+    cctl-infra-node-write-rpc-schema
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Writes to resources the current node JSON RPC schema and endpoints.
+    Writes to resources a node's JSON RPC schema and endpoints.
     "
 }
 

@@ -4,11 +4,11 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-net-status
+    cctl-infra-net-status
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Displays network status.
+    Displays process status of each network node.
     "
 }
 
