@@ -64,11 +64,11 @@ function _clean_node()
     local NODE_LOGS=$(get_path_to_node_logs "$NODE_ID")
     local NODE_STORAGE=$(get_path_to_node_storage "$NODE_ID")
 
+    log "... cleaning logs"
     rm "$NODE_LOGS"/*.log > /dev/null 2>&1
 
-    rm "$NODE_STORAGE"/*.lmbd* > /dev/null 2>&1
-    rm "$NODE_STORAGE"/sse_index > /dev/null 2>&1
-    rm "$NODE_STORAGE"/unit_files/* > /dev/null 2>&1
+    log "... cleaning storage"
+    rm -rf "$NODE_STORAGE"/"$CCTL_NET_NAME" > /dev/null 2>&1
 }
 
 function _start_node()

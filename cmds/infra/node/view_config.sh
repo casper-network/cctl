@@ -20,7 +20,9 @@ function _main()
 {
     local NODE_ID=${1}
 
-    less "$(get_path_to_node_config_file "$NODE_ID")"
+    local PATH_TO_NODE_CONFIG=$(get_path_to_node_config_file "$NODE_ID")
+
+    less $PATH_TO_NODE_CONFIG
 }
 
 # ----------------------------------------------------------------

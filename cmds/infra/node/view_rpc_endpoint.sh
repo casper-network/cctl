@@ -24,7 +24,9 @@ function _main()
                 "id": 1,
                 "jsonrpc": "2.0",
                 "method": "rpc.discover"
-            }' | jq '.result.schema.methods[].name'
+            }' \
+            | jq '.result.schema.methods[].name' \
+            | sed -e 's/^"//' -e 's/"$//'
     else
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \

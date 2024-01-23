@@ -40,9 +40,7 @@ function _clean_node()
     rm "$NODE_LOGS"/*.log > /dev/null 2>&1
 
     log "... cleaning storage"
-    rm "$NODE_STORAGE"/*.lmbd* > /dev/null 2>&1
-    rm "$NODE_STORAGE"/sse_index > /dev/null 2>&1
-    rm "$NODE_STORAGE"/unit_files/* > /dev/null 2>&1
+    rm -rf "$NODE_STORAGE"/"$CCTL_NET_NAME" > /dev/null 2>&1
 }
 
 # ----------------------------------------------------------------

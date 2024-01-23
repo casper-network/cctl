@@ -126,6 +126,7 @@ function get_node_protocol_version_from_fs()
 {
     local NODE_ID=${1}
     local SEPARATOR=${2:-"."}
+
     local PATH_TO_NODE_BIN=$(get_path_to_node_bin "$NODE_ID")
     local IFS='_'
 
