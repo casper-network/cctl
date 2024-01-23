@@ -11,14 +11,12 @@
 function render_account()
 {
     local ACCOUNT_TYPE=${1}
-    local ACCOUNT_IDX=${2}   
-    local ACCOUNT_KEY
-    local STATE_ROOT_HASH
+    local ACCOUNT_IDX=${2}
 
-    ACCOUNT_KEY=$(get_account_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
-    STATE_ROOT_HASH=$(get_state_root_hash)
+    local ACCOUNT_KEY=$(get_account_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local STATE_ROOT_HASH=$(get_state_root_hash)
 
-    source "$CCTL"/cmds/chain/view_account.sh \
+    source "$CCTL"/cmds/chain/query/view_account.sh \
         root-hash="$STATE_ROOT_HASH" \
         account-key="$ACCOUNT_KEY"
 }
@@ -34,18 +32,14 @@ function render_account()
 function render_account_balance()
 {
     local ACCOUNT_TYPE=${1}
-    local ACCOUNT_IDX=${2} 
-    local ACCOUNT_KEY
-    local ACCOUNT_PREFIX
-    local STATE_ROOT_HASH
-    local PURSE_UREF
-    
-    ACCOUNT_KEY=$(get_account_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
-    ACCOUNT_PREFIX=$(get_account_prefix "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
-    STATE_ROOT_HASH=$(get_state_root_hash)
-    PURSE_UREF=$(get_main_purse_uref "$ACCOUNT_KEY" "$STATE_ROOT_HASH")
+    local ACCOUNT_IDX=${2}
 
-    source "$CCTL"/cmds/chain/view_account_balance.sh \
+    local ACCOUNT_KEY=$(get_account_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local ACCOUNT_PREFIX=$(get_account_prefix "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local STATE_ROOT_HASH=$(get_state_root_hash)
+    local PURSE_UREF=$(get_main_purse_uref "$ACCOUNT_KEY" "$STATE_ROOT_HASH")
+
+    source "$CCTL"/cmds/chain/query/view_account_balance.sh \
         root-hash="$STATE_ROOT_HASH" \
         purse-uref="$PURSE_UREF" \
         prefix="$ACCOUNT_PREFIX"
@@ -61,13 +55,10 @@ function render_account_hash()
 {
     local ACCOUNT_TYPE=${1}
     local ACCOUNT_IDX=${2}   
-    local ACCOUNT_KEY
-    local ACCOUNT_HASH
-    local ACCOUNT_PREFIX
 
-    ACCOUNT_KEY=$(get_account_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
-    ACCOUNT_HASH=$(get_account_hash "$ACCOUNT_KEY")
-    ACCOUNT_PREFIX=$(get_account_prefix "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local ACCOUNT_KEY=$(get_account_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local ACCOUNT_HASH=$(get_account_hash "$ACCOUNT_KEY")
+    local ACCOUNT_PREFIX=$(get_account_prefix "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
 
     log "$ACCOUNT_PREFIX.account-hash = $ACCOUNT_HASH"
 }
@@ -86,11 +77,9 @@ function render_account_key()
 {
     local ACCOUNT_TYPE=${1}
     local ACCOUNT_IDX=${2}  
-    local ACCOUNT_KEY
-    local ACCOUNT_PREFIX
 
-    ACCOUNT_KEY=$(get_account_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
-    ACCOUNT_PREFIX=$(get_account_prefix "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local ACCOUNT_KEY=$(get_account_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local ACCOUNT_PREFIX=$(get_account_prefix "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
 
     log "$ACCOUNT_PREFIX.account-key = $ACCOUNT_KEY"
 }
@@ -111,13 +100,10 @@ function render_account_main_purse_uref()
     local ACCOUNT_TYPE=${1}
     local ACCOUNT_IDX=${2}  
     local STATE_ROOT_HASH=${3:-$(get_state_root_hash)}
-    local ACCOUNT_KEY
-    local ACCOUNT_PREFIX
-    local PURSE_UREF
 
-    ACCOUNT_KEY=$(get_account_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
-    ACCOUNT_PREFIX=$(get_account_prefix "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
-    PURSE_UREF=$(get_main_purse_uref "$ACCOUNT_KEY" "$STATE_ROOT_HASH")
+    local ACCOUNT_KEY=$(get_account_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local ACCOUNT_PREFIX=$(get_account_prefix "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local PURSE_UREF=$(get_main_purse_uref "$ACCOUNT_KEY" "$STATE_ROOT_HASH")
 
     log "$ACCOUNT_PREFIX.main-purse-uref = $PURSE_UREF"
 }
@@ -132,11 +118,9 @@ function render_account_secret_key()
 {
     local ACCOUNT_TYPE=${1}
     local ACCOUNT_IDX=${2}    
-    local ACCOUNT_PREFIX
-    local PATH_TO_KEY
 
-    ACCOUNT_PREFIX=$(get_account_prefix "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
-    PATH_TO_KEY=$(get_path_to_secret_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local ACCOUNT_PREFIX=$(get_account_prefix "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
+    local PATH_TO_KEY=$(get_path_to_secret_key "$ACCOUNT_TYPE" "$ACCOUNT_IDX")
 
     log "$ACCOUNT_PREFIX.secret-key-path = $PATH_TO_KEY"
 }
@@ -153,10 +137,10 @@ function render_chain_state_root_hash()
 {
     local NODE_ID=${1}
     local BLOCK_HASH=${2}
-    local NODE_IS_UP
+
+    local NODE_IS_UP=$(get_node_is_up "$NODE_ID")
     local STATE_ROOT_HASH
 
-    NODE_IS_UP=$(get_node_is_up "$NODE_ID")
     if [ "$NODE_IS_UP" = true ]; then
         STATE_ROOT_HASH=$(get_state_root_hash "$NODE_ID" "$BLOCK_HASH")
     fi
@@ -174,10 +158,10 @@ function render_chain_state_root_hash()
 function render_last_finalized_block_hash()
 {
     local NODE_ID=${1}
-    local NODE_IS_UP
+
+    local NODE_IS_UP=$(get_node_is_up "$NODE_ID")
     local LFB_HASH
 
-    NODE_IS_UP=$(get_node_is_up "$NODE_ID")
     if [ "$NODE_IS_UP" = true ]; then
         LFB_HASH=$(get_chain_latest_block_hash "$NODE_ID")
     fi

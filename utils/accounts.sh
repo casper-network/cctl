@@ -105,7 +105,7 @@ function get_main_purse_uref()
     local ACCOUNT_KEY=${1}
     local STATE_ROOT_HASH=${2:-$(get_state_root_hash)}
 
-    source "$CCTL"/cmds/chain/view_account.sh \
+    source "$CCTL"/cmds/chain/query/view_account.sh \
         account-key="$ACCOUNT_KEY" \
         root-hash="$STATE_ROOT_HASH" \
         | jq '.stored_value.Account.main_purse' \

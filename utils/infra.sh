@@ -298,6 +298,7 @@ function get_node_staking_weight()
 function get_process_group_members()
 {
     local PROCESS_GROUP=${1}
+
     local SEQ_END
     local SEQ_START
 
@@ -349,11 +350,9 @@ function get_process_name_of_node()
 function get_process_name_of_node_in_group()
 {
     local NODE_ID=${1}
-    local NODE_PROCESS_NAME
-    local PROCESS_GROUP_NAME
 
-    NODE_PROCESS_NAME=$(get_process_name_of_node "$NODE_ID")
-    PROCESS_GROUP_NAME=$(get_process_name_of_node_group "$NODE_ID")
+    local NODE_PROCESS_NAME=$(get_process_name_of_node "$NODE_ID")
+    local PROCESS_GROUP_NAME=$(get_process_name_of_node_group "$NODE_ID")
 
     echo "$PROCESS_GROUP_NAME:$NODE_PROCESS_NAME"
 }

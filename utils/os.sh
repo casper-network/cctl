@@ -39,9 +39,7 @@ function get_os()
 function log ()
 {
     local MSG=${1}
-	local NOW
-
-    NOW=$(date +%Y-%m-%dT%H:%M:%S.%6N)
+	local NOW=$(date +%Y-%m-%dT%H:%M:%S.%6N)
 
     echo -e "$NOW [INFO] [$$] CCTL :: $MSG"
 }
@@ -60,9 +58,7 @@ function log_break()
 function log_error ()
 {
     local MSG=${1}
-    local NOW
-	
-    NOW=$(date +%Y-%m-%dT%H:%M:%S.%6N)
+    local NOW=$(date +%Y-%m-%dT%H:%M:%S.%6N)
 
     echo -e "$NOW [ERROR] [$$] CCTL :: $MSG"
 }
@@ -90,9 +86,7 @@ function log_step_upgrades()
 function log_warning()
 {
     local MSG=${1}
-	local NOW
-
-    NOW=$(date +%Y-%m-%dT%H:%M:%S.%6N)
+	local NOW=$(date +%Y-%m-%dT%H:%M:%S.%6N)
 
     echo -e "$NOW [WARN] [$$] CCTL :: $MSG"
 }

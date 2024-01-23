@@ -10,9 +10,9 @@ function get_chain_era()
 {
     local NODE_ID=${1}
     local TIMEOUT_SEC=${2:-20}
-    local ERA
 
-    ERA=$(_get_from_status_with_retry "$NODE_ID" "$TIMEOUT_SEC" ".last_added_block_info.era_id")
+    local ERA=$(_get_from_status_with_retry "$NODE_ID" "$TIMEOUT_SEC" ".last_added_block_info.era_id")
+
     if [[ -z "$ERA" ]]; then
         echo -2
     else
@@ -30,9 +30,9 @@ function get_chain_height()
 {
     local NODE_ID=${1}
     local TIMEOUT_SEC=${2:-20}
-    local HEIGHT
 
-    HEIGHT=$(_get_from_status_with_retry "$NODE_ID" "$TIMEOUT_SEC" ".last_added_block_info.height")
+    local HEIGHT=$(_get_from_status_with_retry "$NODE_ID" "$TIMEOUT_SEC" ".last_added_block_info.height")
+
     if [[ -z "$HEIGHT" ]]; then
         echo "N/A"
     else
@@ -207,6 +207,7 @@ function _get_from_status_with_retry()
     local INITIAL_NODE_ID=${1}
     local TIMEOUT_SEC=${2}
     local JQ_STRING=${3}
+
     local NODE_ID
     local ATTEMPTS=0
     local OUTPUT

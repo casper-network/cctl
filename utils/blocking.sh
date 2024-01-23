@@ -8,11 +8,10 @@
 function await_n_eras()
 {
     local OFFSET=${1}
-    local CURRENT
-    local FUTURE
 
-    CURRENT=$(get_chain_era)
-    FUTURE=$((CURRENT + OFFSET))
+    local CURRENT=$(get_chain_era)
+    local FUTURE=$((CURRENT + OFFSET))
+
     while [ "$CURRENT" -lt "$FUTURE" ];
     do
         sleep 10.0
@@ -107,10 +106,12 @@ function await_node_historical_sync_to_genesis() {
     local NODE_ID=${1}
     local SYNC_TIMEOUT_SEC=${2}
 
-    log "awaiting node $NODE_ID to do historical sync to genesis"
     local WAIT_TIME_SEC=0
     local LOWEST=$(get_node_lowest_available_block "$NODE_ID")
     local HIGHEST=$(get_node_highest_available_block "$NODE_ID")
+
+    log "awaiting node $NODE_ID to do historical sync to genesis"
+
     while [ -z $HIGHEST ] || [ -z $LOWEST ] || [ $LOWEST -ne 0 ] || [ $HIGHEST -eq 0 ]; do
         log "node $NODE_ID lowest available block: $LOWEST, highest available block: $HIGHEST"
         if [ $WAIT_TIME_SEC -gt $SYNC_TIMEOUT_SEC ]; then

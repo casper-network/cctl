@@ -27,7 +27,7 @@ function _help() {
     NOTES
     ----------------------------------------------------------------
     Initially the network consists of 5 active nodes plus 5 standby nodes.
-    This typology permits node rotation testing scenarios. 
+    This typology permits node rotation testing scenarios.
     "
 }
 
@@ -63,7 +63,7 @@ function _main()
     _setup_supervisor "$NODE_COUNT"
 
     log "... setting genesis chainspec.toml"
-    _setup_genesis_chainspec "$GENESIS_DELAY" "$NODE_COUNT" "$PATH_TO_CHAINSPEC" 
+    _setup_genesis_chainspec "$GENESIS_DELAY" "$NODE_COUNT" "$PATH_TO_CHAINSPEC"
 
     log "... setting genesis accounts.toml"
     _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
@@ -472,6 +472,10 @@ function _setup_keys_dynamic()
 function _setup_keys_static()
 {
     local IDX
+
+    cp \
+        "$(get_path_to_resources)"/static/accounts/faucet/* \
+        "$(get_path_to_assets)"/faucet
 
     for IDX in $(seq 1 "$NODE_COUNT")
     do

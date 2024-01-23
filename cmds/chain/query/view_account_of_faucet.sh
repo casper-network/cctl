@@ -32,6 +32,7 @@ function _main()
     log "faucet a/c purse         : $PURSE_UREF"
     log "faucet a/c purse balance : $ACCOUNT_BALANCE"
     log "faucet on-chain account  : see below"
+
     render_account "$CCTL_ACCOUNT_TYPE_FAUCET"
 }
 
