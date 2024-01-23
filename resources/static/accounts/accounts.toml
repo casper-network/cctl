@@ -1,0 +1,134 @@
+# FAUCET.
+[[accounts]]
+public_key = "018610cce7016ce65fa67a909ddfed21e8e52bb0fa52a39a442894f7ff78ea2b4e"
+balance = "1000000000000000000000000000000000"
+
+# VALIDATOR 1.
+[[accounts]]
+public_key = "016c07fa407f46f7381bb424fbe18c320e8184a7d3e4360acb38d2d58172a9028a"
+balance = "1000000000000000000000000000000000"
+
+[accounts.validator]
+bonded_amount = "1000000000000000001"
+delegation_rate = 1
+
+# VALIDATOR 2.
+[[accounts]]
+public_key = "01706f36a2ebfccea720b49a6424c196cf0bb7aa929f39842975865848b87773ef"
+balance = "1000000000000000000000000000000000"
+
+[accounts.validator]
+bonded_amount = "1000000000000000002"
+delegation_rate = 2
+
+# VALIDATOR 3.
+[[accounts]]
+public_key = "018b2bda41097182c387b72c41a490984aad26a64bc75cd926dee7f0b8d82b4e43"
+balance = "1000000000000000000000000000000000"
+
+[accounts.validator]
+bonded_amount = "1000000000000000003"
+delegation_rate = 3
+
+# VALIDATOR 4.
+[[accounts]]
+public_key = "01f0aaadbf1ef00a83e161eaccadaf4e499d9730a09e8979cb9e8c2d3fc4d8b6f7"
+balance = "1000000000000000000000000000000000"
+
+[accounts.validator]
+bonded_amount = "1000000000000000004"
+delegation_rate = 4
+
+# VALIDATOR 5.
+[[accounts]]
+public_key = "019b5bd3e7f3c2ba280bb264928ba0d18aab832eb92714d9a455e7737e976c8a41"
+balance = "1000000000000000000000000000000000"
+
+[accounts.validator]
+bonded_amount = "1000000000000000005"
+delegation_rate = 5
+
+# VALIDATOR 6.
+[[accounts]]
+public_key = "01df0110facd23b8bac67cda88a3f8ac8134c5fb9232964c8bceff481b03feea63"
+balance = "1000000000000000000000000000000000"
+
+# VALIDATOR 7.
+[[accounts]]
+public_key = "0144c6f3d001b238625cc1ce9138068fb34d1aaa1639b2f2301cfbb1e144b28440"
+balance = "1000000000000000000000000000000000"
+
+# VALIDATOR 8.
+[[accounts]]
+public_key = "01f48cee0845e544d7aba11b5b2adf98940d5c676b12733a79a3a84f85fd1e6654"
+balance = "1000000000000000000000000000000000"
+
+# VALIDATOR 9.
+[[accounts]]
+public_key = "01085035aea7b72f440337e453700dd5d7f881b1d2aa5b25f794194f24921c4967"
+balance = "1000000000000000000000000000000000"
+
+# VALIDATOR 10.
+[[accounts]]
+public_key = "014fe074cafc7ca697099d6d68f5aea2e5b7a118bf96f040bae8dc9d8992e1997b"
+balance = "1000000000000000000000000000000000"
+
+# USER 1.
+[[delegators]]
+validator_public_key = "016c07fa407f46f7381bb424fbe18c320e8184a7d3e4360acb38d2d58172a9028a"
+delegator_public_key = "01af79f28bde4522b27edb8dc9df146c9d3a65f944bbdcf153ea107b291bae232d"
+balance = "1000000000000000000000000000000000"
+delegated_amount = "1000000000000000001"
+
+# USER 2.
+[[delegators]]
+validator_public_key = "01706f36a2ebfccea720b49a6424c196cf0bb7aa929f39842975865848b87773ef"
+delegator_public_key = "01e8e1e0b10972e4945d1e493d41be8f39f47bb1299f3248f297d22cbc02010f89"
+balance = "1000000000000000000000000000000000"
+delegated_amount = "1000000000000000002"
+
+# USER 3.
+[[delegators]]
+validator_public_key = "018b2bda41097182c387b72c41a490984aad26a64bc75cd926dee7f0b8d82b4e43"
+delegator_public_key = "017cc2f24d86bd35d358ee2494d565abe857400c2ef4ea0dcf282b326771aad4eb"
+balance = "1000000000000000000000000000000000"
+delegated_amount = "1000000000000000003"
+
+# USER 4.
+[[delegators]]
+validator_public_key = "01f0aaadbf1ef00a83e161eaccadaf4e499d9730a09e8979cb9e8c2d3fc4d8b6f7"
+delegator_public_key = "0104322706c07b18d8d39b0d4a97cd1c20d692fd81f17c4d4d02f9a774d1c31f05"
+balance = "1000000000000000000000000000000000"
+delegated_amount = "1000000000000000004"
+
+# USER 5.
+[[delegators]]
+validator_public_key = "019b5bd3e7f3c2ba280bb264928ba0d18aab832eb92714d9a455e7737e976c8a41"
+delegator_public_key = "01ee40a116ab7840704edea519aa27d34919933490b14e81fdec4ff52daf432f87"
+balance = "1000000000000000000000000000000000"
+delegated_amount = "1000000000000000005"
+
+# USER 6.
+[[accounts]]
+public_key = "016a5c0b65482cf46783410a5c06374a4a0916312f21ec4eb1a4c1c4024d127e29"
+balance = "1000000000000000000000000000000000"
+
+# USER 7.
+[[accounts]]
+public_key = "018a3a1026b9956ea4e977fba1d8f39afcdc32f38a7e5454647b58ac54fd35eaa2"
+balance = "1000000000000000000000000000000000"
+
+# USER 8.
+[[accounts]]
+public_key = "017437735c20088d90cea8b17a8d290fac27afa6fcde416a8356e19714bfd3e31a"
+balance = "1000000000000000000000000000000000"
+
+# USER 9.
+[[accounts]]
+public_key = "0177c81978c8f4a38bc4e674b82ebbec4992c8efdf13b0ae98138976f922959413"
+balance = "1000000000000000000000000000000000"
+
+# USER 10.
+[[accounts]]
+public_key = "01cdee6d052bee9ac72544a16d631ed86bb8988afca5691879e3e87ac4044842c0"
+balance = "1000000000000000000000000000000000"

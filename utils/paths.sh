@@ -208,6 +208,16 @@ function get_path_to_remotes()
 }
 
 #######################################
+# Returns path to primary resources folder.
+# Globals:
+#   CCTL - path to cctl home directory.
+#######################################
+function get_path_to_resources()
+{
+    echo "$CCTL/resources"
+}
+
+#######################################
 # Returns path to a secret key.
 # Globals:
 #   CCTL_ACCOUNT_TYPE_FAUCET - faucet account type.

@@ -12,34 +12,34 @@ function _help() {
 
     ARGS
     ----------------------------------------------------------------
+    accounts    Type of genesis accounts, i.e. dynamic | static. Optional.
     chainspec   Path to custom genesis chainspec.toml. Optional.
     config      Path to custom genesis chainspec.toml. Optional.
     delay       Delay in seconds prior to genesis window expiration. Optional.
-    nodes       Network nodeset count. Optional.
 
     DEFAULTS
     ----------------------------------------------------------------
+    accounts    static
     chainspec   ${CCTL_CASPER_NODE_HOME}/resources/local/chainspec.toml.in
     config      ${CCTL_CASPER_NODE_HOME}/resources/local/config.toml
     delay       30 seconds
-    nodes       5
 
     NOTES
     ----------------------------------------------------------------
-    The number of nodes should be >= 3.  Furthermore a second set of nodes are 
-    prepared on standby incase user wishes to test network rotation. 
+    The network will consist of 5 active nodes plus 5 passive nodes.
     "
 }
 
 function _main()
 {
-    local GENESIS_DELAY=${1}
-    local NODE_COUNT_AT_GENESIS=${2}
+    local GENESIS_ACCOUNTS_TYPE=${1}
+    local GENESIS_DELAY=${2}
     local PATH_TO_CHAINSPEC=${3}
     local PATH_TO_NODE_CONFIG_TEMPLATE=${4}
 
-    local NODE_COUNT=$((NODE_COUNT_AT_GENESIS * 2))
-    local USER_COUNT="$NODE_COUNT"
+    local NODE_COUNT=10
+    local NODE_COUNT_AT_GENESIS=5
+    local USER_COUNT=10
 
     log "network setup begins ... please wait"
 
@@ -56,16 +56,16 @@ function _main()
     _setup_wasm
 
     log "... setting cryptographic keys"
-    _setup_keys "$NODE_COUNT" "$USER_COUNT"
+    _setup_keys "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$USER_COUNT"
 
     log "... setting supervisor config"
     _setup_supervisor "$NODE_COUNT"
 
     log "... setting genesis chainspec.toml"
-    _setup_genesis_chainspec "$GENESIS_DELAY" "$NODE_COUNT" "$PATH_TO_CHAINSPEC"
+    _setup_genesis_chainspec "$GENESIS_DELAY" "$NODE_COUNT" "$PATH_TO_CHAINSPEC" 
 
     log "... setting genesis accounts.toml"
-    _setup_genesis_accounts "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
+    _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
 
     log "... setting node configs"
     _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE"
@@ -316,6 +316,20 @@ function _setup_fs()
 
 function _setup_genesis_accounts()
 {
+    local GENESIS_ACCOUNTS_TYPE=${1}
+    local NODE_COUNT=${2}
+    local NODE_COUNT_AT_GENESIS=${3}
+    local USER_COUNT=${4}
+
+    if [ "$GENESIS_ACCOUNTS_TYPE" = "dynamic" ]; then
+        _setup_genesis_accounts_dynamic $NODE_COUNT $NODE_COUNT_AT_GENESIS $USER_COUNT
+    else
+        _setup_genesis_accounts_static
+    fi
+}
+
+function _setup_genesis_accounts_dynamic()
+{
     local NODE_COUNT=${1}
     local NODE_COUNT_AT_GENESIS=${2}
     local USER_COUNT=${3}
@@ -382,6 +396,13 @@ EOM
     done
 }
 
+function _setup_genesis_accounts_static()
+{
+    cp \
+        "$(get_path_to_resources)"/static/accounts/accounts.toml \
+        "$(get_path_to_assets)"/genesis/accounts.toml
+}
+
 function _setup_genesis_chainspec()
 {
     local GENESIS_DELAY=${1}
@@ -411,6 +432,19 @@ function _setup_genesis_chainspec()
 
 function _setup_keys()
 {
+    local GENESIS_ACCOUNTS_TYPE=${1}
+    local NODE_COUNT=${2}
+    local USER_COUNT=${3}
+
+    if [ "$GENESIS_ACCOUNTS_TYPE" = "dynamic" ]; then
+        _setup_keys_dynamic $NODE_COUNT $USER_COUNT
+    else
+        _setup_keys_static $NODE_COUNT $USER_COUNT
+    fi
+}
+
+function _setup_keys_dynamic()
+{
     local NODE_COUNT=${1}
     local USER_COUNT=${2}
 
@@ -431,6 +465,25 @@ function _setup_keys()
     do
         "$CASPER_CLIENT" \
             keygen -f "$PATH_TO_ASSETS/users/user-$IDX" > /dev/null 2>&1
+    done
+}
+
+function _setup_keys_static()
+{
+    local IDX
+
+    for IDX in $(seq 1 "$NODE_COUNT")
+    do
+        cp \
+            "$(get_path_to_resources)"/static/accounts/nodes/node-$IDX/* \
+            "$(get_path_to_assets)"/nodes/node-$IDX/keys
+    done
+
+    for IDX in $(seq 1 "$USER_COUNT")
+    do
+        cp \
+            "$(get_path_to_resources)"/static/accounts/users/user-$IDX/* \
+            "$(get_path_to_assets)"/users/user-$IDX
     done
 }
 
@@ -468,9 +521,9 @@ function _setup_wasm()
 
 source "$CCTL"/utils/main.sh
 
+unset _GENESIS_ACCOUNTS_TYPE
 unset _GENESIS_DELAY
 unset _HELP
-unset _NODE_COUNT
 unset _PATH_TO_CHAINSPEC
 
 for ARGUMENT in "$@"
@@ -478,9 +531,9 @@ do
     KEY=$(echo "$ARGUMENT" | cut -f1 -d=)
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
     case "$KEY" in
+        accounts) _GENESIS_ACCOUNTS_TYPE=${VALUE} ;;
         delay) _GENESIS_DELAY=${VALUE} ;;
         help) _HELP="show" ;;
-        nodes) _NODE_COUNT=${VALUE} ;;
         chainspec) _PATH_TO_CHAINSPEC=${VALUE} ;;
         config) _PATH_TO_CONFIG_TOML=${VALUE} ;;
         *)
@@ -490,8 +543,9 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    _main "${_GENESIS_DELAY:-30}" \
-          "${_NODE_COUNT:-5}" \
-          "${_PATH_TO_CHAINSPEC:-"${CCTL_CASPER_NODE_HOME}/resources/local/chainspec.toml.in"}" \
-          "${_PATH_TO_CONFIG_TOML:-"${CCTL_CASPER_NODE_HOME}/resources/local/config.toml"}"
+    _main \
+        "${_GENESIS_ACCOUNTS_TYPE:-"static"}" \
+        "${_GENESIS_DELAY:-30}" \
+        "${_PATH_TO_CHAINSPEC:-"${CCTL_CASPER_NODE_HOME}/resources/local/chainspec.toml.in"}" \
+        "${_PATH_TO_CONFIG_TOML:-"${CCTL_CASPER_NODE_HOME}/resources/local/config.toml"}"
 fi
