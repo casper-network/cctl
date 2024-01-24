@@ -6,10 +6,11 @@
 # SECTION: HELPER VARIABLES
 # ---------------------------------------------------------------
 
-# GitHub repo.
-declare _REPO_NAME=cctl
-declare _REPO=https://github.com/casper-network/$_REPO_NAME.git
-declare _BRANCH=main
+# GitHub repos.
+declare _GH_URL_OF_CCTL=https://github.com/casper-network/cctl.git
+declare _GH_URL_OF_CLI=https://github.com/casper-ecosystem/casper-client-rs.git
+declare _GH_URL_OF_NODE=https://github.com/casper-network/casper-node.git
+declare _GH_URL_OF_NODE_LAUNCHER=https://github.com/casper-network/casper-node-launcher.git
 
 # OS types.
 declare _OS_LINUX="linux"
@@ -19,9 +20,6 @@ declare _OS_LINUX_ARCH="$_OS_LINUX-arch"
 declare _OS_LINUX_DEBIAN="$_OS_LINUX-debian"
 declare _OS_MACOSX="macosx"
 declare _OS_UNKNOWN="unknown"
-
-# Root directory.
-declare _HOME=$HOME/.casperlabs-stests
 
 # ---------------------------------------------------------------
 # SECTION: HELPER FUNCTIONS
@@ -64,21 +62,19 @@ function _get_os()
 # Returns directory in which application will be installed.
 function _get_install_dir()
 {
-	local OS_TYPE="$(_get_os)"
-
-	if [[ $OS_TYPE == $_OS_LINUX* ]]; then
-		echo "$HOME/casperlabs"
-	elif [[ $OS_TYPE == $_OS_MACOSX ]]; then
-		echo "$HOME/casperlabs"
-	else
-		echo "$HOME/casperlabs"
-	fi
+	echo "$(_get_root_dir)"/cctl
 }
 
 # Returns directory in which repo will be installed.
 function _get_repo_dir()
 {
-	echo "$(_get_install_dir)/$_REPO_NAME"
+	echo "$(_get_root_dir)"/cctl
+}
+
+# Returns directory in which application will be installed.
+function _get_root_dir()
+{
+    echo "$HOME"/cspr
 }
 
 # Returns file path of bash terminal session initiliser.
@@ -106,8 +102,10 @@ function _popd () {
 # Reset terminal.
 function _tidyup()
 {
-	# Unset helper vars.
-	unset _REPO
+	unset _GH_URL_OF_CCTL
+	unset _GH_URL_OF_CLI
+	unset _GH_URL_OF_NODE
+	unset _GH_URL_OF_NODE_LAUNCHER
 	unset _OS_LINUX
 	unset _OS_LINUX_REDHAT
 	unset _OS_LINUX_SUSE
@@ -123,34 +121,31 @@ function _notify_user()
 	_log_banner
 	echo "1. CCTL has been successfully installed."
 	echo ""
-	echo "2. Activate the shell:"
-	echo "      cd $(_get_repo_dir)"
-	echo "      source ./activate"
-	echo ""
-	echo "3. Spin up a network:"
+	echo "2. To spin up a network:"
 	echo "      cctl-infra-net-setup && cctl-infra-net-start"
 	echo ""
-	echo "4. Tear down a network"
+	echo "3. To tear down a network"
 	echo "      cctl-infra-net-teardown"
 	_log_banner
 }
 
 # ---------------------------------------------------------------
-# SECTION: VERIFY FUNCTIONS
+# SECTION: VERIFY INSTALLATION
 # ---------------------------------------------------------------
 
-# Verify installation can proceeed.
 function _verify {
 	_log_banner
 	_log 'verifying system:'
 
-	verify_previous
-	verify_prequisites
+	_verify_previous
+	_verify_prequisites
 }
 
-# Verify pre-requisites.
 function _verify_prequisites {
 	_log '... prequisites'
+
+	# Curl.
+	command -v curl >/dev/null 2>&1 || { echo >&2 "Please install curl. https://curl.se"; exit 1; }
 
 	# Git.
 	command -v git >/dev/null 2>&1 || { echo >&2 "Please install git. https://www.atlassian.com/git/tutorials/install-git"; exit 1; }
@@ -158,20 +153,23 @@ function _verify_prequisites {
 	# Python3.
 	command -v python3 >/dev/null 2>&1 || { echo >&2 "Please install python3. https://www.python.org/downloads"; exit 1; }
 
-	# Pipenv.
-	command -v pipenv >/dev/null 2>&1 || { echo >&2 "Please install pipenv. https://pipenv.kennethreitz.org/en/latest/install/#installing-pipenv"; exit 1; }
+	# Cargo.
+	command -v cargo >/dev/null 2>&1 || { echo >&2 "Please install cargo. https://doc.rust-lang.org/cargo/getting-started/installation.html"; exit 1; }
+
+	# Make.
+	command -v make >/dev/null 2>&1 || { echo >&2 "Please install cargo. https://www.geeksforgeeks.org/how-to-install-make-on-ubuntu"; exit 1; }
+
+	# jq.
+	command -v jq >/dev/null 2>&1 || { echo >&2 "Please install jq. https://jqlang.github.io/jq"; exit 1; }
 }
 
-# Verify previous installation.
 function _verify_previous {
 	_log '... previous installation'
 
-	local REPO_DIR="$(_get_repo_dir)"
+	local REPO_DIR="$(_get_install_dir)"
 
 	if [ -d $REPO_DIR ]; then
-		_log "... stests IS ALREADY INSTALLED !"
-		_log "... to update the stests stack run:"
-		_log "...     stests-stack-update"
+		_log "... CCTL IS ALREADY INSTALLED !"
 		_log_banner
 		exit 1
 	fi
@@ -187,80 +185,72 @@ function _install()
 	_log_banner
 	_log 'installing:'
 
-	_install_repo
-	_install_evars
-	_install_daemon_config
-	_install_activator
-	_install_venv
+	_log "... repos"
+	_install_repos
+
+	_log '... environment activator'
+	_install_environment_activator
+
+	_log '... python dependencies'
+    _install_python_dependencies
+
+	_log '... rust toolchain'
+    _install_rust_toolchain
 }
 
-# Install repo.
+function _install_repos()
+{
+    _install_repo $_GH_URL_OF_CCTL
+    _install_repo $_GH_URL_OF_CLI
+    _install_repo $_GH_URL_OF_NODE
+    _install_repo $_GH_URL_OF_NODE_LAUNCHER
+}
+
 function _install_repo()
 {
-	_log '... repo'
+    local REPO_URL=${1}
 
-	local INSTALL_DIR="$(_get_install_dir)"
+	local ROOT_DIR="$(_get_root_dir)"
 
-	mkdir -p $INSTALL_DIR
-	_pushd $INSTALL_DIR
-	git clone -q --single-branch --branch $_BRANCH $_REPO
+	_log "... ... $REPO_URL"
+
+	mkdir -p $ROOT_DIR
+	_pushd $ROOT_DIR
+	git clone -q $REPO_URL
 	_popd
 }
 
-# Install vars.
-function _install_evars()
+function _install_environment_activator()
 {
-	_log '... environment vars'
+	local PATH_TO_INSTALL_DIR="$(_get_install_dir)"
+	local PATH_TO_BASHRC_FILE="$(_get_bashrc_filepath)"
 
-	local REPO_DIR="$(_get_repo_dir)"
-
-	mkdir -p $HOME/.casperlabs-stests
-	cp $REPO_DIR/resources/stests_vars.sh $HOME/.casperlabs-stests/vars
-}
-
-# Install vars.
-function _install_daemon_config()
-{
-	_log '... daemon configuration'
-
-	local REPO_DIR="$(_get_repo_dir)"
-
-	mkdir -p $HOME/.casperlabs-stests/ops/config
-	cp $REPO_DIR/resources/supervisord.conf $HOME/.casperlabs-stests/ops/config
-}
-
-# Install shell activator.
-function _install_activator()
-{
-	_log '... environment activator'
-
-	local REPO_DIR="$(_get_repo_dir)"
-	local BASHRC_FILE="$(_get_bashrc_filepath)"
-
-	cat >> $BASHRC_FILE <<- EOM
+	cat >> $PATH_TO_BASHRC_FILE <<- EOM
 
 	# ----------------------------------------------------------------------
-	# CCTL - CLI
+	# CCTL
 	# ----------------------------------------------------------------------
 
-	source ${REPO_DIR}/activate
+	source ${PATH_TO_INSTALL_DIR}/activate
 
 	EOM
 
-	source $BASHRC_FILE
-	source ${REPO_DIR}/activate
+	source $PATH_TO_BASHRC_FILE
+	source ${PATH_TO_INSTALL_DIR}/activate
 }
 
-# Install venv.
-function _install_venv()
+function _install_python_dependencies()
 {
-	_log '... virtual environment'
+    python3 -m pip -q install supervisor toml tomlkit
+}
 
-	local REPO_DIR="$(_get_repo_dir)"
+function _install_rust_toolchain()
+{
+	local ROOT_DIR="$(_get_root_dir)"
 
-	_pushd $REPO_DIR
-	pipenv install
-	_popd
+    _pushd $ROOT_DIR/casper-node
+    make setup-rs
+    _popd
 }
 
 # ---------------------------------------------------------------
@@ -272,8 +262,8 @@ function _main()
 {
 	_verify
 	_install
-	__tidyup
-	__notify_user
+	_tidyup
+	_notify_user
 }
 
 _main

@@ -30,3 +30,12 @@ Usage
 --------------------------------------
 
 See [here](docs/usage.md) for usage details.
+
+Installation
+--------------------------------------
+
+To install upon a virtual machine execute the one step install script. 
+
+```
+curl https://github.com/casper-network/cctl/blob/main/installer | bash
+```
