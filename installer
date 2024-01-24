@@ -1,0 +1,279 @@
+# ###############################################################
+# CCTL Installation Script
+# ###############################################################
+
+# ---------------------------------------------------------------
+# SECTION: HELPER VARIABLES
+# ---------------------------------------------------------------
+
+# GitHub repo.
+declare _REPO_NAME=cctl
+declare _REPO=https://github.com/casper-network/$_REPO_NAME.git
+declare _BRANCH=main
+
+# OS types.
+declare _OS_LINUX="linux"
+declare _OS_LINUX_REDHAT="$_OS_LINUX-redhat"
+declare _OS_LINUX_SUSE="$_OS_LINUX-suse"
+declare _OS_LINUX_ARCH="$_OS_LINUX-arch"
+declare _OS_LINUX_DEBIAN="$_OS_LINUX-debian"
+declare _OS_MACOSX="macosx"
+declare _OS_UNKNOWN="unknown"
+
+# Root directory.
+declare _HOME=$HOME/.casperlabs-stests
+
+# ---------------------------------------------------------------
+# SECTION: HELPER FUNCTIONS
+# ---------------------------------------------------------------
+
+# Wraps standard echo.
+function _log()
+{
+	local NOW=`date +%Y-%m-%dT%H:%M:%S`
+
+	echo -e $NOW" [INFO] :: CCTL > "$1
+}
+
+# Outputs a line to split up _logging.
+function _log_banner()
+{
+	echo "-------------------------------------------------------------------------------"
+}
+
+# Returns OS type.
+function _get_os()
+{
+	if [[ "$OSTYPE" == "linux-gnu" ]]; then
+		if [ -f /etc/redhat-release ]; then
+			echo $_OS_LINUX_REDHAT
+		elif [ -f /etc/SuSE-release ]; then
+			echo $_OS_LINUX_SUSE
+		elif [ -f /etc/arch-release ]; then
+			echo $_OS_LINUX_ARCH
+		elif [ -f /etc/debian_version ]; then
+			echo $_OS_LINUX_DEBIAN
+		fi
+	elif [[ "$OSTYPE" == "darwin"* ]]; then
+		echo $_OS_MACOSX
+	else
+		echo $_OS_UNKNOWN
+	fi
+}
+
+# Returns directory in which application will be installed.
+function _get_install_dir()
+{
+	local OS_TYPE="$(_get_os)"
+
+	if [[ $OS_TYPE == $_OS_LINUX* ]]; then
+		echo "$HOME/casperlabs"
+	elif [[ $OS_TYPE == $_OS_MACOSX ]]; then
+		echo "$HOME/casperlabs"
+	else
+		echo "$HOME/casperlabs"
+	fi
+}
+
+# Returns directory in which repo will be installed.
+function _get_repo_dir()
+{
+	echo "$(_get_install_dir)/$_REPO_NAME"
+}
+
+# Returns file path of bash terminal session initiliser.
+function _get_bashrc_filepath()
+{
+	local OS_TYPE="$(_get_os)"
+
+	if [[ $OS_TYPE == $_OS_MACOSX ]]; then
+		echo "$HOME/.bash_profile"
+	else
+		echo "$HOME/.bashrc"
+	fi
+}
+
+# Wraps pushd command to suppress stdout.
+function _pushd () {
+    command pushd "$@" > /dev/null
+}
+
+# Wraps popd command to suppress stdout.
+function _popd () {
+    command popd "$@" > /dev/null
+}
+
+# Reset terminal.
+function _tidyup()
+{
+	# Unset helper vars.
+	unset _REPO
+	unset _OS_LINUX
+	unset _OS_LINUX_REDHAT
+	unset _OS_LINUX_SUSE
+	unset _OS_LINUX_ARCH
+	unset _OS_LINUX_DEBIAN
+	unset _OS_MACOSX
+	unset _OS_UNKNOWN
+}
+
+# Notify user upon installation.
+function _notify_user()
+{
+	_log_banner
+	echo "1. CCTL has been successfully installed."
+	echo ""
+	echo "2. Activate the shell:"
+	echo "      cd $(_get_repo_dir)"
+	echo "      source ./activate"
+	echo ""
+	echo "3. Spin up a network:"
+	echo "      cctl-infra-net-setup && cctl-infra-net-start"
+	echo ""
+	echo "4. Tear down a network"
+	echo "      cctl-infra-net-teardown"
+	_log_banner
+}
+
+# ---------------------------------------------------------------
+# SECTION: VERIFY FUNCTIONS
+# ---------------------------------------------------------------
+
+# Verify installation can proceeed.
+function _verify {
+	_log_banner
+	_log 'verifying system:'
+
+	verify_previous
+	verify_prequisites
+}
+
+# Verify pre-requisites.
+function _verify_prequisites {
+	_log '... prequisites'
+
+	# Git.
+	command -v git >/dev/null 2>&1 || { echo >&2 "Please install git. https://www.atlassian.com/git/tutorials/install-git"; exit 1; }
+
+	# Python3.
+	command -v python3 >/dev/null 2>&1 || { echo >&2 "Please install python3. https://www.python.org/downloads"; exit 1; }
+
+	# Pipenv.
+	command -v pipenv >/dev/null 2>&1 || { echo >&2 "Please install pipenv. https://pipenv.kennethreitz.org/en/latest/install/#installing-pipenv"; exit 1; }
+}
+
+# Verify previous installation.
+function _verify_previous {
+	_log '... previous installation'
+
+	local REPO_DIR="$(_get_repo_dir)"
+
+	if [ -d $REPO_DIR ]; then
+		_log "... stests IS ALREADY INSTALLED !"
+		_log "... to update the stests stack run:"
+		_log "...     stests-stack-update"
+		_log_banner
+		exit 1
+	fi
+}
+
+# ---------------------------------------------------------------
+# SECTION: INSTALL FUNCTIONS
+# ---------------------------------------------------------------
+
+# Install entry point.
+function _install()
+{
+	_log_banner
+	_log 'installing:'
+
+	_install_repo
+	_install_evars
+	_install_daemon_config
+	_install_activator
+	_install_venv
+}
+
+# Install repo.
+function _install_repo()
+{
+	_log '... repo'
+
+	local INSTALL_DIR="$(_get_install_dir)"
+
+	mkdir -p $INSTALL_DIR
+	_pushd $INSTALL_DIR
+	git clone -q --single-branch --branch $_BRANCH $_REPO
+	_popd
+}
+
+# Install vars.
+function _install_evars()
+{
+	_log '... environment vars'
+
+	local REPO_DIR="$(_get_repo_dir)"
+
+	mkdir -p $HOME/.casperlabs-stests
+	cp $REPO_DIR/resources/stests_vars.sh $HOME/.casperlabs-stests/vars
+}
+
+# Install vars.
+function _install_daemon_config()
+{
+	_log '... daemon configuration'
+
+	local REPO_DIR="$(_get_repo_dir)"
+
+	mkdir -p $HOME/.casperlabs-stests/ops/config
+	cp $REPO_DIR/resources/supervisord.conf $HOME/.casperlabs-stests/ops/config
+}
+
+# Install shell activator.
+function _install_activator()
+{
+	_log '... environment activator'
+
+	local REPO_DIR="$(_get_repo_dir)"
+	local BASHRC_FILE="$(_get_bashrc_filepath)"
+
+	cat >> $BASHRC_FILE <<- EOM
+
+	# ----------------------------------------------------------------------
+	# CCTL - CLI
+	# ----------------------------------------------------------------------
+
+	source ${REPO_DIR}/activate
+
+	EOM
+
+	source $BASHRC_FILE
+	source ${REPO_DIR}/activate
+}
+
+# Install venv.
+function _install_venv()
+{
+	_log '... virtual environment'
+
+	local REPO_DIR="$(_get_repo_dir)"
+
+	_pushd $REPO_DIR
+	pipenv install
+	_popd
+}
+
+# ---------------------------------------------------------------
+# SECTION: MAIN ENTRY POINT
+# ---------------------------------------------------------------
+
+# Main entry point.
+function _main()
+{
+	_verify
+	_install
+	__tidyup
+	__notify_user
+}
+
+_main
