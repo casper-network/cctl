@@ -7,7 +7,7 @@
 #######################################
 function get_path_to_assets()
 {
-    echo "${CCTL_PATH_TO_ASSETS:-$CCTL/assets}"
+    echo "${CCTL_ASSETS:-$CCTL/assets}"
 }
 
 #######################################
@@ -16,18 +16,6 @@ function get_path_to_assets()
 function get_path_to_assets_bin()
 {
     echo "$(get_path_to_assets)"/bin
-}
-
-#######################################
-# Returns path to a network's dump folder.
-# Globals:
-#   CCTL - path to cctl home directory.
-# Arguments:
-#   Network ordinal identifier.
-#######################################
-function get_path_to_assets_dump()
-{
-    echo "$CCTL"/dumps/net-"$NET_ID"
 }
 
 #######################################
@@ -48,20 +36,6 @@ function get_path_to_binary()
 function get_path_to_client()
 {
     get_path_to_binary "casper-client"
-}
-
-#######################################
-# Returns path to a smart contract.
-# Globals:
-#   CCTL - path to cctl home directory.
-# Arguments:
-#   Contract wasm file name.
-#######################################
-function get_path_to_contract()
-{
-    local FILENAME=${1}
-
-    get_path_to_binary "$FILENAME"
 }
 
 #######################################
@@ -105,7 +79,6 @@ function get_path_net_supervisord_cfg()
 #######################################
 function get_path_net_supervisord_sock()
 {
-    # echo "$(get_path_to_assets)"/daemon/socket/supervisord.sock
     echo /tmp/cctl-supervisord.sock
 }
 
@@ -158,16 +131,6 @@ function get_path_to_node_config_file()
 }
 
 #######################################
-# Returns path to a node's keys directory.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_path_to_node_keys()
-{
-    echo "$(get_path_to_node "$1")"/keys
-}
-
-#######################################
 # Returns path to a node's logs directory.
 # Arguments:
 #   Node ordinal identifier.
@@ -197,14 +160,6 @@ function get_path_to_node_secret_key()
     local NODE_ID=${1} 
 
     get_path_to_secret_key "$CCTL_ACCOUNT_TYPE_NODE" "$NODE_ID"
-}
-
-#######################################
-# Returns path to folder containing download remotes.
-#######################################
-function get_path_to_remotes()
-{
-    echo "$CCTL/remotes"
 }
 
 #######################################
@@ -239,38 +194,6 @@ function get_path_to_secret_key()
     elif [ "$ACCOUNT_TYPE" = "$CCTL_ACCOUNT_TYPE_USER" ]; then
         echo "$(get_path_to_user "$ACCOUNT_IDX")"/secret_key.pem
     fi
-}
-
-#######################################
-# Returns path to a stage folder.
-# Arguments:
-#   Stage ordinal identifier.
-#######################################
-function get_path_to_stage()
-{
-    local STAGE_ID=${1} 
-
-    echo "$(get_path_to_stages)/stage-$STAGE_ID"
-}
-
-#######################################
-# Returns path to a stage settings file.
-# Arguments:
-#   Stage ordinal identifier.
-#######################################
-function get_path_to_stage_settings()
-{
-    local STAGE_ID=${1} 
-
-    echo "$(get_path_to_stage "$STAGE_ID")/settings.sh"
-}
-
-#######################################
-# Returns path to folder hosting set of stages.
-#######################################
-function get_path_to_stages()
-{
-    echo "$CCTL/stages"
 }
 
 #######################################
