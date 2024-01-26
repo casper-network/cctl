@@ -7,7 +7,7 @@
 #######################################
 function get_path_to_assets()
 {
-    echo "$CCTL/assets"
+    echo "${CCTL_PATH_TO_ASSETS:-$CCTL/assets}"
 }
 
 #######################################
