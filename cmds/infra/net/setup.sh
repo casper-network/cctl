@@ -20,8 +20,8 @@ function _help() {
     DEFAULTS
     ----------------------------------------------------------------
     accounts    static
-    chainspec   ${CCTL_CASPER_NODE_HOME}/resources/local/chainspec.toml.in
-    config      ${CCTL_CASPER_NODE_HOME}/resources/local/config.toml
+    chainspec   ${CCTL_PATH_TO_CASPER_NODE}/resources/local/chainspec.toml.in
+    config      ${CCTL_PATH_TO_CASPER_NODE}/resources/local/config.toml
     delay       30 seconds
 
     NOTES
@@ -177,13 +177,13 @@ function _setup_binaries()
 
     # Set paths.
     if [ "$CCTL_COMPILE_TARGET" = "debug" ]; then
-        PATH_TO_CASPER_CLIENT="$CCTL_CASPER_CLIENT_HOME/target/debug/casper-client"
-        PATH_TO_CASPER_NODE="$CCTL_CASPER_NODE_HOME/target/debug/casper-node"
-        PATH_TO_CASPER_NODE_LAUNCHER="$CCTL_CASPER_NODE_LAUNCHER_HOME/target/debug/casper-node-launcher"
+        PATH_TO_CASPER_CLIENT="$CCTL_PATH_TO_CASPER_CLIENT/target/debug/casper-client"
+        PATH_TO_CASPER_NODE="$CCTL_PATH_TO_CASPER_NODE/target/debug/casper-node"
+        PATH_TO_CASPER_NODE_LAUNCHER="$CCTL_PATH_TO_CASPER_NODE_LAUNCHER/target/debug/casper-node-launcher"
     else
-        PATH_TO_CASPER_CLIENT="$CCTL_CASPER_CLIENT_HOME/target/release/casper-client"
-        PATH_TO_CASPER_NODE="$CCTL_CASPER_NODE_HOME/target/release/casper-node"
-        PATH_TO_CASPER_NODE_LAUNCHER="$CCTL_CASPER_NODE_LAUNCHER_HOME/target/release/casper-node-launcher"
+        PATH_TO_CASPER_CLIENT="$CCTL_PATH_TO_CASPER_CLIENT/target/release/casper-client"
+        PATH_TO_CASPER_NODE="$CCTL_PATH_TO_CASPER_NODE/target/release/casper-node"
+        PATH_TO_CASPER_NODE_LAUNCHER="$CCTL_PATH_TO_CASPER_NODE_LAUNCHER/target/release/casper-node-launcher"
     fi
 
     # Set node.
@@ -495,7 +495,7 @@ function _setup_keys_static()
 function _setup_wasm()
 {
     local PATH_TO_ASSETS=$(get_path_to_assets)
-    local PATH_TO_WASM="$CCTL_CASPER_NODE_HOME/target/wasm32-unknown-unknown/release"
+    local PATH_TO_WASM="$CCTL_PATH_TO_CASPER_NODE/target/wasm32-unknown-unknown/release"
     local PATH_TO_WASM_DIR=$PATH_TO_ASSETS/bin/wasm
 
     for CONTRACT in "${CCTL_CONTRACTS_CLIENT_AUCTION[@]}"
@@ -551,6 +551,6 @@ else
     _main \
         "${_GENESIS_ACCOUNTS_TYPE:-"static"}" \
         "${_GENESIS_DELAY:-30}" \
-        "${_PATH_TO_CHAINSPEC:-"${CCTL_CASPER_NODE_HOME}/resources/local/chainspec.toml.in"}" \
-        "${_PATH_TO_CONFIG_TOML:-"${CCTL_CASPER_NODE_HOME}/resources/local/config.toml"}"
+        "${_PATH_TO_CHAINSPEC:-"${CCTL_PATH_TO_CASPER_NODE}/resources/local/chainspec.toml.in"}" \
+        "${_PATH_TO_CONFIG_TOML:-"${CCTL_PATH_TO_CASPER_NODE}/resources/local/config.toml"}"
 fi

@@ -206,7 +206,7 @@ function _get_from_status_with_retry()
 {
     local INITIAL_NODE_ID=${1}
     local TIMEOUT_SEC=${2}
-    local JQ_STRING=${3}
+    local JQ_QRY=${3}
 
     local NODE_ID
     local ATTEMPTS=0
@@ -215,7 +215,12 @@ function _get_from_status_with_retry()
     while [ "$ATTEMPTS" -le "$TIMEOUT_SEC" ]; do
         NODE_ID=${INITIAL_NODE_ID:-$(get_node_for_dispatch)}
         if [ $(get_node_is_up "$NODE_ID") = true ]; then
-            OUTPUT=$(curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES "$(get_node_address_rest $NODE_ID)/status" | jq "$JQ_STRING")
+            OUTPUT=$(
+                curl \
+                    $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+                    "$(get_node_address_rest $NODE_ID)/status" \
+                    | jq "$JQ_QRY" \
+                )
         fi
         if [[ -n "$OUTPUT" ]] && [ "$OUTPUT" != "null" ]; then
             echo "$OUTPUT"

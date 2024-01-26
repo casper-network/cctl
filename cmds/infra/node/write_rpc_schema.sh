@@ -14,13 +14,18 @@ function _help() {
 
 function _main()
 {
-    rm $CCTL_RESOURCES/rpc-schema/*.json
-    _write_schema
-    _write_endpoints
+    local PATH_TO_RESOURCES=$(get_path_to_resources)
+
+    rm $PATH_TO_RESOURCES/rpc-schema/*.json
+
+    _write_schema $PATH_TO_RESOURCES
+    _write_endpoints $PATH_TO_RESOURCES
 }
 
 function _write_schema()
 {
+    local PATH_TO_RESOURCES=${1}
+
     log "writing -> schema.json"
 
     curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
@@ -38,6 +43,8 @@ function _write_schema()
 
 function _write_endpoints()
 {
+    local PATH_TO_RESOURCES=${1}
+
     local ENDPOINTS=$(
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \

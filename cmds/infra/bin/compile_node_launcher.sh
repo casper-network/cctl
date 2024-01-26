@@ -24,7 +24,7 @@ function _main()
 {
     local MODE=${1}
 
-    pushd "$CCTL_CASPER_NODE_LAUNCHER_HOME" || \
+    pushd "$CCTL_PATH_TO_CASPER_NODE_LAUNCHER" || \
         { echo "Could not find the casper-node-launcher repo - have you cloned it into your working directory?"; exit; }
 
     if [ "$MODE" = "debug" ]; then
