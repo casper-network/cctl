@@ -24,7 +24,7 @@ function _main()
 {
     local MODE=${1}
 
-    pushd "$CCTL_CASPER_CLIENT_HOME" || \
+    pushd "$CCTL_PATH_TO_CASPER_CLIENT" || \
         { echo "Could not find the casper-client-rs repo - have you cloned it into your working directory?"; exit; }
 
     if [ "$MODE" = "debug" ]; then

@@ -7,24 +7,6 @@
 # Set path -> here.
 export CCTL="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Set path -> here -> assets.
-export CCTL_ASSETS="$CCTL/assets"
-
-# Set path -> here -> resources.
-export CCTL_RESOURCES="$CCTL/resources"
-
-# Set path -> root.
-export CCTL_ROOT="$( cd "$( dirname "${CCTL[0]}" )" && pwd )"
-
-# Set path -> root -> casper-client.
-export CCTL_CASPER_CLIENT_HOME="$CCTL_ROOT"/casper-client-rs
-
-# Set path -> root -> casper-node.
-export CCTL_CASPER_NODE_HOME="$CCTL_ROOT"/casper-node
-
-# Set path -> root -> casper-node launcher.
-export CCTL_CASPER_NODE_LAUNCHER_HOME="$CCTL_ROOT"/casper-node-launcher
-
 # ###############################################################
 # UTILS
 # ###############################################################
@@ -90,6 +72,7 @@ alias cctl-chain-view-genesis-chainspec='source $CCTL/cmds/chain/query/view_gene
 alias cctl-chain-view-height='source $CCTL/cmds/chain/query/view_height.sh'
 alias cctl-chain-view-last-finalized-block='source $CCTL/cmds/chain/query/view_last_finalized_block.sh'
 alias cctl-chain-view-state-root-hash='source $CCTL/cmds/chain/query/view_state_root_hash.sh'
+alias cctl-chain-view-tip-info='source $CCTL/cmds/chain/query/view_tip_info.sh'
 # ... transactions
 alias cctl-tx-dispatch-native-transfer='source $CCTL/cmds/chain/tx/dispatch_transfer_native.sh'
 alias cctl-tx-dispatch-native-transfer-batch='source $CCTL/cmds/chain/tx/dispatch_transfer_native_batch.sh'

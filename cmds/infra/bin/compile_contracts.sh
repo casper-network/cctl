@@ -22,7 +22,7 @@ function _help() {
 
 function _main()
 {
-    pushd "$CCTL_CASPER_NODE_HOME" || \
+    pushd "$CCTL_PATH_TO_CASPER_NODE" || \
         { echo "Could not find the casper-node repo - have you cloned it into your working directory?"; exit; }
 
     make setup-rs
