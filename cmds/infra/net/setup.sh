@@ -74,98 +74,6 @@ function _main()
     log "network setup complete"
 }
 
-function _teardown()
-{
-    _teardown_net
-    _teardown_assets
-}
-
-function _teardown_net()
-{
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_net_supervisord_sock)
-
-    if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
-        supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" shutdown > /dev/null 2>&1 || true
-        sleep 2.0
-    fi
-}
-
-function _teardown_assets()
-{
-    local _PATH_TO_ASSETS=$(get_path_to_assets)
-
-    if [ -d "$_PATH_TO_ASSETS" ]; then
-        rm -rf "$_PATH_TO_ASSETS"
-    fi
-}
-
-function _setup_node_configs()
-{
-    local NODE_COUNT=${1}
-    local PATH_TO_NODE_CONFIG_TEMPLATE=${2}
-
-    local NODE_ID
-    local PATH_TO_ASSETS=$(get_path_to_assets)
-
-    for NODE_ID in $(seq 1 "$NODE_COUNT")
-    do
-        _setup_node_config $NODE_ID $PATH_TO_NODE_CONFIG_TEMPLATE
-    done
-}
-
-function _setup_node_config()
-{
-    local NODE_ID=${1}
-    local PATH_TO_NODE_CONFIG_TEMPLATE=${2}
-
-    local PATH_TO_ASSETS=$(get_path_to_assets)
-    local PATH_TO_NODE_CONFIG
-    local SCRIPT
-
-    PATH_TO_NODE_CONFIG_DIR="$(get_path_to_node "$NODE_ID")/config/1_0_0"
-    PATH_TO_NODE_CONFIG="$PATH_TO_NODE_CONFIG_DIR/config.toml"
-
-    cp "$PATH_TO_ASSETS/genesis/accounts.toml" "$PATH_TO_NODE_CONFIG_DIR"
-    cp "$PATH_TO_ASSETS/genesis/chainspec.toml" "$PATH_TO_NODE_CONFIG_DIR"
-
-    cp "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
-    SCRIPT=(
-        "import toml;"
-        "cfg=toml.load('$PATH_TO_NODE_CONFIG');"
-        "cfg['consensus']['secret_key_path']='../../keys/secret_key.pem';"
-        "cfg['logging']['format']='json';"
-        "cfg['network']['bind_address']='$(get_network_bind_address "$NODE_ID")';"
-        "cfg['network']['known_addresses']=[$(get_network_known_addresses "$NODE_ID")];"
-        "cfg['storage']['path']='../../storage';"
-        "cfg['rest_server']['address']='0.0.0.0:$(get_node_port_rest "$NODE_ID")';"
-        "cfg['rpc_server']['address']='0.0.0.0:$(get_node_port_rpc "$NODE_ID")';"
-        "cfg['event_stream_server']['address']='0.0.0.0:$(get_node_port_sse "$NODE_ID")';"
-        "cfg['diagnostics_port']['enabled']=False;"
-        "cfg['speculative_exec_server']['address']='0.0.0.0:$(get_node_port_speculative_exec "$NODE_ID")';"
-        "toml.dump(cfg, open('$PATH_TO_NODE_CONFIG', 'w'));"
-    )
-    python3 -c "${SCRIPT[*]}"
-}
-
-function _get_node_pos_stake_weight()
-{
-    local NODE_COUNT_AT_GENESIS=${1}
-    local NODE_ID=${2}
-    local POS_WEIGHT
-
-    if [ "$NODE_ID" -le "$NODE_COUNT_AT_GENESIS" ]; then
-        POS_WEIGHT=$(get_node_staking_weight "$NODE_ID")
-    else
-        POS_WEIGHT="0"
-    fi
-    if [ "x$POS_WEIGHT" = 'x' ]; then
-        POS_WEIGHT="0"
-    fi
-
-    echo $POS_WEIGHT
-}
-
 function _setup_binaries()
 {
     local NODE_COUNT=${1}
@@ -175,7 +83,6 @@ function _setup_binaries()
     local PATH_TO_BINARY_OF_CASPER_NODE=$(get_path_to_binary_of_casper_node)
     local PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER=$(get_path_to_binary_of_casper_node_launcher)
     local PATH_TO_NODE_BIN
-    local PATH_TO_WASM_OF_CASPER_NODE=$(get_path_to_wasm_of_casper_node)
     
     cp "$(get_path_to_binary_of_casper_client)" "$(get_path_to_assets)"/bin
     for NODE_ID in $(seq 1 "$NODE_COUNT")
@@ -184,83 +91,6 @@ function _setup_binaries()
         cp "$(get_path_to_binary_of_casper_node)" "$PATH_TO_NODE_BIN/1_0_0"
         cp "$(get_path_to_binary_of_casper_node_launcher)" "$PATH_TO_NODE_BIN"
     done
-}
-
-function _setup_supervisor()
-{
-    local NODE_COUNT=${1}
-
-    local PATH_TO_ASSETS=$(get_path_to_assets)
-    local PATH_TO_NODE_BIN
-    local PATH_TO_NODE_CONFIG
-    local PATH_TO_NODE_LOGS
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCK=$(get_path_to_net_supervisord_sock)
-
-    touch "$PATH_TO_SUPERVISOR_CONFIG"
-
-# Set supervisord.conf header.
-cat >> "$PATH_TO_SUPERVISOR_CONFIG" <<- EOM
-[unix_http_server]
-file=$PATH_TO_SUPERVISOR_SOCK ;
-
-[supervisord]
-logfile=$PATH_TO_ASSETS/daemon/logs/supervisord.log ;
-logfile_maxbytes=200MB ;
-logfile_backups=10 ;
-loglevel=info ;
-pidfile=$PATH_TO_ASSETS/daemon/socket/supervisord.pid ;
-
-[rpcinterface:supervisor]
-supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
-
-[supervisorctl]
-serverurl=unix:///$PATH_TO_SUPERVISOR_SOCK ;
-EOM
-
-# Set supervisord.conf app sections.
-for IDX in $(seq 1 "$NODE_COUNT")
-do
-    PATH_TO_NODE_BIN=$(get_path_to_node_bin "$IDX")
-    PATH_TO_NODE_CONFIG=$(get_path_to_node_config "$IDX")
-    PATH_TO_NODE_LOGS=$(get_path_to_node_logs "$IDX")
-
-    cat >> "$PATH_TO_SUPERVISOR_CONFIG" <<- EOM
-
-[program:cctl-node-$IDX]
-autostart=false
-autorestart=false
-command=$PATH_TO_NODE_BIN/casper-node-launcher
-environment=CASPER_BIN_DIR="$PATH_TO_NODE_BIN",CASPER_CONFIG_DIR="$PATH_TO_NODE_CONFIG"
-numprocs=1
-numprocs_start=0
-startsecs=0
-stopsignal=TERM
-stopwaitsecs=5
-stopasgroup=true
-stderr_logfile=$PATH_TO_NODE_LOGS/stderr.log ;
-stderr_logfile_backups=5 ;
-stderr_logfile_maxbytes=500MB ;
-stdout_logfile=$PATH_TO_NODE_LOGS/stdout.log ;
-stdout_logfile_backups=5 ;
-stdout_logfile_maxbytes=500MB ;
-EOM
-done
-
-# Set supervisord.conf group sections.
-cat >> "$PATH_TO_SUPERVISOR_CONFIG" <<- EOM
-
-[group:$CCTL_PROCESS_GROUP_1]
-programs=$(get_process_group_members "$CCTL_PROCESS_GROUP_1")
-
-[group:$CCTL_PROCESS_GROUP_2]
-programs=$(get_process_group_members "$CCTL_PROCESS_GROUP_2")
-
-[group:$CCTL_PROCESS_GROUP_3]
-programs=$(get_process_group_members "$CCTL_PROCESS_GROUP_3")
-
-EOM
-
 }
 
 function _setup_fs()
@@ -274,7 +104,6 @@ function _setup_fs()
 
     mkdir -p "$PATH_TO_ASSETS"
     mkdir "$PATH_TO_ASSETS/bin"
-    mkdir "$PATH_TO_ASSETS/bin/wasm"
     mkdir "$PATH_TO_ASSETS/daemon"
     mkdir "$PATH_TO_ASSETS/daemon/config"
     mkdir "$PATH_TO_ASSETS/daemon/logs"
@@ -478,6 +307,149 @@ function _setup_keys_static()
     done
 }
 
+function _setup_node_configs()
+{
+    local NODE_COUNT=${1}
+    local PATH_TO_NODE_CONFIG_TEMPLATE=${2}
+
+    local NODE_ID
+    local PATH_TO_ASSETS=$(get_path_to_assets)
+
+    for NODE_ID in $(seq 1 "$NODE_COUNT")
+    do
+        _setup_node_config $NODE_ID $PATH_TO_NODE_CONFIG_TEMPLATE
+    done
+}
+
+function _setup_node_config()
+{
+    local NODE_ID=${1}
+    local PATH_TO_NODE_CONFIG_TEMPLATE=${2}
+
+    local PATH_TO_ASSETS=$(get_path_to_assets)
+    local PATH_TO_NODE_CONFIG
+    local SCRIPT
+
+    PATH_TO_NODE_CONFIG_DIR="$(get_path_to_node "$NODE_ID")/config/1_0_0"
+    PATH_TO_NODE_CONFIG="$PATH_TO_NODE_CONFIG_DIR/config.toml"
+
+    cp "$PATH_TO_ASSETS/genesis/accounts.toml" "$PATH_TO_NODE_CONFIG_DIR"
+    cp "$PATH_TO_ASSETS/genesis/chainspec.toml" "$PATH_TO_NODE_CONFIG_DIR"
+
+    cp "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
+    SCRIPT=(
+        "import toml;"
+        "cfg=toml.load('$PATH_TO_NODE_CONFIG');"
+        "cfg['consensus']['secret_key_path']='../../keys/secret_key.pem';"
+        "cfg['logging']['format']='json';"
+        "cfg['network']['bind_address']='$(get_network_bind_address "$NODE_ID")';"
+        "cfg['network']['known_addresses']=[$(get_network_known_addresses "$NODE_ID")];"
+        "cfg['storage']['path']='../../storage';"
+        "cfg['rest_server']['address']='0.0.0.0:$(get_node_port_rest "$NODE_ID")';"
+        "cfg['rpc_server']['address']='0.0.0.0:$(get_node_port_rpc "$NODE_ID")';"
+        "cfg['event_stream_server']['address']='0.0.0.0:$(get_node_port_sse "$NODE_ID")';"
+        "cfg['diagnostics_port']['enabled']=False;"
+        "cfg['speculative_exec_server']['address']='0.0.0.0:$(get_node_port_speculative_exec "$NODE_ID")';"
+        "toml.dump(cfg, open('$PATH_TO_NODE_CONFIG', 'w'));"
+    )
+    python3 -c "${SCRIPT[*]}"
+}
+
+function _get_node_pos_stake_weight()
+{
+    local NODE_COUNT_AT_GENESIS=${1}
+    local NODE_ID=${2}
+    local POS_WEIGHT
+
+    if [ "$NODE_ID" -le "$NODE_COUNT_AT_GENESIS" ]; then
+        POS_WEIGHT=$(get_node_staking_weight "$NODE_ID")
+    else
+        POS_WEIGHT="0"
+    fi
+    if [ "x$POS_WEIGHT" = 'x' ]; then
+        POS_WEIGHT="0"
+    fi
+
+    echo $POS_WEIGHT
+}
+
+function _setup_supervisor()
+{
+    local NODE_COUNT=${1}
+
+    local PATH_TO_ASSETS=$(get_path_to_assets)
+    local PATH_TO_NODE_BIN
+    local PATH_TO_NODE_CONFIG
+    local PATH_TO_NODE_LOGS
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCK=$(get_path_to_net_supervisord_sock)
+
+    touch "$PATH_TO_SUPERVISOR_CONFIG"
+
+# Set supervisord.conf header.
+cat >> "$PATH_TO_SUPERVISOR_CONFIG" <<- EOM
+[unix_http_server]
+file=$PATH_TO_SUPERVISOR_SOCK ;
+
+[supervisord]
+logfile=$PATH_TO_ASSETS/daemon/logs/supervisord.log ;
+logfile_maxbytes=200MB ;
+logfile_backups=10 ;
+loglevel=info ;
+pidfile=$PATH_TO_ASSETS/daemon/socket/supervisord.pid ;
+
+[rpcinterface:supervisor]
+supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
+
+[supervisorctl]
+serverurl=unix:///$PATH_TO_SUPERVISOR_SOCK ;
+EOM
+
+# Set supervisord.conf app sections.
+for IDX in $(seq 1 "$NODE_COUNT")
+do
+    PATH_TO_NODE_BIN=$(get_path_to_node_bin "$IDX")
+    PATH_TO_NODE_CONFIG=$(get_path_to_node_config "$IDX")
+    PATH_TO_NODE_LOGS=$(get_path_to_node_logs "$IDX")
+
+    cat >> "$PATH_TO_SUPERVISOR_CONFIG" <<- EOM
+
+[program:cctl-node-$IDX]
+autostart=false
+autorestart=false
+command=$PATH_TO_NODE_BIN/casper-node-launcher
+environment=CASPER_BIN_DIR="$PATH_TO_NODE_BIN",CASPER_CONFIG_DIR="$PATH_TO_NODE_CONFIG"
+numprocs=1
+numprocs_start=0
+startsecs=0
+stopsignal=TERM
+stopwaitsecs=5
+stopasgroup=true
+stderr_logfile=$PATH_TO_NODE_LOGS/stderr.log ;
+stderr_logfile_backups=5 ;
+stderr_logfile_maxbytes=500MB ;
+stdout_logfile=$PATH_TO_NODE_LOGS/stdout.log ;
+stdout_logfile_backups=5 ;
+stdout_logfile_maxbytes=500MB ;
+EOM
+done
+
+# Set supervisord.conf group sections.
+cat >> "$PATH_TO_SUPERVISOR_CONFIG" <<- EOM
+
+[group:$CCTL_PROCESS_GROUP_1]
+programs=$(get_process_group_members "$CCTL_PROCESS_GROUP_1")
+
+[group:$CCTL_PROCESS_GROUP_2]
+programs=$(get_process_group_members "$CCTL_PROCESS_GROUP_2")
+
+[group:$CCTL_PROCESS_GROUP_3]
+programs=$(get_process_group_members "$CCTL_PROCESS_GROUP_3")
+
+EOM
+
+}
+
 function _setup_wasm()
 {
     local PATH_TO_ASSETS=$(get_path_to_assets)
@@ -489,6 +461,32 @@ function _setup_wasm()
             cp "$PATH_TO_WASM_OF_CASPER_NODE/$CONTRACT" "$PATH_TO_ASSETS"/bin
         fi
     done
+}
+
+function _teardown()
+{
+    _teardown_net
+    _teardown_assets
+}
+
+function _teardown_net()
+{
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_net_supervisord_sock)
+
+    if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
+        supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" shutdown > /dev/null 2>&1 || true
+        sleep 2.0
+    fi
+}
+
+function _teardown_assets()
+{
+    local _PATH_TO_ASSETS=$(get_path_to_assets)
+
+    if [ -d "$_PATH_TO_ASSETS" ]; then
+        rm -rf "$_PATH_TO_ASSETS"
+    fi
 }
 
 # ----------------------------------------------------------------

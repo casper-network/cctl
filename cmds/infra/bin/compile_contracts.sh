@@ -36,7 +36,6 @@ function _main()
         make build-contract-rs/transfer-to-account-u512
         make build-contract-rs/undelegate
         make build-contract-rs/withdraw-bid
-        make build-contract-rs/cctl-dictionary
         popd || exit
     fi
 }

@@ -103,11 +103,15 @@ function get_path_to_casper_node_resources()
 #######################################
 function get_path_to_wasm_of_casper_node()
 {
+    local COMPILE_TARGET
+    local PATH_TO_WASM
+
     if ((${#CSPR_PATH_TO_CASPER_NODE_WASM[@]})); then
         echo $CSPR_PATH_TO_CASPER_NODE_WASM
     else
-
-        echo $(get_path_to_assets)/bin/wasm
+        COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
+        PATH_TO_WASM="casper-node/target/wasm32-unknown-unknown/$COMPILE_TARGET"
+        echo $(get_path_to_working_directory_file $PATH_TO_WASM)
     fi
 }
 
@@ -144,7 +148,7 @@ function get_path_to_wasm()
 {
     local FILENAME=${1}    
 
-    echo "$(get_path_to_assets)"/bin/wasm/"$FILENAME"
+    echo "$(get_path_to_assets)"/bin/"$FILENAME"
 }
 
 #######################################
