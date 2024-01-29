@@ -25,33 +25,39 @@ function get_path_to_binary()
 #######################################
 # Returns path to casper client binary.
 # Globals:
+#   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_CASPER_CLIENT_BINARY
 #######################################
 function get_path_to_binary_of_casper_client()
 {
+    local COMPILE_TARGET
     local PATH_TO_BINARY
 
     if ((${#CSPR_PATH_TO_CASPER_CLIENT_BINARY[@]})); then
         echo $CSPR_PATH_TO_CASPER_CLIENT_BINARY
     else
-        PATH_TO_BINARY="casper-client-rs/target/release/casper-client"
+        COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
+        PATH_TO_BINARY="casper-client-rs/target/$COMPILE_TARGET/casper-client"
         echo $(get_path_to_working_directory_file $PATH_TO_BINARY)
     fi   
- }
+}
 
 #######################################
 # Returns path to casper node binary.
 # Globals:
+#   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_CASPER_NODE_BINARY.
 #######################################
 function get_path_to_binary_of_casper_node()
 {
+    local COMPILE_TARGET
     local PATH_TO_BINARY
 
     if ((${#CSPR_PATH_TO_CASPER_NODE_BINARY[@]})); then
         echo $CSPR_PATH_TO_CASPER_NODE_BINARY
     else
-        PATH_TO_BINARY="casper-node/target/release/casper-node"
+        COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
+        PATH_TO_BINARY="casper-node/target/$COMPILE_TARGET/casper-node"
         echo $(get_path_to_working_directory_file $PATH_TO_BINARY)
     fi   
 }
@@ -59,16 +65,19 @@ function get_path_to_binary_of_casper_node()
 #######################################
 # Returns path to casper node launcher binary.
 # Globals:
+#   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_CASPER_NODE_LAUNCHER_BINARY.
 #######################################
 function get_path_to_binary_of_casper_node_launcher()
 {
+    local COMPILE_TARGET
     local PATH_TO_BINARY
 
     if ((${#CSPR_PATH_TO_CASPER_NODE_LAUNCHER_BINARY[@]})); then
         echo $CSPR_PATH_TO_CASPER_NODE_LAUNCHER_BINARY
     else
-        PATH_TO_BINARY="casper-node-launcher/target/release/casper-node-launcher"
+        COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
+        PATH_TO_BINARY="casper-node-launcher/target/$COMPILE_TARGET/casper-node-launcher"
         echo $(get_path_to_working_directory_file $PATH_TO_BINARY)
     fi   
 }
@@ -97,6 +106,7 @@ function get_path_to_wasm_of_casper_node()
     if ((${#CSPR_PATH_TO_CASPER_NODE_WASM[@]})); then
         echo $CSPR_PATH_TO_CASPER_NODE_WASM
     else
+
         echo $(get_path_to_assets)/bin/wasm
     fi
 }
