@@ -20,8 +20,8 @@ function _help() {
     DEFAULTS
     ----------------------------------------------------------------
     accounts    static
-    chainspec   $(get_path_to_casper_node_resources)/resources/local/chainspec.toml.in
-    config      $(get_path_to_casper_node_resources)/resources/local/config.toml
+    chainspec   $(get_path_to_casper_node_resources)/local/chainspec.toml.in
+    config      $(get_path_to_casper_node_resources)/local/config.toml
     delay       30 seconds
 
     NOTES
@@ -38,43 +38,40 @@ function _main()
     local PATH_TO_CHAINSPEC=${3}
     local PATH_TO_NODE_CONFIG_TEMPLATE=${4}
 
-    echo $3
-    echo $4
+    local NODE_COUNT=10
+    local NODE_COUNT_AT_GENESIS=5
+    local USER_COUNT=10
 
-    # local NODE_COUNT=10
-    # local NODE_COUNT_AT_GENESIS=5
-    # local USER_COUNT=10
+    log "network setup begins ... please wait"
 
-    # log "network setup begins ... please wait"
+    log "... tearing down existing"
+    _teardown
 
-    # log "... tearing down existing"
-    # _teardown
+    log "... setting assets directory"
+    _setup_fs "$NODE_COUNT" "$USER_COUNT"
 
-    # log "... setting assets directory"
-    # _setup_fs "$NODE_COUNT" "$USER_COUNT"
+    log "... setting binaries"
+    _setup_binaries "$NODE_COUNT"
 
-    # log "... setting binaries"
-    # _setup_binaries "$NODE_COUNT"
+    log "... setting wasm payloads"
+    _setup_wasm
 
-    # log "... setting wasm payloads"
-    # _setup_wasm
+    log "... setting cryptographic keys"
+    _setup_keys "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$USER_COUNT"
 
-    # log "... setting cryptographic keys"
-    # _setup_keys "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$USER_COUNT"
+    log "... setting supervisor config"
+    _setup_supervisor "$NODE_COUNT"
 
-    # log "... setting supervisor config"
-    # _setup_supervisor "$NODE_COUNT"
+    log "... setting genesis chainspec.toml"
+    _setup_genesis_chainspec "$GENESIS_DELAY" "$NODE_COUNT" "$PATH_TO_CHAINSPEC"
 
-    # log "... setting genesis chainspec.toml"
-    # _setup_genesis_chainspec "$GENESIS_DELAY" "$NODE_COUNT" "$PATH_TO_CHAINSPEC"
+    log "... setting genesis accounts.toml"
+    _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
 
-    # log "... setting genesis accounts.toml"
-    # _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
+    log "... setting node configs"
+    _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE"
 
-    # log "... setting node configs"
-    # _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE"
-
-    # log "network setup complete"
+    log "network setup complete"
 }
 
 function _teardown()
@@ -401,9 +398,8 @@ function _setup_genesis_chainspec()
     local PATH_TO_CHAINSPEC_TEMPLATE=${3}
 
     local ACTIVATION_POINT=$(get_genesis_timestamp "$GENESIS_DELAY")
-    local PROTOCOL_VERSION=1.0.0
-
     local PATH_TO_CHAINSPEC
+    local PROTOCOL_VERSION=1.0.0
     local SCRIPT
 
     PATH_TO_CHAINSPEC="$(get_path_to_assets)/genesis/chainspec.toml"
@@ -487,8 +483,6 @@ function _setup_wasm()
     local PATH_TO_ASSETS=$(get_path_to_assets)
     local PATH_TO_WASM_OF_CASPER_NODE=$(get_path_to_wasm_of_casper_node)
 
-    echo $PATH_TO_WASM_OF_CASPER_NODE
-
     for CONTRACT in "${CCTL_SMART_CONTRACTS[@]}"
     do
         if [ -f "$PATH_TO_WASM_OF_CASPER_NODE/$CONTRACT" ]; then
@@ -530,6 +524,6 @@ else
     _main \
         "${_GENESIS_ACCOUNTS_TYPE:-"static"}" \
         "${_GENESIS_DELAY:-30}" \
-        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_casper_node_resources)/resources/local/chainspec.toml.in"}" \
-        "${_PATH_TO_CONFIG_TOML:-"$(get_path_to_casper_node_resources)/resources/local/config.toml"}"
+        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_casper_node_resources)/local/chainspec.toml.in"}" \
+        "${_PATH_TO_CONFIG_TOML:-"$(get_path_to_casper_node_resources)/local/config.toml"}"
 fi
