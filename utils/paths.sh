@@ -92,7 +92,7 @@ function get_path_to_casper_node_resources()
     if ((${#CSPR_PATH_TO_CASPER_NODE_RESOURCES[@]})); then
         echo $CSPR_PATH_TO_CASPER_NODE_RESOURCES
     else
-        echo $(get_path_to_assets)/resources
+        echo $(get_path_to_working_directory)/casper-node/resources
     fi
 }
 
