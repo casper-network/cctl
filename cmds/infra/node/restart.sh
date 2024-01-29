@@ -51,7 +51,7 @@ function _stop_node()
     local NODE_ID=${1}
 
     local NODE_PROCESS=$(get_process_name_of_node_in_group "$NODE_ID")
-    local SUPERVISORD_CONFIG=$(get_path_net_supervisord_cfg)
+    local SUPERVISORD_CONFIG=$(get_path_to_net_supervisord_cfg)
 
     supervisorctl -c "$SUPERVISORD_CONFIG" stop "$NODE_PROCESS" > /dev/null 2>&1
     sleep 1.0
@@ -76,7 +76,7 @@ function _start_node()
     local NODE_ID=${1}
 
     local NODE_PROCESS=$(get_process_name_of_node_in_group "$NODE_ID")
-    local SUPERVISORD_CONFIG=$(get_path_net_supervisord_cfg)
+    local SUPERVISORD_CONFIG=$(get_path_to_net_supervisord_cfg)
 
     supervisorctl -c "$SUPERVISORD_CONFIG" start "$NODE_PROCESS" > /dev/null 2>&1
     sleep 1.0

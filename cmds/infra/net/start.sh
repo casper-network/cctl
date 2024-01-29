@@ -20,7 +20,7 @@ function _main()
 {
     log "network spin up begins ... please wait"
 
-    if [ ! -e "$(get_path_net_supervisord_sock)" ]; then
+    if [ ! -e "$(get_path_to_net_supervisord_sock)" ]; then
         log "... starting supervisord"
         _start_supervisord
     fi
@@ -31,13 +31,13 @@ function _main()
 
 function _start_supervisord()
 {
-    supervisord -c "$(get_path_net_supervisord_cfg)"
+    supervisord -c "$(get_path_to_net_supervisord_cfg)"
     sleep 2.0
 }
 
 function _start_net()
 {
-    local PATH_TO_CFG=$(get_path_net_supervisord_cfg)
+    local PATH_TO_CFG=$(get_path_to_net_supervisord_cfg)
 
     log "... ... genesis bootstrap nodes"
     supervisorctl -c "$PATH_TO_CFG" start "$CCTL_PROCESS_GROUP_1":*  > /dev/null 2>&1

@@ -38,7 +38,7 @@ function _stop_node()
     local NODE_ID=${1}
 
     local NODE_PROCESS_NAME=$(get_process_name_of_node_in_group "$NODE_ID")
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_net_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
     
     supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" stop "$NODE_PROCESS_NAME" > /dev/null 2>&1
     sleep 1.0

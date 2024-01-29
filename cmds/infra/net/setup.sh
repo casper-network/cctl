@@ -71,7 +71,7 @@ function _main()
     log "... setting node configs"
     _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE"
 
-    log "network setup complete"
+    # log "network setup complete"
 }
 
 function _teardown()
@@ -82,8 +82,8 @@ function _teardown()
 
 function _teardown_net()
 {
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_net_supervisord_sock)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_net_supervisord_sock)
 
     if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
         supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" shutdown > /dev/null 2>&1 || true
@@ -170,32 +170,20 @@ function _setup_binaries()
 {
     local NODE_COUNT=${1}
 
-    local PATH_TO_CASPER_CLIENT
-    local PATH_TO_CASPER_NODE
-    local PATH_TO_CASPER_NODE_LAUNCHER
+    local NODE_ID
+    local PATH_TO_BINARY_OF_CASPER_CLIENT=$(get_path_to_binary_of_casper_client)
+    local PATH_TO_BINARY_OF_CASPER_NODE=$(get_path_to_binary_of_casper_node)
+    local PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER=$(get_path_to_binary_of_casper_node_launcher)
     local PATH_TO_NODE_BIN
-
-    # Set paths.
-    if [ "$CCTL_COMPILE_TARGET" = "debug" ]; then
-        PATH_TO_CASPER_CLIENT="$CCTL_PATH_TO_CASPER_CLIENT/target/debug/casper-client"
-        PATH_TO_CASPER_NODE="$CCTL_PATH_TO_CASPER_NODE/target/debug/casper-node"
-        PATH_TO_CASPER_NODE_LAUNCHER="$CCTL_PATH_TO_CASPER_NODE_LAUNCHER/target/debug/casper-node-launcher"
-    else
-        PATH_TO_CASPER_CLIENT="$CCTL_PATH_TO_CASPER_CLIENT/target/release/casper-client"
-        PATH_TO_CASPER_NODE="$CCTL_PATH_TO_CASPER_NODE/target/release/casper-node"
-        PATH_TO_CASPER_NODE_LAUNCHER="$CCTL_PATH_TO_CASPER_NODE_LAUNCHER/target/release/casper-node-launcher"
-    fi
-
-    # Set node.
-    for IDX in $(seq 1 "$NODE_COUNT")
+    local PATH_TO_WASM_OF_CASPER_NODE=$(get_path_to_wasm_of_casper_node)
+    
+    cp "$(get_path_to_binary_of_casper_client)" "$(get_path_to_assets)"/bin
+    for NODE_ID in $(seq 1 "$NODE_COUNT")
     do
-        PATH_TO_NODE_BIN="$(get_path_to_node_bin "$IDX")"
-        cp "$PATH_TO_CASPER_NODE_LAUNCHER" "$PATH_TO_NODE_BIN"
-        cp "$PATH_TO_CASPER_NODE" "$PATH_TO_NODE_BIN/1_0_0"
+        PATH_TO_NODE_BIN="$(get_path_to_node_bin "$NODE_ID")"
+        cp "$(get_path_to_binary_of_casper_node)" "$PATH_TO_NODE_BIN/1_0_0"
+        cp "$(get_path_to_binary_of_casper_node_launcher)" "$PATH_TO_NODE_BIN"
     done
-
-    # Set node client.
-    cp "$PATH_TO_CASPER_CLIENT" "$(get_path_to_assets_bin)"
 }
 
 function _setup_supervisor()
@@ -206,8 +194,8 @@ function _setup_supervisor()
     local PATH_TO_NODE_BIN
     local PATH_TO_NODE_CONFIG
     local PATH_TO_NODE_LOGS
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCK=$(get_path_net_supervisord_sock)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCK=$(get_path_to_net_supervisord_sock)
 
     touch "$PATH_TO_SUPERVISOR_CONFIG"
 
@@ -495,27 +483,12 @@ function _setup_keys_static()
 function _setup_wasm()
 {
     local PATH_TO_ASSETS=$(get_path_to_assets)
-    local PATH_TO_WASM="$CCTL_PATH_TO_CASPER_NODE/target/wasm32-unknown-unknown/release"
-    local PATH_TO_WASM_DIR=$PATH_TO_ASSETS/bin/wasm
+    local PATH_TO_WASM_OF_CASPER_NODE=$(get_path_to_wasm_of_casper_node)
 
-    for CONTRACT in "${CCTL_CONTRACTS_CLIENT_AUCTION[@]}"
+    for CONTRACT in "${CCTL_SMART_CONTRACTS[@]}"
     do
-        if [ -f "$PATH_TO_WASM/$CONTRACT" ]; then
-            cp "$PATH_TO_WASM/$CONTRACT" "$PATH_TO_WASM_DIR"
-        fi
-    done
-
-    for CONTRACT in "${CCTL_CONTRACTS_CLIENT_SHARED[@]}"
-    do
-        if [ -f "$PATH_TO_WASM/$CONTRACT" ]; then
-            cp "$PATH_TO_WASM/$CONTRACT" "$PATH_TO_WASM_DIR"
-        fi
-    done
-
-    for CONTRACT in "${CCTL_CONTRACTS_CLIENT_TRANSFERS[@]}"
-    do
-        if [ -f "$PATH_TO_WASM/$CONTRACT" ]; then
-            cp "$PATH_TO_WASM/$CONTRACT" "$PATH_TO_WASM_DIR"
+        if [ -f "$PATH_TO_WASM_OF_CASPER_NODE/$CONTRACT" ]; then
+            cp "$PATH_TO_WASM_OF_CASPER_NODE/$CONTRACT" "$PATH_TO_ASSETS"/bin
         fi
     done
 }
