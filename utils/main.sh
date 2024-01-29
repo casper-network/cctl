@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-source "$CCTL"/utils/defaults.sh
 source "$CCTL"/utils/accounts.sh
 source "$CCTL"/utils/blocking.sh
 source "$CCTL"/utils/constants.sh

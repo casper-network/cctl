@@ -22,20 +22,23 @@ function _help() {
 
 function _main()
 {
-    pushd "$CCTL_PATH_TO_CASPER_NODE" || \
-        { echo "Could not find the casper-node repo - have you cloned it into your working directory?"; exit; }
+    local PATH_TO_REPO=$(get_path_to_working_directory)/casper-node
 
-    make setup-rs
-    make build-contract-rs/activate-bid
-    make build-contract-rs/add-bid
-    make build-contract-rs/delegate
-    make build-contract-rs/named-purse-payment
-    make build-contract-rs/transfer-to-account-u512
-    make build-contract-rs/undelegate
-    make build-contract-rs/withdraw-bid
-    make build-contract-rs/cctl-dictionary
-
-    popd || exit
+    if [ ! -d "$PATH_TO_REPO" ]; then
+        log "ERROR: casper-node repo must be cloned into $(get_path_to_working_directory) before compilation can occur"
+    else
+        pushd "$PATH_TO_REPO"
+        make setup-rs
+        make build-contract-rs/activate-bid
+        make build-contract-rs/add-bid
+        make build-contract-rs/delegate
+        make build-contract-rs/named-purse-payment
+        make build-contract-rs/transfer-to-account-u512
+        make build-contract-rs/undelegate
+        make build-contract-rs/withdraw-bid
+        make build-contract-rs/cctl-dictionary
+        popd || exit
+    fi
 }
 
 # ----------------------------------------------------------------
