@@ -14,10 +14,6 @@ declare CCTL="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Import utility functions.
 source "$CCTL"/utils/main.sh
 
-echo $(get_path_to_binary_of_casper_client)
-echo $(get_path_to_binary_of_casper_node)
-echo $(get_path_to_binary_of_casper_node_launcher)
-
 # ###############################################################
 # COMMANDS
 # ###############################################################
