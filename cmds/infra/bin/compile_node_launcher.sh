@@ -8,7 +8,7 @@ function _help() {
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Compiles L1 node launcher.
+    Compiles L1 node launcher .
 
     ARGS
     ----------------------------------------------------------------
@@ -24,16 +24,19 @@ function _main()
 {
     local MODE=${1}
 
-    pushd "$CCTL_PATH_TO_CASPER_NODE_LAUNCHER" || \
-        { echo "Could not find the casper-node-launcher repo - have you cloned it into your working directory?"; exit; }
+    local PATH_TO_REPO=$(get_path_to_working_directory)/casper-node-launcher
 
-    if [ "$MODE" = "debug" ]; then
-        cargo build
+    if [ ! -d "$PATH_TO_REPO" ]; then
+        log "ERROR: casper-node-launcher repo must be cloned into $(get_path_to_working_directory) before compilation can occur"
     else
-        cargo build --release
+        pushd "$PATH_TO_REPO"
+        if [ "$MODE" = "debug" ]; then
+            cargo build
+        else
+            cargo build --release
+        fi
+        popd || exit
     fi
-
-    popd || exit
 }
 
 # ----------------------------------------------------------------

@@ -24,16 +24,19 @@ function _main()
 {
     local MODE=${1}
 
-    pushd "$CCTL_PATH_TO_CASPER_CLIENT" || \
-        { echo "Could not find the casper-client-rs repo - have you cloned it into your working directory?"; exit; }
+    local PATH_TO_REPO=$(get_path_to_working_directory)/casper-client-rs
 
-    if [ "$MODE" = "debug" ]; then
-        cargo build
+    if [ ! -d "$PATH_TO_REPO" ]; then
+        log "ERROR: casper-client-rs repo must be cloned into $(get_path_to_working_directory) before compilation can occur"
     else
-        cargo build --release
+        pushd "$PATH_TO_REPO"
+        if [ "$MODE" = "debug" ]; then
+            cargo build
+        else
+            cargo build --release
+        fi
+        popd || exit
     fi
-
-    popd || exit
 }
 
 # ----------------------------------------------------------------

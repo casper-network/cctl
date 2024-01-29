@@ -112,7 +112,7 @@ function get_network_known_addresses()
 function get_net_is_up()
 {
     # Presence of supervisord socket indicates true.
-    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_net_supervisord_sock)
+    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_net_supervisord_sock)
     if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
         echo true
     else

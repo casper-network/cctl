@@ -20,8 +20,8 @@ function _help() {
     DEFAULTS
     ----------------------------------------------------------------
     accounts    static
-    chainspec   ${CCTL_PATH_TO_CASPER_NODE}/resources/local/chainspec.toml.in
-    config      ${CCTL_PATH_TO_CASPER_NODE}/resources/local/config.toml
+    chainspec   $(get_path_to_casper_node_resources)/resources/local/chainspec.toml.in
+    config      $(get_path_to_casper_node_resources)/resources/local/config.toml
     delay       30 seconds
 
     NOTES
@@ -38,40 +38,43 @@ function _main()
     local PATH_TO_CHAINSPEC=${3}
     local PATH_TO_NODE_CONFIG_TEMPLATE=${4}
 
-    local NODE_COUNT=10
-    local NODE_COUNT_AT_GENESIS=5
-    local USER_COUNT=10
+    echo $3
+    echo $4
 
-    log "network setup begins ... please wait"
+    # local NODE_COUNT=10
+    # local NODE_COUNT_AT_GENESIS=5
+    # local USER_COUNT=10
 
-    log "... tearing down existing"
-    _teardown
+    # log "network setup begins ... please wait"
 
-    log "... setting assets directory"
-    _setup_fs "$NODE_COUNT" "$USER_COUNT"
+    # log "... tearing down existing"
+    # _teardown
 
-    log "... setting binaries"
-    _setup_binaries "$NODE_COUNT"
+    # log "... setting assets directory"
+    # _setup_fs "$NODE_COUNT" "$USER_COUNT"
 
-    log "... setting wasm payloads"
-    _setup_wasm
+    # log "... setting binaries"
+    # _setup_binaries "$NODE_COUNT"
 
-    log "... setting cryptographic keys"
-    _setup_keys "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$USER_COUNT"
+    # log "... setting wasm payloads"
+    # _setup_wasm
 
-    log "... setting supervisor config"
-    _setup_supervisor "$NODE_COUNT"
+    # log "... setting cryptographic keys"
+    # _setup_keys "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$USER_COUNT"
 
-    log "... setting genesis chainspec.toml"
-    _setup_genesis_chainspec "$GENESIS_DELAY" "$NODE_COUNT" "$PATH_TO_CHAINSPEC"
+    # log "... setting supervisor config"
+    # _setup_supervisor "$NODE_COUNT"
 
-    log "... setting genesis accounts.toml"
-    _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
+    # log "... setting genesis chainspec.toml"
+    # _setup_genesis_chainspec "$GENESIS_DELAY" "$NODE_COUNT" "$PATH_TO_CHAINSPEC"
 
-    log "... setting node configs"
-    _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE"
+    # log "... setting genesis accounts.toml"
+    # _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
 
-    log "network setup complete"
+    # log "... setting node configs"
+    # _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE"
+
+    # log "network setup complete"
 }
 
 function _teardown()
@@ -82,8 +85,8 @@ function _teardown()
 
 function _teardown_net()
 {
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_net_supervisord_sock)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_net_supervisord_sock)
 
     if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
         supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" shutdown > /dev/null 2>&1 || true
@@ -170,32 +173,20 @@ function _setup_binaries()
 {
     local NODE_COUNT=${1}
 
-    local PATH_TO_CASPER_CLIENT
-    local PATH_TO_CASPER_NODE
-    local PATH_TO_CASPER_NODE_LAUNCHER
+    local NODE_ID
+    local PATH_TO_BINARY_OF_CASPER_CLIENT=$(get_path_to_binary_of_casper_client)
+    local PATH_TO_BINARY_OF_CASPER_NODE=$(get_path_to_binary_of_casper_node)
+    local PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER=$(get_path_to_binary_of_casper_node_launcher)
     local PATH_TO_NODE_BIN
-
-    # Set paths.
-    if [ "$CCTL_COMPILE_TARGET" = "debug" ]; then
-        PATH_TO_CASPER_CLIENT="$CCTL_PATH_TO_CASPER_CLIENT/target/debug/casper-client"
-        PATH_TO_CASPER_NODE="$CCTL_PATH_TO_CASPER_NODE/target/debug/casper-node"
-        PATH_TO_CASPER_NODE_LAUNCHER="$CCTL_PATH_TO_CASPER_NODE_LAUNCHER/target/debug/casper-node-launcher"
-    else
-        PATH_TO_CASPER_CLIENT="$CCTL_PATH_TO_CASPER_CLIENT/target/release/casper-client"
-        PATH_TO_CASPER_NODE="$CCTL_PATH_TO_CASPER_NODE/target/release/casper-node"
-        PATH_TO_CASPER_NODE_LAUNCHER="$CCTL_PATH_TO_CASPER_NODE_LAUNCHER/target/release/casper-node-launcher"
-    fi
-
-    # Set node.
-    for IDX in $(seq 1 "$NODE_COUNT")
+    local PATH_TO_WASM_OF_CASPER_NODE=$(get_path_to_wasm_of_casper_node)
+    
+    cp "$(get_path_to_binary_of_casper_client)" "$(get_path_to_assets)"/bin
+    for NODE_ID in $(seq 1 "$NODE_COUNT")
     do
-        PATH_TO_NODE_BIN="$(get_path_to_node_bin "$IDX")"
-        cp "$PATH_TO_CASPER_NODE_LAUNCHER" "$PATH_TO_NODE_BIN"
-        cp "$PATH_TO_CASPER_NODE" "$PATH_TO_NODE_BIN/1_0_0"
+        PATH_TO_NODE_BIN="$(get_path_to_node_bin "$NODE_ID")"
+        cp "$(get_path_to_binary_of_casper_node)" "$PATH_TO_NODE_BIN/1_0_0"
+        cp "$(get_path_to_binary_of_casper_node_launcher)" "$PATH_TO_NODE_BIN"
     done
-
-    # Set node client.
-    cp "$PATH_TO_CASPER_CLIENT" "$(get_path_to_assets_bin)"
 }
 
 function _setup_supervisor()
@@ -206,8 +197,8 @@ function _setup_supervisor()
     local PATH_TO_NODE_BIN
     local PATH_TO_NODE_CONFIG
     local PATH_TO_NODE_LOGS
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCK=$(get_path_net_supervisord_sock)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCK=$(get_path_to_net_supervisord_sock)
 
     touch "$PATH_TO_SUPERVISOR_CONFIG"
 
@@ -339,7 +330,6 @@ function _setup_genesis_accounts_dynamic()
     local PATH_TO_ACCOUNTS
     local PATH_TO_ASSETS="$(get_path_to_assets)"
     local PATH_TO_ACCOUNTS="$PATH_TO_ASSETS/genesis/accounts.toml"
-
 
     # Set accounts.toml.
     touch "$PATH_TO_ACCOUNTS"
@@ -495,27 +485,14 @@ function _setup_keys_static()
 function _setup_wasm()
 {
     local PATH_TO_ASSETS=$(get_path_to_assets)
-    local PATH_TO_WASM="$CCTL_PATH_TO_CASPER_NODE/target/wasm32-unknown-unknown/release"
-    local PATH_TO_WASM_DIR=$PATH_TO_ASSETS/bin/wasm
+    local PATH_TO_WASM_OF_CASPER_NODE=$(get_path_to_wasm_of_casper_node)
 
-    for CONTRACT in "${CCTL_CONTRACTS_CLIENT_AUCTION[@]}"
-    do
-        if [ -f "$PATH_TO_WASM/$CONTRACT" ]; then
-            cp "$PATH_TO_WASM/$CONTRACT" "$PATH_TO_WASM_DIR"
-        fi
-    done
+    echo $PATH_TO_WASM_OF_CASPER_NODE
 
-    for CONTRACT in "${CCTL_CONTRACTS_CLIENT_SHARED[@]}"
+    for CONTRACT in "${CCTL_SMART_CONTRACTS[@]}"
     do
-        if [ -f "$PATH_TO_WASM/$CONTRACT" ]; then
-            cp "$PATH_TO_WASM/$CONTRACT" "$PATH_TO_WASM_DIR"
-        fi
-    done
-
-    for CONTRACT in "${CCTL_CONTRACTS_CLIENT_TRANSFERS[@]}"
-    do
-        if [ -f "$PATH_TO_WASM/$CONTRACT" ]; then
-            cp "$PATH_TO_WASM/$CONTRACT" "$PATH_TO_WASM_DIR"
+        if [ -f "$PATH_TO_WASM_OF_CASPER_NODE/$CONTRACT" ]; then
+            cp "$PATH_TO_WASM_OF_CASPER_NODE/$CONTRACT" "$PATH_TO_ASSETS"/bin
         fi
     done
 }
@@ -548,9 +525,11 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
+    # echo $(get_path_to_casper_node_resources)
+
     _main \
         "${_GENESIS_ACCOUNTS_TYPE:-"static"}" \
         "${_GENESIS_DELAY:-30}" \
-        "${_PATH_TO_CHAINSPEC:-"${CCTL_PATH_TO_CASPER_NODE}/resources/local/chainspec.toml.in"}" \
-        "${_PATH_TO_CONFIG_TOML:-"${CCTL_PATH_TO_CASPER_NODE}/resources/local/config.toml"}"
+        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_casper_node_resources)/resources/local/chainspec.toml.in"}" \
+        "${_PATH_TO_CONFIG_TOML:-"$(get_path_to_casper_node_resources)/resources/local/config.toml"}"
 fi

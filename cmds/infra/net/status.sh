@@ -14,7 +14,7 @@ function _help() {
 
 function _main()
 {
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_net_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
 
     supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" status all || true
 }

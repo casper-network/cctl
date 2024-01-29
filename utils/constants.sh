@@ -24,24 +24,13 @@ declare CCTL_BASE_PORT_NETWORK=22000
 # Base speculative execution RPC server port number.
 declare CCTL_BASE_PORT_SPEC_EXEC=25000
 
-# Set of client side auction contracts.
-declare CCTL_CONTRACTS_CLIENT_AUCTION=(
-    "activate_bid.wasm"
-    "add_bid.wasm"
-    "delegate.wasm"
-    "undelegate.wasm"
-    "withdraw_bid.wasm"
-)
-
-# Set of client side shared contracts.
-declare CCTL_CONTRACTS_CLIENT_SHARED=(
-    "named_purse_payment.wasm"
-)
-
-# Set of client side transfer contracts.
-declare CCTL_CONTRACTS_CLIENT_TRANSFERS=(
-    "transfer_to_account_u512.wasm"
-)
+# cURL arguments which are used when talking to the CCTL nodes.
+# We need to allow retires and limit the default timeouts because not all
+# testing scenarios guarantee that nodes are responsive immediately, which may
+# lead to the test being stuck. The exponential backoff delay used for reties
+# is replaced with a constant 1 sec. delay.
+# In addition, we don't want cURL to put anything on the standard output.
+declare CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES="--max-time 4 --connect-timeout 2 --retry 20 --retry-connrefused --retry-delay 1 -s"
 
 # Default amount used when delegating.
 declare CCTL_DEFAULT_AUCTION_DELEGATE_AMOUNT=1000000000   # (1e9)
@@ -82,10 +71,13 @@ declare CCTL_PROCESS_GROUP_2=validator-group-2
 # Name of process group: non-genesis validators.
 declare CCTL_PROCESS_GROUP_3=validator-group-3
 
-# cURL arguments which are used when talking to the CCTL nodes.
-# We need to allow retires and limit the default timeouts because not all
-# testing scenarios guarantee that nodes are responsive immediately, which may
-# lead to the test being stuck. The exponential backoff delay used for reties
-# is replaced with a constant 1 sec. delay.
-# In addition, we don't want cURL to put anything on the standard output.
-declare CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES="--max-time 4 --connect-timeout 2 --retry 20 --retry-connrefused --retry-delay 1 -s"
+# Set of compiled smart contracts.
+declare CCTL_SMART_CONTRACTS=(
+    "activate_bid.wasm"
+    "add_bid.wasm"
+    "delegate.wasm"
+    "named_purse_payment.wasm"
+    "transfer_to_account_u512.wasm"
+    "undelegate.wasm"
+    "withdraw_bid.wasm"
+)
