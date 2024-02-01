@@ -50,7 +50,7 @@ function _main()
     local NODE_ADDRESS
     local OUTPUT
     local PATH_TO_CLIENT=$(get_path_to_client)
-    local PATH_TO_CONTRACT=$(get_path_to_wasm "transfer_to_account_u512.wasm")
+    local PATH_TO_CONTRACT="$(get_path_to_assets)"/bin/transfer_to_account_u512.wasm
     local SUCCESSFUL_DISPATCH_COUNT=0
 
     if [ "$NODE_ID" == "random" ]; then

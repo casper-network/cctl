@@ -35,7 +35,7 @@ function _main()
     local PATH_TO_CLIENT=$(get_path_to_client)
     local PATH_TO_TX
     local PATH_TO_TX_BATCH
-    local PATH_TO_TX_ROOT=$(get_path_to_transactions)
+    local PATH_TO_TX_ROOT="$(get_path_to_assets)"/transactions
     local TX_ID
 
     # Set node address.

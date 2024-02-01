@@ -62,7 +62,7 @@ function get_account_key()
     local ACCOUNT_IDX=${2}
 
     if [ "$ACCOUNT_TYPE" = "$CCTL_ACCOUNT_TYPE_FAUCET" ]; then
-        cat "$(get_path_to_faucet)"/public_key_hex
+        cat "$(get_path_to_assets)"/faucet/public_key_hex
     elif [ "$ACCOUNT_TYPE" = "$CCTL_ACCOUNT_TYPE_NODE" ]; then
         cat "$(get_path_to_node "$ACCOUNT_IDX")"/keys/public_key_hex
     elif [ "$ACCOUNT_TYPE" = "$CCTL_ACCOUNT_TYPE_USER" ]; then

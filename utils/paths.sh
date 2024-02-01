@@ -11,30 +11,18 @@ function get_path_to_assets()
 }
 
 #######################################
-# Returns path to a binary file.
-# Arguments:
-#   Binary file name.
-#######################################
-function get_path_to_binary()
-{
-    local FILENAME=${1}    
-
-    echo "$(get_path_to_assets)"/bin/"$FILENAME"
-}
-
-#######################################
 # Returns path to casper client binary.
 # Globals:
 #   CSPR_COMPILE_TARGET
-#   CSPR_PATH_TO_CASPER_CLIENT_BINARY
+#   CSPR_PATH_TO_BIN
 #######################################
 function get_path_to_binary_of_casper_client()
 {
     local COMPILE_TARGET
     local PATH_TO_BINARY
 
-    if ((${#CSPR_PATH_TO_CASPER_CLIENT_BINARY[@]})); then
-        echo $CSPR_PATH_TO_CASPER_CLIENT_BINARY
+    if ((${#CSPR_PATH_TO_BIN[@]})); then
+        echo $CSPR_PATH_TO_BIN/casper-client
     else
         COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
         PATH_TO_BINARY="casper-client-rs/target/$COMPILE_TARGET/casper-client"
@@ -46,15 +34,15 @@ function get_path_to_binary_of_casper_client()
 # Returns path to casper node binary.
 # Globals:
 #   CSPR_COMPILE_TARGET
-#   CSPR_PATH_TO_CASPER_NODE_BINARY.
+#   CSPR_PATH_TO_BIN.
 #######################################
 function get_path_to_binary_of_casper_node()
 {
     local COMPILE_TARGET
     local PATH_TO_BINARY
 
-    if ((${#CSPR_PATH_TO_CASPER_NODE_BINARY[@]})); then
-        echo $CSPR_PATH_TO_CASPER_NODE_BINARY
+    if ((${#CSPR_PATH_TO_BIN[@]})); then
+        echo $CSPR_PATH_TO_BIN/casper-node
     else
         COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
         PATH_TO_BINARY="casper-node/target/$COMPILE_TARGET/casper-node"
@@ -66,15 +54,15 @@ function get_path_to_binary_of_casper_node()
 # Returns path to casper node launcher binary.
 # Globals:
 #   CSPR_COMPILE_TARGET
-#   CSPR_PATH_TO_CASPER_NODE_LAUNCHER_BINARY.
+#   CSPR_PATH_TO_BIN.
 #######################################
 function get_path_to_binary_of_casper_node_launcher()
 {
     local COMPILE_TARGET
     local PATH_TO_BINARY
 
-    if ((${#CSPR_PATH_TO_CASPER_NODE_LAUNCHER_BINARY[@]})); then
-        echo $CSPR_PATH_TO_CASPER_NODE_LAUNCHER_BINARY
+    if ((${#CSPR_PATH_TO_BIN[@]})); then
+        echo $CSPR_PATH_TO_BIN/casper-node-launcher
     else
         COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
         PATH_TO_BINARY="casper-node-launcher/target/$COMPILE_TARGET/casper-node-launcher"
@@ -89,8 +77,8 @@ function get_path_to_binary_of_casper_node_launcher()
 #######################################
 function get_path_to_casper_node_resources()
 {
-    if ((${#CSPR_PATH_TO_CASPER_NODE_RESOURCES[@]})); then
-        echo $CSPR_PATH_TO_CASPER_NODE_RESOURCES
+    if ((${#CSPR_PATH_TO_RESOURCES[@]})); then
+        echo $CSPR_PATH_TO_RESOURCES
     else
         echo $(get_path_to_working_directory)/casper-node/resources
     fi
@@ -99,15 +87,16 @@ function get_path_to_casper_node_resources()
 #######################################
 # Returns path to casper node wasm folder.
 # Globals:
-#   CSPR_PATH_TO_CASPER_NODE_WASM.
+#   CSPR_COMPILE_TARGET
+#   CSPR_PATH_TO_BIN.
 #######################################
 function get_path_to_wasm_of_casper_node()
 {
     local COMPILE_TARGET
     local PATH_TO_WASM
 
-    if ((${#CSPR_PATH_TO_CASPER_NODE_WASM[@]})); then
-        echo $CSPR_PATH_TO_CASPER_NODE_WASM
+    if ((${#CSPR_PATH_TO_BIN[@]})); then
+        echo $CSPR_PATH_TO_BIN
     else
         COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
         PATH_TO_WASM="casper-node/target/wasm32-unknown-unknown/$COMPILE_TARGET"
@@ -120,35 +109,7 @@ function get_path_to_wasm_of_casper_node()
 #######################################
 function get_path_to_client()
 {
-    get_path_to_binary "casper-client"
-}
-
-#######################################
-# Returns path to a network faucet.
-#######################################
-function get_path_to_faucet()
-{
-    echo "$(get_path_to_assets)"/faucet
-}
-
-#######################################
-# Returns path to directory containing transactions dispatched into network.
-#######################################
-function get_path_to_transactions()
-{
-    echo "$(get_path_to_assets)"/transactions
-}
-
-#######################################
-# Returns path to a wasm file.
-# Arguments:
-#   Wasm file name.
-#######################################
-function get_path_to_wasm()
-{
-    local FILENAME=${1}    
-
-    echo "$(get_path_to_assets)"/bin/"$FILENAME"
+    echo "$(get_path_to_assets)"/bin/casper-client
 }
 
 #######################################
@@ -198,42 +159,6 @@ function get_path_to_node()
 }
 
 #######################################
-# Returns path to a node's binary folder.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_path_to_node_bin()
-{
-    local NODE_ID=${1:-1}
-
-    echo "$(get_path_to_node "$NODE_ID")"/bin
-}
-
-#######################################
-# Returns path to a node's config folder.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_path_to_node_config()
-{
-    local NODE_ID=${1:-1}
-    
-    echo "$(get_path_to_node "$NODE_ID")"/config
-}
-
-#######################################
-# Returns path to a node's active config file.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_path_to_node_config_file()
-{
-    local NODE_ID=${1:-1}
-
-    echo "$(get_path_to_node "$NODE_ID")/config/1_0_0/config.toml"
-}
-
-#######################################
 # Returns path to a node's logs directory.
 # Arguments:
 #   Node ordinal identifier.
@@ -272,16 +197,6 @@ function get_path_to_node_secret_key()
 }
 
 #######################################
-# Returns path to primary resources folder.
-# Globals:
-#   CCTL - path to cctl home directory.
-#######################################
-function get_path_to_resources()
-{
-    echo "$CCTL/resources"
-}
-
-#######################################
 # Returns path to a secret key.
 # Globals:
 #   CCTL_ACCOUNT_TYPE_FAUCET - faucet account type.
@@ -297,7 +212,7 @@ function get_path_to_secret_key()
     local ACCOUNT_IDX=${2}
 
     if [ "$ACCOUNT_TYPE" = "$CCTL_ACCOUNT_TYPE_FAUCET" ]; then
-        echo "$(get_path_to_faucet)"/secret_key.pem
+        echo "$(get_path_to_assets)"/faucet/secret_key.pem
     elif [ "$ACCOUNT_TYPE" = "$CCTL_ACCOUNT_TYPE_NODE" ]; then
         echo "$(get_path_to_node "$ACCOUNT_IDX")"/keys/secret_key.pem
     elif [ "$ACCOUNT_TYPE" = "$CCTL_ACCOUNT_TYPE_USER" ]; then

@@ -20,7 +20,7 @@ function _main()
 {
     local NODE_ID=${1}
 
-    local PATH_TO_NODE_CONFIG=$(get_path_to_node_config_file "$NODE_ID")
+    local PATH_TO_NODE_CONFIG="$(get_path_to_node "$NODE_ID")/config/1_0_0/config.toml"
 
     less $PATH_TO_NODE_CONFIG
 }

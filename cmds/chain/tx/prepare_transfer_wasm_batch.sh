@@ -43,9 +43,9 @@ function _main()
     local CP2_ACCOUNT_HASH
     local GAS_PAYMENT=$CCTL_DEFAULT_GAS_PAYMENT
     local PATH_TO_CLIENT=$(get_path_to_client)
-    local PATH_TO_CONTRACT=$(get_path_to_wasm "transfer_to_account_u512.wasm")
+    local PATH_TO_CONTRACT="$(get_path_to_assets)"/bin/transfer_to_account_u512.wasm
     local PATH_TO_TX_DIR
-    local PATH_TO_TX_ROOT_DIR=$(get_path_to_transactions)
+    local PATH_TO_TX_ROOT="$(get_path_to_assets)"/transactions
     local PATH_TO_TX_UNSIGNED
     local PATH_TO_TX_SIGNED
     local USER_ID

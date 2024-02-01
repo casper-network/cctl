@@ -44,7 +44,7 @@ function _main()
     local GAS_PAYMENT=$CCTL_DEFAULT_GAS_PAYMENT
     local PATH_TO_CLIENT=$(get_path_to_client)
     local PATH_TO_TX_DIR
-    local PATH_TO_TX_ROOT_DIR=$(get_path_to_transactions)
+    local PATH_TO_TX_ROOT="$(get_path_to_assets)"/transactions
     local PATH_TO_TX_UNSIGNED
     local PATH_TO_TX_SIGNED
     local USER_ID

@@ -84,12 +84,12 @@ function _setup_binaries()
     local PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER=$(get_path_to_binary_of_casper_node_launcher)
     local PATH_TO_NODE_BIN
     
-    cp "$(get_path_to_binary_of_casper_client)" "$(get_path_to_assets)"/bin
+    cp "$PATH_TO_BINARY_OF_CASPER_CLIENT" "$(get_path_to_assets)"/bin
     for NODE_ID in $(seq 1 "$NODE_COUNT")
     do
-        PATH_TO_NODE_BIN="$(get_path_to_node_bin "$NODE_ID")"
-        cp "$(get_path_to_binary_of_casper_node)" "$PATH_TO_NODE_BIN/1_0_0"
-        cp "$(get_path_to_binary_of_casper_node_launcher)" "$PATH_TO_NODE_BIN"
+        PATH_TO_NODE_BIN="$(get_path_to_node "$NODE_ID")"/bin
+        cp "$PATH_TO_BINARY_OF_CASPER_NODE" "$PATH_TO_NODE_BIN/1_0_0"
+        cp "$PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER" "$PATH_TO_NODE_BIN"
     done
 }
 
@@ -216,7 +216,7 @@ EOM
 function _setup_genesis_accounts_static()
 {
     cp \
-        "$(get_path_to_resources)"/static/accounts/accounts.toml \
+        "$CCTL"/resources/static/accounts/accounts.toml \
         "$(get_path_to_assets)"/genesis/accounts.toml
 }
 
@@ -289,20 +289,20 @@ function _setup_keys_static()
     local IDX
 
     cp \
-        "$(get_path_to_resources)"/static/accounts/faucet/* \
+        "$CCTL"/resources/static/accounts/faucet/* \
         "$(get_path_to_assets)"/faucet
 
     for IDX in $(seq 1 "$NODE_COUNT")
     do
         cp \
-            "$(get_path_to_resources)"/static/accounts/nodes/node-$IDX/* \
+            "$CCTL"/resources/static/accounts/nodes/node-$IDX/* \
             "$(get_path_to_assets)"/nodes/node-$IDX/keys
     done
 
     for IDX in $(seq 1 "$USER_COUNT")
     do
         cp \
-            "$(get_path_to_resources)"/static/accounts/users/user-$IDX/* \
+            "$CCTL"/resources/static/accounts/users/user-$IDX/* \
             "$(get_path_to_assets)"/users/user-$IDX
     done
 }
@@ -408,8 +408,8 @@ EOM
 # Set supervisord.conf app sections.
 for IDX in $(seq 1 "$NODE_COUNT")
 do
-    PATH_TO_NODE_BIN=$(get_path_to_node_bin "$IDX")
-    PATH_TO_NODE_CONFIG=$(get_path_to_node_config "$IDX")
+    PATH_TO_NODE_BIN="$(get_path_to_node "$IDX")"/bin
+    PATH_TO_NODE_CONFIG="$(get_path_to_node "$IDX")"/config
     PATH_TO_NODE_LOGS=$(get_path_to_node_logs "$IDX")
 
     cat >> "$PATH_TO_SUPERVISOR_CONFIG" <<- EOM

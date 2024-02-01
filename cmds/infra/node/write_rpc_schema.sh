@@ -14,12 +14,10 @@ function _help() {
 
 function _main()
 {
-    local PATH_TO_RESOURCES=$(get_path_to_resources)
+    rm "$CCTL"/resources/rpc-schema/*.json
 
-    rm $PATH_TO_RESOURCES/rpc-schema/*.json
-
-    _write_schema $PATH_TO_RESOURCES
-    _write_endpoints $PATH_TO_RESOURCES
+    _write_schema "$CCTL"/resources/rpc-schema
+    _write_endpoints "$CCTL"/resources/rpc-schema
 }
 
 function _write_schema()
