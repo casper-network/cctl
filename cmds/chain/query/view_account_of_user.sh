@@ -35,7 +35,8 @@ function _main()
     log "user #$USER_ID a/c purse         : $PURSE_UREF"
     log "user #$USER_ID a/c purse balance : $ACCOUNT_BALANCE"
     log "user #$USER_ID on-chain account  : see below"
-    render_account "$CCTL_ACCOUNT_TYPE_USER" "$USER_ID"
+
+    source "$CCTL"/cmds/chain/query/view_account.sh account=$ACCOUNT_HASH
 }
 
 # ----------------------------------------------------------------

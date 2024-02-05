@@ -8,4 +8,3 @@ source "$CCTL"/utils/infra.sh
 source "$CCTL"/utils/os.sh
 source "$CCTL"/utils/paths.sh
 source "$CCTL"/utils/queries.sh
-source "$CCTL"/utils/views.sh

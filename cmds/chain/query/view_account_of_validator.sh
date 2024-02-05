@@ -35,7 +35,8 @@ function _main()
     log "validator #$NODE_ID a/c purse         : $PURSE_UREF"
     log "validator #$NODE_ID a/c purse balance : $ACCOUNT_BALANCE"
     log "validator #$NODE_ID on-chain account  : see below"
-    render_account "$CCTL_ACCOUNT_TYPE_NODE" "$NODE_ID"
+
+    source "$CCTL"/cmds/chain/query/view_account.sh account=$ACCOUNT_HASH
 }
 
 # ----------------------------------------------------------------

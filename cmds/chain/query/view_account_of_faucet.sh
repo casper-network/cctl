@@ -33,7 +33,7 @@ function _main()
     log "faucet a/c purse balance : $ACCOUNT_BALANCE"
     log "faucet on-chain account  : see below"
 
-    render_account "$CCTL_ACCOUNT_TYPE_FAUCET"
+    source "$CCTL"/cmds/chain/query/view_account.sh account=$ACCOUNT_HASH
 }
 
 # ----------------------------------------------------------------
