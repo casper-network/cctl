@@ -232,7 +232,7 @@ function _setup_genesis_chainspec()
     local SCRIPT
 
     PATH_TO_CHAINSPEC="$(get_path_to_assets)/genesis/chainspec.toml"
-    cp "$PATH_TO_CHAINSPEC_TEMPLATE" "$PATH_TO_CHAINSPEC"
+    cp --no-preserve=mode "$PATH_TO_CHAINSPEC_TEMPLATE" "$PATH_TO_CHAINSPEC"
 
     SCRIPT=(
         "import toml;"
@@ -336,7 +336,7 @@ function _setup_node_config()
     cp "$PATH_TO_ASSETS/genesis/accounts.toml" "$PATH_TO_NODE_CONFIG_DIR"
     cp "$PATH_TO_ASSETS/genesis/chainspec.toml" "$PATH_TO_NODE_CONFIG_DIR"
 
-    cp "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
+    cp --no-preserve=mode "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
     SCRIPT=(
         "import toml;"
         "cfg=toml.load('$PATH_TO_NODE_CONFIG');"
