@@ -3,16 +3,17 @@
 #######################################
 # Returns an on-chain account balance.
 # Arguments:
-#   Data to be hashed.
+#   Purse URef.
+#   State root hash at a certain block height.
 #######################################
 function get_account_balance()
 {
     local PURSE_UREF=${1}
     local STATE_ROOT_HASH=${2:-$(get_state_root_hash)}
-    local ACCOUNT_BALANCE
-    local NODE_ADDRESS
 
-    NODE_ADDRESS=$(get_node_address_rpc)
+    local ACCOUNT_BALANCE
+    local NODE_ADDRESS=$(get_node_address_rpc)
+
     ACCOUNT_BALANCE=$(
         $(get_path_to_client) query-balance \
             --node-address "$NODE_ADDRESS" \
@@ -28,7 +29,8 @@ function get_account_balance()
 #######################################
 # Returns an on-chain account hash.
 # Arguments:
-#   Data to be hashed.
+#   Key of account.
+#   Type of account key.
 #######################################
 function get_account_hash()
 {
@@ -68,28 +70,6 @@ function get_account_key()
     elif [ "$ACCOUNT_TYPE" = "$CCTL_ACCOUNT_TYPE_USER" ]; then
         cat "$(get_path_to_user "$ACCOUNT_IDX")"/public_key_hex
     fi
-}
-
-#######################################
-# Returns an account prefix used when logging.
-# Globals:
-#   CCTL_ACCOUNT_TYPE_FAUCET - faucet account type.
-# Arguments:
-#   Account type.
-#   Account index (optional).
-#######################################
-function get_account_prefix()
-{
-    local ACCOUNT_TYPE=${1}
-    local ACCOUNT_IDX=${2:-}
-    local NET_ID=${NET_ID:-1}
-
-    local PREFIX="net-$NET_ID.$ACCOUNT_TYPE"
-    if [ "$ACCOUNT_TYPE" != "$CCTL_ACCOUNT_TYPE_FAUCET" ]; then
-        PREFIX=$PREFIX"-"$ACCOUNT_IDX
-    fi
-
-    echo "$PREFIX"
 }
 
 #######################################
