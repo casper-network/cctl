@@ -13,20 +13,16 @@ function _help() {
     ARGS
     ----------------------------------------------------------------
     amount          Amount (motes) to transfer. Optional.
-    interval        Time interval (seconds) between each transfer. Optional.
-    node            Either ordinal identifier of a running node or random. Optional.
-    transfers       Number of transfers to be dispatched. Optional.
-    user            Ordinal identifier of user. Optional.
-    verbose         Flag indicating whether logging output will be verbose or not. Optional.
+    count           Number of transactions per batch. Optional.
+    size            Batch size. Optional.
+    ttl             Transfer time to live. Optional.
 
     DEFAULTS
     ----------------------------------------------------------------
     amount          $CCTL_DEFAULT_TRANSFER_AMOUNT
-    interval        0.01 seconds
-    node            random
-    transfers       100
-    user            1
-    verbose         true
+    count           5
+    size            200
+    ttl             30minutes
     "
 }
 
@@ -43,10 +39,9 @@ function _main()
     local CP2_ACCOUNT_HASH
     local GAS_PAYMENT=$CCTL_DEFAULT_GAS_PAYMENT
     local PATH_TO_CLIENT=$(get_path_to_client)
+    local PATH_TO_TX
     local PATH_TO_TX_DIR
-    local PATH_TO_TX_ROOT="$(get_path_to_assets)"/transactions
-    local PATH_TO_TX_UNSIGNED
-    local PATH_TO_TX_SIGNED
+    local PATH_TO_TX_ROOT_DIR="$(get_path_to_assets)"/transactions
     local USER_ID
 
     if [ -d "$PATH_TO_TX_ROOT_DIR"/transfer-native ]; then
@@ -69,10 +64,12 @@ function _main()
             # Enumerate set of transfers to prepare.
             for TRANSFER_ID in $(seq 1 "$BATCH_SIZE")
             do
-                # Set unsigned tx.
-                PATH_TO_TX_UNSIGNED="$PATH_TO_TX_DIR"/transfer-$TRANSFER_ID-unsigned.json
+                # Set path to tx.
+                PATH_TO_TX="$PATH_TO_TX_DIR"/transfer-$TRANSFER_ID.json
+
+                # Set tx.
                 $PATH_TO_CLIENT make-transfer \
-                    --output "$PATH_TO_TX_UNSIGNED" \
+                    --output "$PATH_TO_TX" \
                     --chain-name "$CHAIN_NAME" \
                     --payment-amount "$GAS_PAYMENT" \
                     --ttl "$DEPLOY_TTL" \
@@ -81,17 +78,6 @@ function _main()
                     --amount "$AMOUNT" \
                     --target-account "account-hash-$CP2_ACCOUNT_HASH" > \
                     /dev/null 2>&1
-
-                # Set signed tx.
-                PATH_TO_TX_SIGNED="$PATH_TO_TX_DIR/transfer-$TRANSFER_ID.json"
-                $PATH_TO_CLIENT sign-deploy \
-                    --secret-key "$CP1_SECRET_KEY" \
-                    --input "$PATH_TO_TX_UNSIGNED" \
-                    --output "$PATH_TO_TX_SIGNED" \
-                    > /dev/null 2>&1
-
-                # Tidy up.
-                rm "$PATH_TO_TX_UNSIGNED"
             done
         done
     done
