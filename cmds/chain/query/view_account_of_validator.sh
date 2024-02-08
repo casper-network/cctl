@@ -26,7 +26,7 @@ function _main()
     local ACCOUNT_KEY=$(get_account_key "$CCTL_ACCOUNT_TYPE_NODE" "$NODE_ID")
     local ACCOUNT_HASH=$(get_account_hash "$ACCOUNT_KEY")
     local STATE_ROOT_HASH=$(get_state_root_hash)
-    local PURSE_UREF=$(get_main_purse_uref "$ACCOUNT_KEY" "$STATE_ROOT_HASH")
+    local PURSE_UREF=$(get_main_purse_uref "$ACCOUNT_HASH" "$STATE_ROOT_HASH")
     local ACCOUNT_BALANCE=$(get_account_balance "$PURSE_UREF" "$STATE_ROOT_HASH")
 
     log "validator #$NODE_ID a/c secret key    : $PATH_TO_ACCOUNT_SKEY"
