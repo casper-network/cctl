@@ -227,12 +227,15 @@ function _setup_genesis_chainspec()
     local PATH_TO_CHAINSPEC_TEMPLATE=${3}
 
     local ACTIVATION_POINT=$(get_genesis_timestamp "$GENESIS_DELAY")
-    local PATH_TO_CHAINSPEC
+    local PATH_TO_CHAINSPEC="$(get_path_to_assets)/genesis/chainspec.toml"
     local PROTOCOL_VERSION=1.0.0
     local SCRIPT
 
-    PATH_TO_CHAINSPEC="$(get_path_to_assets)/genesis/chainspec.toml"
-    cp --no-preserve=mode "$PATH_TO_CHAINSPEC_TEMPLATE" "$PATH_TO_CHAINSPEC"
+    if [ "$(get_os)" = "macosx" ]; then
+        cp "$PATH_TO_CHAINSPEC_TEMPLATE" "$PATH_TO_CHAINSPEC"
+    else
+        cp --no-preserve=mode "$PATH_TO_CHAINSPEC_TEMPLATE" "$PATH_TO_CHAINSPEC"
+    fi
 
     SCRIPT=(
         "import toml;"
@@ -336,7 +339,12 @@ function _setup_node_config()
     cp "$PATH_TO_ASSETS/genesis/accounts.toml" "$PATH_TO_NODE_CONFIG_DIR"
     cp "$PATH_TO_ASSETS/genesis/chainspec.toml" "$PATH_TO_NODE_CONFIG_DIR"
 
-    cp --no-preserve=mode "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
+    if [ "$(get_os)" = "macosx" ]; then
+        cp "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
+    else
+        cp --no-preserve=mode "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
+    fi
+
     SCRIPT=(
         "import toml;"
         "cfg=toml.load('$PATH_TO_NODE_CONFIG');"
