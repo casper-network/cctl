@@ -12,7 +12,7 @@ function _help() {
 
     ARGS
     ----------------------------------------------------------------
-    node        Ordinal identifier of node to be stopped. Optional.
+    node        Ordinal identifier of a node. Optional.
 
     DEFAULTS
     ----------------------------------------------------------------
