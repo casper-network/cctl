@@ -1,4 +1,4 @@
-# Dockerfile script to download, build and setup a local casper-node CCTL
+# Dockerfile script to download, create and setup a local casper-node CCTL
 # The script is split into two sections across two Debian images:
 # Build: install dependencies, download the source code,
 #  install rust and build the casper-node
