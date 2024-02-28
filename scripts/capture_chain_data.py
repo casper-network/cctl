@@ -74,7 +74,7 @@ async def main(args: argparse.Namespace):
     # Set node client.
     client: NodeClient = _get_client(args)
 
-    # Validate range.
+    # Parse range.
     try:
         assert args.range_from >= 0
         assert args.range_to > args.range_from
@@ -82,18 +82,24 @@ async def main(args: argparse.Namespace):
     except AssertionError:
         raise Exception("Specified block range is invalid")
     
-    # Validate io target.
+    # Parse io target.
     io_target = pathlib.Path(args.io_target)
     try:
         assert io_target.is_dir
     except AssertionError:
         raise Exception("Invalid target directory.")
 
+    print("-" * 74)
+    print("CCTL :: Chain data capture begins.")
+    print("-" * 74)
+
     # Capute blocks within range.
     block_range = range(args.range_from, args.range_to)
     for block in _yield_blocks(client, block_range):
         _write_block(io_target, block)
 
+    print("-" * 74)
+    print("CCTL :: Chain data capture complete.")
     print("-" * 74)
 
 
@@ -109,10 +115,12 @@ def _write_block(io_target: pathlib.Path, block: dict):
     """Writes block data to file system.
 
     """
-    fname = f"block-{block["header"]["height"]}.json"
-    fpath = io_target / fname
+    block_height: int = block["header"]["height"]
+    fname: str = f"block-{block_height}.json"
+    fpath: pathlib.Path = io_target / fname
 
     with open(fpath, 'w') as fhandle:
+        print(f"Writing block {block_height} -> {fpath}")
         fhandle.write(json.dumps(block, indent=4))
 
 
