@@ -57,6 +57,7 @@ alias cctl-chain-view-account-of-user='source $CCTL/cmds/chain/query/view_accoun
 alias cctl-chain-view-account-of-validator='source $CCTL/cmds/chain/query/view_account_of_validator.sh'
 alias cctl-chain-view-auction-info='source $CCTL/cmds/chain/query/view_auction_info.sh'
 alias cctl-chain-view-block='source $CCTL/cmds/chain/query/view_block.sh'
+alias cctl-chain-view-block-transfers='source $CCTL/cmds/chain/query/view_block_transfers.sh'
 alias cctl-chain-view-deploy='source $CCTL/cmds/chain/query/view_deploy.sh'
 alias cctl-chain-view-era='source $CCTL/cmds/chain/query/view_era.sh'
 alias cctl-chain-view-era-summary='source $CCTL/cmds/chain/query/view_era_summary.sh'
