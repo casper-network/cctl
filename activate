@@ -50,6 +50,7 @@ alias cctl-chain-await-until-block-n='source $CCTL/cmds/chain/await/until_block_
 alias cctl-chain-await-until-era-n='source $CCTL/cmds/chain/await/until_era_n.sh'
 # ... views
 alias cctl-chain-view-account='source $CCTL/cmds/chain/query/view_account.sh'
+alias cctl-chain-view-account-address='source $CCTL/cmds/chain/query/view_account_address.sh'
 alias cctl-chain-view-account-balance='source $CCTL/cmds/chain/query/view_account_balance.sh'
 alias cctl-chain-view-account-balances='source $CCTL/cmds/chain/query/view_account_balances.sh'
 alias cctl-chain-view-account-of-faucet='source $CCTL/cmds/chain/query/view_account_of_faucet.sh'
