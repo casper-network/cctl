@@ -71,17 +71,16 @@ alias cctl-chain-view-tip-info='source $CCTL/cmds/chain/query/view_tip_info.sh'
 alias cctl-chain-view-validator-changes='source $CCTL/cmds/chain/query/view_validator_changes.sh'
 
 # Transaction commands:
-# ... transfers
+# ... system auction
+alias cctl-tx-auction-activate-bid='source $CCTL/cmds/tx/auction/activate_bid.sh'
+alias cctl-tx-auction-delegate='source $CCTL/cmds/tx/auction/delegate.sh'
+alias cctl-tx-auction-add-bid='source $CCTL/cmds/tx/auction/add_bid.sh'
+alias cctl-tx-auction-undelegate='source $CCTL/cmds/tx/auction/undelegate.sh'
+alias cctl-tx-auction-withdraw-bid='source $CCTL/cmds/tx/auction/withdraw_bid.sh'
+# ... system mint
 alias cctl-tx-transfer-dispatch-native='source $CCTL/cmds/tx/transfer/dispatch_native.sh'
 alias cctl-tx-transfer-dispatch-native-batch='source $CCTL/cmds/tx/transfer/dispatch_native_batch.sh'
 alias cctl-tx-transfer-dispatch-wasm='source $CCTL/cmds/tx/transfer/dispatch_wasm.sh'
 alias cctl-tx-transfer-dispatch-wasm-batch='source $CCTL/cmds/tx/transfer/dispatch_wasm_batch.sh'
 alias cctl-tx-transfer-prepare-native-batch='source $CCTL/cmds/tx/transfer/prepare_native_batch.sh'
 alias cctl-tx-transfer-prepare-wasm-batch='source $CCTL/cmds/tx/transfer/prepare_wasm_batch.sh'
-
-# ... auction
-alias cctl-tx-auction-activate-bid='source $CCTL/cmds/tx/auction/activate_bid.sh'
-alias cctl-tx-auction-delegate='source $CCTL/cmds/tx/auction/delegate.sh'
-alias cctl-tx-auction-add-bid='source $CCTL/cmds/tx/auction/add_bid.sh'
-alias cctl-tx-auction-undelegate='source $CCTL/cmds/tx/auction/undelegate.sh'
-alias cctl-tx-auction-withdraw-bid='source $CCTL/cmds/tx/auction/withdraw_bid.sh'
