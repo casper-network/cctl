@@ -24,7 +24,7 @@ alias cctl-infra-net-start='source $CCTL/cmds/infra/net/start.sh'
 alias cctl-infra-net-status='source $CCTL/cmds/infra/net/status.sh'
 alias cctl-infra-net-stop='source $CCTL/cmds/infra/net/stop.sh'
 alias cctl-infra-net-teardown='source $CCTL/cmds/infra/net/teardown.sh'
-# ... node
+# ... node control
 alias cctl-infra-node-clean='source $CCTL/cmds/infra/node/clean.sh'
 alias cctl-infra-node-stop='source $CCTL/cmds/infra/node/stop.sh'
 alias cctl-infra-node-restart='source $CCTL/cmds/infra/node/restart.sh'
@@ -69,10 +69,19 @@ alias cctl-chain-view-last-finalized-block='source $CCTL/cmds/chain/query/view_l
 alias cctl-chain-view-state-root-hash='source $CCTL/cmds/chain/query/view_state_root_hash.sh'
 alias cctl-chain-view-tip-info='source $CCTL/cmds/chain/query/view_tip_info.sh'
 alias cctl-chain-view-validator-changes='source $CCTL/cmds/chain/query/view_validator_changes.sh'
-# ... transactions
+
+# Transaction commands:
+# ... transfers
 alias cctl-tx-transfer-dispatch-native='source $CCTL/cmds/tx/transfer/dispatch_native.sh'
 alias cctl-tx-transfer-dispatch-native-batch='source $CCTL/cmds/tx/transfer/dispatch_native_batch.sh'
 alias cctl-tx-transfer-dispatch-wasm='source $CCTL/cmds/tx/transfer/dispatch_wasm.sh'
 alias cctl-tx-transfer-dispatch-wasm-batch='source $CCTL/cmds/tx/transfer/dispatch_wasm_batch.sh'
 alias cctl-tx-transfer-prepare-native-batch='source $CCTL/cmds/tx/transfer/prepare_native_batch.sh'
 alias cctl-tx-transfer-prepare-wasm-batch='source $CCTL/cmds/tx/transfer/prepare_wasm_batch.sh'
+
+# ... auction
+alias cctl-tx-auction-activate-bid='source $CCTL/cmds/tx/auction/activate_bid.sh'
+alias cctl-tx-auction-delegate='source $CCTL/cmds/tx/auction/delegate.sh'
+alias cctl-tx-auction-add-bid='source $CCTL/cmds/tx/auction/add_bid.sh'
+alias cctl-tx-auction-undelegate='source $CCTL/cmds/tx/auction/undelegate.sh'
+alias cctl-tx-auction-withdraw-bid='source $CCTL/cmds/tx/auction/withdraw_bid.sh'

@@ -33,7 +33,7 @@ declare CCTL_BASE_PORT_SPEC_EXEC=25000
 declare CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES="--max-time 4 --connect-timeout 2 --retry 20 --retry-connrefused --retry-delay 1 -s"
 
 # Default amount used when delegating.
-declare CCTL_DEFAULT_AUCTION_DELEGATE_AMOUNT=1000000000   # (1e9)
+declare CCTL_DEFAULT_AUCTION_DELEGATE_AMOUNT=1000000000000   # (1e12)
 
 # Default era offset to apply when activating an upgrade.
 declare CCTL_DEFAULT_ERA_ACTIVATION_OFFSET=2
@@ -58,6 +58,9 @@ declare CCTL_INITIAL_DELEGATION_AMOUNT=1000000000000000000   # (1e18)
 
 # Base weight applied to a validator at genesis.
 declare CCTL_VALIDATOR_BASE_WEIGHT=1000000000000000000   # (1e18)
+
+# Default amount used when submitting an auction bid.
+declare CCTL_DEFAULT_AUCTION_BID_AMOUNT=1000000000000   # (1e12)
 
 # Name of local cctl network.
 declare CCTL_NET_NAME=cspr-dev-cctl
