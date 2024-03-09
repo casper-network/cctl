@@ -4,11 +4,11 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-tx-exec-transfer-wasm
+    cctl-tx-mint-transfer
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Dispatches a set of wasm transfers into network.
+    Dispatches a set of transfers into network.
 
     ARGS
     ----------------------------------------------------------------
@@ -16,6 +16,7 @@ function _help() {
     interval        Time interval (seconds) between each transfer. Optional.
     node            Either ordinal identifier of a running node or random. Optional.
     transfers       Number of transfers to be dispatched. Optional.
+    type            Type of transfer, native or wasm. Optional.
     user            Ordinal identifier of user. Optional.
     verbose         Flag indicating whether logging output will be verbose or not. Optional.
 
@@ -25,6 +26,7 @@ function _help() {
     interval        0.01 seconds
     node            random
     transfers       100
+    type            native
     user            1
     verbose         true
     "
@@ -36,8 +38,11 @@ function _main()
     local INTERVAL=${2}
     local NODE_ID=${3}
     local TRANSFERS=${4}
-    local USER_ID=${5}
-    local VERBOSE=${6}
+    local TYPEOF=${5}
+    local USER_ID=${6}
+    local VERBOSE=${7}
+
+    echo $TYPEOF
 
     local CHAIN_NAME=$CCTL_NET_NAME
     local CP1_SECRET_KEY=$(get_path_to_secret_key "$CCTL_ACCOUNT_TYPE_FAUCET")
@@ -62,11 +67,13 @@ function _main()
     fi
 
     if [ $VERBOSE == true ]; then
-        log "dispatching $TRANSFERS wasm transfers"
+        log "dispatching $TRANSFERS $TYPEOF transfers"
         log "... chain=$CHAIN_NAME"
         log "... transfer amount=$AMOUNT"
-        log "... transfer contract=$PATH_TO_CONTRACT"
         log "... transfer interval=$INTERVAL (s)"
+        if [ $TYPEOF == "wasm" ]; then
+            log "... transfer contract=$PATH_TO_CONTRACT"
+        fi
         log "... counter-party 1 public key=$CP1_ACCOUNT_KEY"
         log "... counter-party 2 public key=$CP2_ACCOUNT_KEY"
         log "... dispatched deploys:"
@@ -79,17 +86,31 @@ function _main()
         DISPATCH_NODE_ADDRESS=${NODE_ADDRESS:-$(get_node_address_rpc)}
 
         # Dispatch deploy.
-        OUTPUT=$(
-            $PATH_TO_CLIENT put-deploy \
-                --chain-name "$CHAIN_NAME" \
-                --node-address "$DISPATCH_NODE_ADDRESS" \
-                --payment-amount "$GAS_PAYMENT" \
-                --ttl "5minutes" \
-                --secret-key "$CP1_SECRET_KEY" \
-                --session-arg "$(get_cl_arg_u512 'amount' "$AMOUNT")" \
-                --session-arg "$(get_cl_arg_account_hash 'target' "$CP2_ACCOUNT_HASH")" \
-                --session-path "$PATH_TO_CONTRACT"
-            )
+        if [ $TYPEOF == "wasm" ]; then
+            OUTPUT=$(
+                $PATH_TO_CLIENT put-deploy \
+                    --chain-name "$CHAIN_NAME" \
+                    --node-address "$DISPATCH_NODE_ADDRESS" \
+                    --payment-amount "$GAS_PAYMENT" \
+                    --ttl "5minutes" \
+                    --secret-key "$CP1_SECRET_KEY" \
+                    --session-arg "$(get_cl_arg_u512 'amount' "$AMOUNT")" \
+                    --session-arg "$(get_cl_arg_account_hash 'target' "$CP2_ACCOUNT_HASH")" \
+                    --session-path "$PATH_TO_CONTRACT"
+                )
+        else
+            OUTPUT=$(
+                $PATH_TO_CLIENT transfer \
+                    --chain-name "$CHAIN_NAME" \
+                    --node-address "$DISPATCH_NODE_ADDRESS" \
+                    --payment-amount "$GAS_PAYMENT" \
+                    --ttl "5minutes" \
+                    --secret-key "$CP1_SECRET_KEY" \
+                    --amount "$AMOUNT" \
+                    --target-account "$CP2_ACCOUNT_KEY" \
+                    --transfer-id $((DISPATCH_ATTEMPTS + 1))
+                )
+        fi
 
         # Process output.
         if [[ $? -eq 0 ]]; then
@@ -109,7 +130,7 @@ function _main()
     done
 
     if [ $VERBOSE == true ]; then
-        log "successfully dispatched $SUCCESSFUL_DISPATCH_COUNT of $DISPATCH_ATTEMPTS wasm transfers"
+        log "successfully dispatched $SUCCESSFUL_DISPATCH_COUNT of $DISPATCH_ATTEMPTS $TYPEOF transfers"
     fi
 }
 
@@ -124,6 +145,7 @@ unset _HELP
 unset _INTERVAL
 unset _NODE_ID
 unset _TRANSFERS
+unset _TYPEOF
 unset _USER_ID
 unset _VERBOSE
 
@@ -137,6 +159,7 @@ do
         interval) _INTERVAL=${VALUE} ;;
         node) _NODE_ID=${VALUE} ;;
         transfers) _TRANSFERS=${VALUE} ;;
+        type) _TYPEOF=${VALUE} ;;
         user) _USER_ID=${VALUE} ;;
         verbose) _VERBOSE=${VALUE} ;;
         *)
@@ -151,6 +174,7 @@ else
         "${_INTERVAL:-0.01}" \
         "${_NODE_ID:-"random"}" \
         "${_TRANSFERS:-100}" \
+        "${_TYPEOF:-"native"}" \
         "${_USER_ID:-1}" \
         ${_VERBOSE:-true}
 fi

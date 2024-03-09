@@ -4,23 +4,25 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-tx-dispatch-wasm-transfer-batch
+    cctl-tx-mint-transfer-batch
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Dispatches a prepared set of wasm transfers into network.
+    Dispatches a set of transfer batches into network.
 
     ARGS
     ----------------------------------------------------------------
     batch           Ordinal identifier of batch to be dispatched.
     interval        Time interval (seconds) between each transfer. Optional.
     node            Either ordinal identifier of a running node or random. Optional.
+    type            Type of transfer, native or wasm. Optional.
 
     DEFAULTS
     ----------------------------------------------------------------
     batch           1
     interval        0.01 seconds
     node            random
+    type            native
     "
 }
 
@@ -29,6 +31,7 @@ function _main()
     local BATCH_ID=${1}
     local INTERVAL=${2}
     local NODE_ID=${3}
+    local TYPEOF=${4}
 
     local DISPATCH_NODE_ADDRESS
     local NODE_ADDRESS
@@ -47,10 +50,14 @@ function _main()
         NODE_ADDRESS=$(get_node_address_rpc "$NODE_ID")
     fi
 
+    log_break
+    log "dispatching $BATCH_COUNT batches of $BATCH_SIZE $TYPEOF transfers per user to the file system"
+    log_break
+
     # Dispatch deploy batch.
-    PATH_TO_TX_BATCH="$PATH_TO_TX_ROOT"/transfer-wasm/batch-$BATCH_ID
+    PATH_TO_TX_BATCH="$PATH_TO_TX_ROOT"/transfer-$TYPEOF/batch-$BATCH_ID    
     if [ ! -d "$PATH_TO_TX_BATCH" ]; then
-        log "ERROR: no batch exists on file system - have you prepared it ?"
+        log "ERROR: no batch exists on file system - have you written it ?"
     else
         TX_ID=0
         for USER_ID in $(seq 1 "$(get_count_of_users)")
@@ -88,6 +95,7 @@ unset _BATCH_ID
 unset _HELP
 unset _INTERVAL
 unset _NODE_ID
+unset _TYPEOF
 
 for ARGUMENT in "$@"
 do
@@ -98,6 +106,7 @@ do
         help) _HELP="show" ;;
         interval) _INTERVAL=${VALUE} ;;
         node) _NODE_ID=${VALUE} ;;
+        type) _TYPEOF=${VALUE} ;;
         *)
     esac
 done
@@ -108,5 +117,6 @@ else
     _main \
         "${_BATCH_ID:-1}" \
         "${_INTERVAL:-0.01}" \
-        "${_NODE_ID:-"random"}"
+        "${_NODE_ID:-"random"}" \
+        "${_TYPEOF:-"native"}"
 fi
