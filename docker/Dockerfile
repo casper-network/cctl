@@ -1,18 +1,24 @@
 # Dockerfile script to download, create and setup a local casper-node CCTL
 # The script is split into two sections across two Debian images:
 # Build: install dependencies, download the source code,
-#  install rust and build the casper-node
+# install rust and build the casper-node
 # Run: install run time dependencies, create a non root user and
-#  copy over the compiled binaries from the build ready for cctl start
+# copy over the compiled binaries from the build ready for cctl start
 FROM debian:buster as build
 
+# Allow users to specify forked node, or specific commit
+# If not fallback to release branch (or alternatively just specify branch)
+ARG NODE_REPO=https://github.com/casper-network/casper-node.git
+ARG NODE_COMMIT=
+ARG CLIENT_REPO=https://github.com/casper-ecosystem/casper-client-rs.git
+ARG CLIENT_COMMIT=
 ARG NODE_GITBRANCH=release-1.5.6
 ARG CLIENT_GITBRANCH=release-2.0.0
 
-RUN apt-get update  \
+RUN apt-get update \
     && DEBIAN_FRONTEND="noninteractive" \
     apt-get install -y sudo tzdata curl gnupg gcc git ca-certificates \
-        protobuf-compiler libprotobuf-dev  \
+        protobuf-compiler libprotobuf-dev \
         pkg-config libssl-dev make build-essential gettext-base lsof cmake\
         && rm -rf /var/lib/apt/lists/*
 
@@ -23,9 +29,17 @@ RUN curl -f -L https://static.rust-lang.org/rustup.sh -O \
 ENV PATH="$PATH:/root/.cargo/bin"
 
 RUN git clone https://github.com/casper-network/casper-node-launcher.git \
-        && git clone -b $CLIENT_GITBRANCH https://github.com/casper-ecosystem/casper-client-rs \
-        && git clone -b $NODE_GITBRANCH https://github.com/casper-network/casper-node.git \
-        && git clone https://github.com/casper-network/cctl.git
+    && git clone https://github.com/casper-network/cctl.git
+RUN if [ -n "$NODE_COMMIT" ]; then \
+        git clone -b $NODE_COMMIT $NODE_REPO; \
+    else \
+        git clone -b $NODE_GITBRANCH $NODE_REPO; \
+    fi \
+    && if [ -n "$CLIENT_COMMIT" ]; then \
+        git clone -b $CLIENT_COMMIT $CLIENT_REPO; \
+    else \
+        git clone -b $CLIENT_GITBRANCH $CLIENT_REPO; \
+    fi
 
 WORKDIR /casper-node
 
@@ -47,7 +61,7 @@ RUN apt-get update \
       && apt-get install -y sudo curl git ca-certificates jq supervisor lsof python3 python3-pip python3-toml \
       && rm -rf /var/lib/apt/lists/*
 
-RUN useradd -ms /bin/bash cctl &&  echo "cctl:cctl" | chpasswd && adduser cctl sudo
+RUN useradd -ms /bin/bash cctl && echo "cctl:cctl" | chpasswd && adduser cctl sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER cctl
