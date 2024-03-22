@@ -66,7 +66,7 @@ function get_genesis_timestamp()
     local DELAY=${1}
     local SCRIPT=(
         "import datetime as dt;"
-        "print((dt.datetime.now(dt.UTC) + dt.timedelta(seconds=$DELAY)).isoformat('T') + 'Z');"
+        "print((dt.datetime.now(dt.UTC) + dt.timedelta(seconds=$DELAY)).isoformat('T')[:-6] + 'Z');"
      )
 
     python3 -c "${SCRIPT[*]}"
