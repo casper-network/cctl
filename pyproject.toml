@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "cctl"
+version = "0.1.0"
+description = "Bash application to work with a local casper network."
+authors = ["Mark A. Greenslade <asladeofgreen@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+toml = "^0.10.2"
+supervisor = "^4.2.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
