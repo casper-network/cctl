@@ -3,10 +3,10 @@
   "summary": "returns an Account from the network",
   "params": [
     {
-      "name": "public_key",
+      "name": "account_identifier",
       "schema": {
         "description": "The public key of the Account.",
-        "$ref": "#/components/schemas/PublicKey"
+        "$ref": "#/components/schemas/AccountIdentifier"
       },
       "required": true
     },
@@ -58,7 +58,7 @@
       "name": "state_get_account_info_example",
       "params": [
         {
-          "name": "public_key",
+          "name": "account_identifier",
           "value": "013b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"
         },
         {
@@ -71,7 +71,7 @@
       "result": {
         "name": "state_get_account_info_example_result",
         "value": {
-          "api_version": "1.5.3",
+          "api_version": "1.5.6",
           "account": {
             "account_hash": "account-hash-e94daaff79c2ab8d9c31d9c3058d7d0a0dd31204a5638dc1451fa67b2e3fb88c",
             "named_keys": [],

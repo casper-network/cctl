@@ -3,20 +3,27 @@
   "summary": "a query to global state using either a Block hash or state root hash",
   "params": [
     {
-      "name": "state_identifier",
-      "schema": {
-        "description": "The identifier used for the query.",
-        "$ref": "#/components/schemas/GlobalStateIdentifier"
-      },
-      "required": true
-    },
-    {
       "name": "key",
       "schema": {
         "description": "`casper_types::Key` as formatted string.",
         "type": "string"
       },
       "required": true
+    },
+    {
+      "name": "state_identifier",
+      "schema": {
+        "description": "The identifier used for the query. If none is passed the tip of the chain will be used.",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/GlobalStateIdentifier"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "required": false
     },
     {
       "name": "path",
@@ -91,7 +98,7 @@
       "result": {
         "name": "query_global_state_example_result",
         "value": {
-          "api_version": "1.5.3",
+          "api_version": "1.5.6",
           "block_header": {
             "parent_hash": "0707070707070707070707070707070707070707070707070707070707070707",
             "state_root_hash": "0808080808080808080808080808080808080808080808080808080808080808",

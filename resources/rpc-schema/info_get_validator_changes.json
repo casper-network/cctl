@@ -34,7 +34,7 @@
       "result": {
         "name": "info_get_validator_changes_example_result",
         "value": {
-          "api_version": "1.5.3",
+          "api_version": "1.5.6",
           "changes": [
             {
               "public_key": "01d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c",

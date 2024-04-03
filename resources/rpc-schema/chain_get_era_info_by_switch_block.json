@@ -53,7 +53,7 @@
       "result": {
         "name": "chain_get_era_info_by_switch_block_example_result",
         "value": {
-          "api_version": "1.5.3",
+          "api_version": "1.5.6",
           "era_summary": {
             "block_hash": "13c2d7a68ecdd4b74bf4393c88915c836c863fc4bf11d7f2bd930a1bbccacdcb",
             "era_id": 42,

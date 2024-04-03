@@ -53,7 +53,7 @@
       "result": {
         "name": "chain_get_block_example_result",
         "value": {
-          "api_version": "1.5.3",
+          "api_version": "1.5.6",
           "block": {
             "hash": "13c2d7a68ecdd4b74bf4393c88915c836c863fc4bf11d7f2bd930a1bbccacdcb",
             "header": {

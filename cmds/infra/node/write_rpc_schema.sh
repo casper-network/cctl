@@ -36,7 +36,7 @@ function _write_schema()
             "method": "rpc.discover"
         }' \
         | jq '.result.schema' \
-        > $CCTL_RESOURCES/rpc-schema/schema.json
+        > "$CCTL"/resources/rpc-schema/schema.json
 }
 
 function _write_endpoints()
@@ -68,7 +68,7 @@ function _write_endpoints()
                 "method": "rpc.discover"
             }' \
             | jq '.result.schema.methods[] | select(.name == "'"$ENDPOINT"'")' \
-            > $CCTL_RESOURCES/rpc-schema/$ENDPOINT.json
+            > "$CCTL"/resources/rpc-schema/$ENDPOINT.json
     done
 }
 

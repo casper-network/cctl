@@ -47,7 +47,7 @@
       "result": {
         "name": "state_get_auction_info_example_result",
         "value": {
-          "api_version": "1.5.3",
+          "api_version": "1.5.6",
           "auction_state": {
             "state_root_hash": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
             "block_height": 10,

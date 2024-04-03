@@ -121,8 +121,8 @@
               "address": "127.0.0.1:54321"
             }
           ],
-          "api_version": "1.5.3",
-          "build_version": "1.5.3-53dd338",
+          "api_version": "1.5.6",
+          "build_version": "1.5.6",
           "chainspec_name": "casper-example",
           "starting_state_root_hash": "0000000000000000000000000000000000000000000000000000000000000000",
           "last_added_block_info": {
