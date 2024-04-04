@@ -52,9 +52,9 @@ function _display_storage()
     log "node #$NODE_ID :: storage @ $PATH_TO_NODE_STORAGE"
 
     if [[ $OS_TYPE == "$_OS_LINUX*" ]]; then
-        ll "$PATH_TO_NODE_STORAGE"
+        ll "$PATH_TO_NODE_STORAGE"/"$CCTL_NET_NAME"
     elif [[ $OS_TYPE == "$_OS_MACOSX" ]]; then
-        ls -lG "$PATH_TO_NODE_STORAGE"
+        ls -lG "$PATH_TO_NODE_STORAGE"/"$CCTL_NET_NAME"
     fi
 }
 
