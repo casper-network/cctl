@@ -1,6 +1,3 @@
-WORK IN PROGRESS - FEEDBACK WELCOME !
-===============
-
 cctl
 ===============
 
