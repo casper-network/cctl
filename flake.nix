@@ -56,8 +56,12 @@
       in
       {
         packages = {
-          inherit (pkgs) cctl;
+          inherit (pkgs) cctl cctl-test-utils;
           default = pkgs.cctl;
+        };
+        
+        devsShells.cctl-test-utils = pkgs.mkShell {
+          inputsFrom = [ self.packages.${system}.risc0package ];
         };
 
         formatter = pkgs.nixpkgs-fmt;
