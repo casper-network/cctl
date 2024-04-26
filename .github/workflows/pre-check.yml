@@ -1,0 +1,11 @@
+name: pre-check
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-signed-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check signed commits
+        uses: 1Password/check-signed-commits-action@v1
