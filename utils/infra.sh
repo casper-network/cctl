@@ -121,6 +121,18 @@ function get_net_is_up()
 }
 
 #######################################
+# Returns node binary address.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_node_address_binary()
+{
+    local NODE_ID=${1}
+
+    echo "http://localhost:$(get_node_port "$CCTL_BASE_PORT_BINARY" "$NODE_ID")"
+}
+
+#######################################
 # Returns node event address.
 # Arguments:
 #   Node ordinal identifier.
@@ -227,7 +239,11 @@ function get_node_port_bind()
 {
     local NODE_ID=${1}
 
-    get_node_port "$CCTL_BASE_PORT_NETWORK" "$NODE_ID"
+    if ((${#CSPR_BASE_PORT_NETWORK[@]})); then
+        get_node_port "$CSPR_BASE_PORT_NETWORK" "$NODE_ID"
+    else
+        get_node_port "$CCTL_BASE_PORT_NETWORK" "$NODE_ID"
+    fi
 }
 
 #######################################
@@ -239,7 +255,11 @@ function get_node_port_binary()
 {
     local NODE_ID=${1}
 
-    get_node_port "$CCTL_BASE_PORT_BINARY" "$NODE_ID"
+    if ((${#CSPR_BASE_PORT_BINARY[@]})); then
+        get_node_port "$CSPR_BASE_PORT_BINARY" "$NODE_ID"
+    else
+        get_node_port "$CCTL_BASE_PORT_BINARY" "$NODE_ID"
+    fi
 }
 
 #######################################
@@ -251,7 +271,11 @@ function get_node_port_speculative_exec()
 {
     local NODE_ID=${1}
 
-    get_node_port "$CCTL_BASE_PORT_SPEC_EXEC" "$NODE_ID"
+    if ((${#CSPR_BASE_PORT_SPEC_EXEC[@]})); then
+        get_node_port "$CSPR_BASE_PORT_SPEC_EXEC" "$NODE_ID"
+    else
+        get_node_port "$CCTL_BASE_PORT_SPEC_EXEC" "$NODE_ID"
+    fi
 }
 
 #######################################
@@ -263,7 +287,11 @@ function get_node_port_rest()
 {
     local NODE_ID=${1}
 
-    get_node_port "$CCTL_BASE_PORT_REST" "$NODE_ID"
+    if ((${#CSPR_BASE_PORT_REST[@]})); then
+        get_node_port "$CSPR_BASE_PORT_REST" "$NODE_ID"
+    else
+        get_node_port "$CCTL_BASE_PORT_REST" "$NODE_ID"
+    fi
 }
 
 #######################################
@@ -275,7 +303,11 @@ function get_node_port_rpc()
 {
     local NODE_ID=${1}
 
-    get_node_port "$CCTL_BASE_PORT_RPC" "$NODE_ID"
+    if ((${#CSPR_BASE_PORT_RPC[@]})); then
+        get_node_port "$CSPR_BASE_PORT_RPC" "$NODE_ID"
+    else
+        get_node_port "$CCTL_BASE_PORT_RPC" "$NODE_ID"
+    fi
 }
 
 #######################################
@@ -287,7 +319,11 @@ function get_node_port_sse()
 {
     local NODE_ID=${1}
 
-    get_node_port "$CCTL_BASE_PORT_SSE" "$NODE_ID"
+    if ((${#CSPR_BASE_PORT_SSE[@]})); then
+        get_node_port "$CSPR_BASE_PORT_SSE" "$NODE_ID"
+    else
+        get_node_port "$CCTL_BASE_PORT_SSE" "$NODE_ID"
+    fi
 }
 
 #######################################
