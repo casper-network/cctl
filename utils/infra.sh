@@ -231,6 +231,18 @@ function get_node_port_bind()
 }
 
 #######################################
+# Calculates binary port.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_node_port_binary()
+{
+    local NODE_ID=${1}
+
+    get_node_port "$CCTL_BASE_PORT_BINARY" "$NODE_ID"
+}
+
+#######################################
 # Calculates speculative execution port.
 # Arguments:
 #   Node ordinal identifier.
@@ -324,6 +336,8 @@ function get_process_group_members()
             RESULT=$RESULT", "
         fi
         RESULT=$RESULT$(get_process_name_of_node "$NODE_ID")
+        RESULT=$RESULT", "
+        RESULT=$RESULT$(get_process_name_of_sidecar "$NODE_ID")
     done
 
     echo "$RESULT"
@@ -377,6 +391,19 @@ function get_process_name_of_node_group()
 }
 
 #######################################
+# Returns name of a daemonized sidecar process within a group.
+# Arguments:
+#   Network ordinal identifier.
+#   Node ordinal identifier.
+#######################################
+function get_process_name_of_sidecar()
+{
+    local NODE_ID=${1}
+
+    echo "cctl-sidecar-$NODE_ID"
+}
+
+#######################################
 # Returns count of nodes that atleast attempted to start
 #######################################
 function get_count_of_started_nodes()
@@ -415,4 +442,3 @@ function do_await_genesis_era_to_complete() {
         sleep 1.0
     done
 }
-

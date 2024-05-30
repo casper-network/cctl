@@ -4,11 +4,11 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-bin-compile
+    cctl-infra-bin-compile-sidecar
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Compiles complete set of binaries and smart contracts.
+    Compiles L1 node sidecar.
 
     ARGS
     ----------------------------------------------------------------
@@ -24,11 +24,19 @@ function _main()
 {
     local MODE=${1}
 
-    source "$CCTL"/cmds/infra/bin/compile_node.sh mode="$MODE"
-    source "$CCTL"/cmds/infra/bin/compile_node_launcher.sh mode="$MODE"
-    source "$CCTL"/cmds/infra/bin/compile_client.sh mode="$MODE"
-    source "$CCTL"/cmds/infra/bin/compile_node_sidecar.sh mode="$MODE"
-    source "$CCTL"/cmds/infra/bin/compile_contracts.sh
+    local PATH_TO_REPO=$(get_path_to_working_directory)/casper-sidecar
+
+    if [ ! -d "$PATH_TO_REPO" ]; then
+        log "ERROR: casper-sidecar repo must be cloned into $(get_path_to_working_directory) before compilation can occur"
+    else
+        pushd "$PATH_TO_REPO"
+        if [ "$MODE" = "debug" ]; then
+            cargo build
+        else
+            cargo build --release
+        fi
+        popd || exit
+    fi
 }
 
 # ----------------------------------------------------------------

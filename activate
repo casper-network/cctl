@@ -18,6 +18,7 @@ alias cctl-infra-bin-compile-client='source $CCTL/cmds/infra/bin/compile_client.
 alias cctl-infra-bin-compile-contracts='source $CCTL/cmds/infra/bin/compile_contracts.sh'
 alias cctl-infra-bin-compile-node='source $CCTL/cmds/infra/bin/compile_node.sh'
 alias cctl-infra-bin-compile-node-launcher='source $CCTL/cmds/infra/bin/compile_node_launcher.sh'
+alias cctl-infra-bin-compile-node-sidecar='source $CCTL/cmds/infra/bin/compile_node_sidecar.sh'
 # ... network
 alias cctl-infra-net-setup='source $CCTL/cmds/infra/net/setup.sh'
 alias cctl-infra-net-start='source $CCTL/cmds/infra/net/start.sh'

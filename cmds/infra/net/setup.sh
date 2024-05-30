@@ -37,6 +37,7 @@ function _main()
     local GENESIS_DELAY=${2}
     local PATH_TO_CHAINSPEC=${3}
     local PATH_TO_NODE_CONFIG_TEMPLATE=${4}
+    local PATH_TO_SIDECAR_CONFIG_TEMPLATE=${5}
 
     local NODE_COUNT=10
     local NODE_COUNT_AT_GENESIS=5
@@ -71,6 +72,9 @@ function _main()
     log "... setting node configs"
     _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE"
 
+    log "... setting sidecar configs"
+    _setup_sidecar_configs "$NODE_COUNT" "$PATH_TO_SIDECAR_CONFIG_TEMPLATE"
+
     log "network setup complete"
 }
 
@@ -82,14 +86,16 @@ function _setup_binaries()
     local PATH_TO_BINARY_OF_CASPER_CLIENT=$(get_path_to_binary_of_casper_client)
     local PATH_TO_BINARY_OF_CASPER_NODE=$(get_path_to_binary_of_casper_node)
     local PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER=$(get_path_to_binary_of_casper_node_launcher)
+    local PATH_TO_BINARY_OF_CASPER_EVENT_SIDECAR=$(get_path_to_binary_of_casper_event_sidecar)
     local PATH_TO_NODE_BIN
-    
+
     cp "$PATH_TO_BINARY_OF_CASPER_CLIENT" "$(get_path_to_assets)"/bin
     for NODE_ID in $(seq 1 "$NODE_COUNT")
     do
         PATH_TO_NODE_BIN="$(get_path_to_node "$NODE_ID")"/bin
         cp "$PATH_TO_BINARY_OF_CASPER_NODE" "$PATH_TO_NODE_BIN/1_0_0"
         cp "$PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER" "$PATH_TO_NODE_BIN"
+        cp "$PATH_TO_BINARY_OF_CASPER_EVENT_SIDECAR" "$PATH_TO_NODE_BIN/1_0_0"
     done
 }
 
@@ -331,14 +337,15 @@ function _setup_node_config()
 
     local PATH_TO_ASSETS=$(get_path_to_assets)
     local PATH_TO_NODE_CONFIG
+    local PATH_TO_NODE_CONFIG_DIR
     local SCRIPT
 
     PATH_TO_NODE_CONFIG_DIR="$(get_path_to_node "$NODE_ID")/config/1_0_0"
-    PATH_TO_NODE_CONFIG="$PATH_TO_NODE_CONFIG_DIR/config.toml"
 
     cp "$PATH_TO_ASSETS/genesis/accounts.toml" "$PATH_TO_NODE_CONFIG_DIR"
     cp "$PATH_TO_ASSETS/genesis/chainspec.toml" "$PATH_TO_NODE_CONFIG_DIR"
 
+    PATH_TO_NODE_CONFIG="$PATH_TO_NODE_CONFIG_DIR/config.toml"
     if [ "$(get_os)" = "macosx" ]; then
         cp "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
     else
@@ -359,6 +366,43 @@ function _setup_node_config()
         "cfg['diagnostics_port']['enabled']=False;"
         "cfg['speculative_exec_server']['address']='0.0.0.0:$(get_node_port_speculative_exec "$NODE_ID")';"
         "toml.dump(cfg, open('$PATH_TO_NODE_CONFIG', 'w'));"
+    )
+    python3 -c "${SCRIPT[*]}"
+}
+
+function _setup_sidecar_configs()
+{
+    local NODE_COUNT=${1}
+    local PATH_TO_TEMPLATE=${2}
+    local NODE_ID
+
+    for NODE_ID in $(seq 1 "$NODE_COUNT")
+    do
+        _setup_sidecar_config $NODE_ID $PATH_TO_TEMPLATE
+    done
+}
+
+function _setup_sidecar_config()
+{
+    local NODE_ID=${1}
+    local PATH_TO_TEMPLATE=${2}
+
+    local PATH_TO_CONFIG="$(get_path_to_node "$NODE_ID")/config/1_0_0/sidecar.toml"
+    local SCRIPT
+
+    if [ "$(get_os)" = "macosx" ]; then
+        cp "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
+    else
+        cp --no-preserve=mode "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
+    fi
+
+    SCRIPT=(
+        "import toml;"
+        "cfg=toml.load('$PATH_TO_CONFIG');"
+        "cfg['rpc_server']['main_server']['address']='0.0.0.0:$(get_node_port_rpc "$NODE_ID")';"
+        "cfg['rpc_server']['speculative_exec_server']['address']='0.0.0.0:$(get_node_port_speculative_exec "$NODE_ID")';"
+        "cfg['rpc_server']['node_client']['address']='0.0.0.0:$(get_node_port_binary "$NODE_ID")';"
+        "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
     )
     python3 -c "${SCRIPT[*]}"
 }
@@ -386,6 +430,7 @@ function _setup_supervisor()
     local NODE_COUNT=${1}
 
     local PATH_TO_ASSETS=$(get_path_to_assets)
+    local PATH_TO_NODE
     local PATH_TO_NODE_BIN
     local PATH_TO_NODE_CONFIG
     local PATH_TO_NODE_LOGS
@@ -413,9 +458,10 @@ supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 serverurl=unix:///$PATH_TO_SUPERVISOR_SOCK ;
 EOM
 
-# Set supervisord.conf app sections.
+# Set supervisord.conf node application sections.
 for IDX in $(seq 1 "$NODE_COUNT")
 do
+    PATH_TO_NODE="$(get_path_to_node "$IDX")"
     PATH_TO_NODE_BIN="$(get_path_to_node "$IDX")"/bin
     PATH_TO_NODE_CONFIG="$(get_path_to_node "$IDX")"/config
     PATH_TO_NODE_LOGS=$(get_path_to_node_logs "$IDX")
@@ -437,6 +483,24 @@ stderr_logfile=$PATH_TO_NODE_LOGS/stderr.log ;
 stderr_logfile_backups=5 ;
 stderr_logfile_maxbytes=500MB ;
 stdout_logfile=$PATH_TO_NODE_LOGS/stdout.log ;
+stdout_logfile_backups=5 ;
+stdout_logfile_maxbytes=500MB ;
+
+[program:cctl-sidecar-$IDX]
+autostart=false
+autorestart=false
+command=$CCTL/cmds/infra/node/sidecar/start.sh node_dir=$PATH_TO_NODE
+environment=NODE_DIR="$PATH_TO_NODE"
+numprocs=1
+numprocs_start=0
+startsecs=0
+stopsignal=TERM
+stopwaitsecs=5
+stopasgroup=true
+stderr_logfile=$PATH_TO_NODE_LOGS/sidecar-stderr.log ;
+stderr_logfile_backups=5 ;
+stderr_logfile_maxbytes=500MB ;
+stdout_logfile=$PATH_TO_NODE_LOGS/sidecar-stdout.log ;
 stdout_logfile_backups=5 ;
 stdout_logfile_maxbytes=500MB ;
 EOM
@@ -507,6 +571,8 @@ unset _GENESIS_ACCOUNTS_TYPE
 unset _GENESIS_DELAY
 unset _HELP
 unset _PATH_TO_CHAINSPEC
+unset _PATH_TO_NODE_CONFIG
+unset _PATH_TO_SIDECAR_CONFIG
 
 for ARGUMENT in "$@"
 do
@@ -517,19 +583,20 @@ do
         delay) _GENESIS_DELAY=${VALUE} ;;
         help) _HELP="show" ;;
         chainspec) _PATH_TO_CHAINSPEC=${VALUE} ;;
-        config) _PATH_TO_CONFIG_TOML=${VALUE} ;;
+        config) _PATH_TO_NODE_CONFIG=${VALUE} ;;
+        sidecar) _PATH_TO_SIDECAR_CONFIG=${VALUE} ;;
         *)
     esac
 done
 
+
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    # echo $(get_path_to_casper_node_resources)
-
     _main \
         "${_GENESIS_ACCOUNTS_TYPE:-"static"}" \
         "${_GENESIS_DELAY:-30}" \
         "${_PATH_TO_CHAINSPEC:-"$(get_path_to_casper_node_resources)/local/chainspec.toml.in"}" \
-        "${_PATH_TO_CONFIG_TOML:-"$(get_path_to_casper_node_resources)/local/config.toml"}"
+        "${_PATH_TO_NODE_CONFIG:-"$(get_path_to_casper_node_resources)/local/config.toml"}" \
+        "${_PATH_TO_SIDECAR_CONFIG:-"$(get_path_to_casper_sidecar_resources)/example_configs/default_rpc_only_config.toml"}"
 fi
