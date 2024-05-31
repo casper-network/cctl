@@ -401,10 +401,10 @@ function get_process_name_of_node_in_group()
 {
     local NODE_ID=${1}
 
-    local NODE_PROCESS_NAME=$(get_process_name_of_node "$NODE_ID")
+    local PROCESS_NAME=$(get_process_name_of_node "$NODE_ID")
     local PROCESS_GROUP_NAME=$(get_process_name_of_node_group "$NODE_ID")
 
-    echo "$PROCESS_GROUP_NAME:$NODE_PROCESS_NAME"
+    echo "$PROCESS_GROUP_NAME:$PROCESS_NAME"
 }
 
 #######################################
@@ -427,7 +427,7 @@ function get_process_name_of_node_group()
 }
 
 #######################################
-# Returns name of a daemonized sidecar process within a group.
+# Returns name of a daemonized sidecar process.
 # Arguments:
 #   Network ordinal identifier.
 #   Node ordinal identifier.
@@ -437,6 +437,21 @@ function get_process_name_of_node_sidecar()
     local NODE_ID=${1}
 
     echo "cctl-node-$NODE_ID-sidecar"
+}
+
+#######################################
+# Returns name of a daemonized sidecar process within a group.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_process_name_of_node_sidecar_in_group()
+{
+    local NODE_ID=${1}
+
+    local PROCESS_NAME=$(get_process_name_of_node_sidecar "$NODE_ID")
+    local PROCESS_GROUP_NAME=$(get_process_name_of_node_group "$NODE_ID")
+
+    echo "$PROCESS_GROUP_NAME:$PROCESS_NAME"
 }
 
 #######################################
