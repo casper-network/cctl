@@ -27,7 +27,7 @@ function get_path_to_binary_of_casper_client()
         COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
         PATH_TO_BINARY="casper-client-rs/target/$COMPILE_TARGET/casper-client"
         echo $(get_path_to_working_directory_file $PATH_TO_BINARY)
-    fi   
+    fi
 }
 
 #######################################
@@ -36,18 +36,18 @@ function get_path_to_binary_of_casper_client()
 #   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_BIN.
 #######################################
-function get_path_to_binary_of_casper_event_sidecar()
+function get_path_to_binary_of_casper_node_sidecar()
 {
     local COMPILE_TARGET
     local PATH_TO_BINARY
 
     if ((${#CSPR_PATH_TO_BIN[@]})); then
-        echo $CSPR_PATH_TO_BIN/casper-event-sidecar
+        echo $CSPR_PATH_TO_BIN/casper-sidecar
     else
         COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
-        PATH_TO_BINARY="casper-sidecar/target/$COMPILE_TARGET/casper-event-sidecar"
+        PATH_TO_BINARY="casper-sidecar/target/$COMPILE_TARGET/casper-sidecar"
         echo $(get_path_to_working_directory_file $PATH_TO_BINARY)
-    fi   
+    fi
 }
 
 #######################################
@@ -67,7 +67,7 @@ function get_path_to_binary_of_casper_node()
         COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
         PATH_TO_BINARY="casper-node/target/$COMPILE_TARGET/casper-node"
         echo $(get_path_to_working_directory_file $PATH_TO_BINARY)
-    fi   
+    fi
 }
 
 #######################################
@@ -87,7 +87,7 @@ function get_path_to_binary_of_casper_node_launcher()
         COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
         PATH_TO_BINARY="casper-node-launcher/target/$COMPILE_TARGET/casper-node-launcher"
         echo $(get_path_to_working_directory_file $PATH_TO_BINARY)
-    fi   
+    fi
 }
 
 #######################################
@@ -225,7 +225,7 @@ function get_path_to_node_storage()
 #######################################
 function get_path_to_node_secret_key()
 {
-    local NODE_ID=${1} 
+    local NODE_ID=${1}
 
     get_path_to_secret_key "$CCTL_ACCOUNT_TYPE_NODE" "$NODE_ID"
 }

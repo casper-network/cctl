@@ -70,10 +70,7 @@ function _main()
     _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
 
     log "... setting node configs"
-    _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE"
-
-    log "... setting sidecar configs"
-    _setup_sidecar_configs "$NODE_COUNT" "$PATH_TO_SIDECAR_CONFIG_TEMPLATE"
+    _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_SIDECAR_CONFIG_TEMPLATE"
 
     log "network setup complete"
 }
@@ -86,16 +83,16 @@ function _setup_binaries()
     local PATH_TO_BINARY_OF_CASPER_CLIENT=$(get_path_to_binary_of_casper_client)
     local PATH_TO_BINARY_OF_CASPER_NODE=$(get_path_to_binary_of_casper_node)
     local PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER=$(get_path_to_binary_of_casper_node_launcher)
-    local PATH_TO_BINARY_OF_CASPER_EVENT_SIDECAR=$(get_path_to_binary_of_casper_event_sidecar)
+    local PATH_TO_BINARY_OF_CASPER_NODE_SIDECAR=$(get_path_to_binary_of_casper_node_sidecar)
     local PATH_TO_NODE_BIN
 
     cp "$PATH_TO_BINARY_OF_CASPER_CLIENT" "$(get_path_to_assets)"/bin
     for NODE_ID in $(seq 1 "$NODE_COUNT")
     do
         PATH_TO_NODE_BIN="$(get_path_to_node "$NODE_ID")"/bin
-        cp "$PATH_TO_BINARY_OF_CASPER_NODE" "$PATH_TO_NODE_BIN/1_0_0"
+        cp "$PATH_TO_BINARY_OF_CASPER_NODE" "$PATH_TO_NODE_BIN/2_0_0"
         cp "$PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER" "$PATH_TO_NODE_BIN"
-        cp "$PATH_TO_BINARY_OF_CASPER_EVENT_SIDECAR" "$PATH_TO_NODE_BIN/1_0_0"
+        cp "$PATH_TO_BINARY_OF_CASPER_NODE_SIDECAR" "$PATH_TO_NODE_BIN/2_0_0"
     done
 }
 
@@ -124,9 +121,9 @@ function _setup_fs()
         PATH_TO_NODE="$PATH_TO_ASSETS"/nodes/node-"$IDX"
         mkdir "$PATH_TO_NODE"
         mkdir "$PATH_TO_NODE/bin"
-        mkdir "$PATH_TO_NODE/bin/1_0_0"
+        mkdir "$PATH_TO_NODE/bin/2_0_0"
         mkdir "$PATH_TO_NODE/config"
-        mkdir "$PATH_TO_NODE/config/1_0_0"
+        mkdir "$PATH_TO_NODE/config/2_0_0"
         mkdir "$PATH_TO_NODE/keys"
         mkdir "$PATH_TO_NODE/logs"
         mkdir "$PATH_TO_NODE/storage"
@@ -234,7 +231,7 @@ function _setup_genesis_chainspec()
 
     local ACTIVATION_POINT=$(get_genesis_timestamp "$GENESIS_DELAY")
     local PATH_TO_CHAINSPEC="$(get_path_to_assets)/genesis/chainspec.toml"
-    local PROTOCOL_VERSION=1.0.0
+    local PROTOCOL_VERSION=2.0.0
     local SCRIPT
 
     if [ "$(get_os)" = "macosx" ]; then
@@ -319,42 +316,50 @@ function _setup_keys_static()
 function _setup_node_configs()
 {
     local NODE_COUNT=${1}
-    local PATH_TO_NODE_CONFIG_TEMPLATE=${2}
+    local PATH_TO_TEMPLATE_OF_NODE_CONFIG=${2}
+    local PATH_TO_TEMPLATE_OF_SIDECAR_CONFIG=${3}
 
     local NODE_ID
     local PATH_TO_ASSETS=$(get_path_to_assets)
 
     for NODE_ID in $(seq 1 "$NODE_COUNT")
     do
-        _setup_node_config $NODE_ID $PATH_TO_NODE_CONFIG_TEMPLATE
+        _setup_node_genesis_config $NODE_ID
+        _setup_node_binary_config $NODE_ID $PATH_TO_TEMPLATE_OF_NODE_CONFIG
+        _setup_node_sidecar_config $NODE_ID $PATH_TO_TEMPLATE_OF_SIDECAR_CONFIG
+
     done
 }
 
-function _setup_node_config()
+function _setup_node_genesis_config()
 {
     local NODE_ID=${1}
-    local PATH_TO_NODE_CONFIG_TEMPLATE=${2}
 
-    local PATH_TO_ASSETS=$(get_path_to_assets)
-    local PATH_TO_NODE_CONFIG
-    local PATH_TO_NODE_CONFIG_DIR
+    local PATH_TO_NODE_CONFIG_DIR="$(get_path_to_node "$NODE_ID")/config/2_0_0"
+
+    cp "$(get_path_to_assets)/genesis/accounts.toml" "$PATH_TO_NODE_CONFIG_DIR"
+    cp "$(get_path_to_assets)/genesis/chainspec.toml" "$PATH_TO_NODE_CONFIG_DIR"
+}
+
+function _setup_node_binary_config()
+{
+    local NODE_ID=${1}
+    local PATH_TO_TEMPLATE_OF_CONFIG=${2}
+
+    local PATH_TO_CONFIG
     local SCRIPT
 
-    PATH_TO_NODE_CONFIG_DIR="$(get_path_to_node "$NODE_ID")/config/1_0_0"
-
-    cp "$PATH_TO_ASSETS/genesis/accounts.toml" "$PATH_TO_NODE_CONFIG_DIR"
-    cp "$PATH_TO_ASSETS/genesis/chainspec.toml" "$PATH_TO_NODE_CONFIG_DIR"
-
-    PATH_TO_NODE_CONFIG="$PATH_TO_NODE_CONFIG_DIR/config.toml"
+    PATH_TO_CONFIG="$(get_path_to_node "$NODE_ID")/config/2_0_0/config.toml"
     if [ "$(get_os)" = "macosx" ]; then
-        cp "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
+        cp "$PATH_TO_TEMPLATE_OF_CONFIG" "$PATH_TO_CONFIG"
     else
-        cp --no-preserve=mode "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
+        cp --no-preserve=mode "$PATH_TO_TEMPLATE_OF_CONFIG" "$PATH_TO_CONFIG"
     fi
 
     SCRIPT=(
         "import toml;"
-        "cfg=toml.load('$PATH_TO_NODE_CONFIG');"
+        "cfg=toml.load('$PATH_TO_TEMPLATE_OF_CONFIG');"
+        "cfg['binary_port_server']['address']='0.0.0.0:$(get_node_port_binary "$NODE_ID")';"
         "cfg['consensus']['secret_key_path']='../../keys/secret_key.pem';"
         "cfg['diagnostics_port']['enabled']=False;"
         "cfg['event_stream_server']['address']='0.0.0.0:$(get_node_port_sse "$NODE_ID")';"
@@ -362,32 +367,18 @@ function _setup_node_config()
         "cfg['network']['bind_address']='$(get_network_bind_address "$NODE_ID")';"
         "cfg['network']['known_addresses']=[$(get_network_known_addresses "$NODE_ID")];"
         "cfg['rest_server']['address']='0.0.0.0:$(get_node_port_rest "$NODE_ID")';"
-        "cfg['rpc_server']['address']='0.0.0.0:$(get_node_port_rpc "$NODE_ID")';"
-        "cfg['speculative_exec_server']['address']='0.0.0.0:$(get_node_port_speculative_exec "$NODE_ID")';"
         "cfg['storage']['path']='../../storage';"
-        "toml.dump(cfg, open('$PATH_TO_NODE_CONFIG', 'w'));"
+        "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
     )
     python3 -c "${SCRIPT[*]}"
 }
 
-function _setup_sidecar_configs()
-{
-    local NODE_COUNT=${1}
-    local PATH_TO_TEMPLATE=${2}
-    local NODE_ID
-
-    for NODE_ID in $(seq 1 "$NODE_COUNT")
-    do
-        _setup_sidecar_config $NODE_ID $PATH_TO_TEMPLATE
-    done
-}
-
-function _setup_sidecar_config()
+function _setup_node_sidecar_config()
 {
     local NODE_ID=${1}
     local PATH_TO_TEMPLATE=${2}
 
-    local PATH_TO_CONFIG="$(get_path_to_node "$NODE_ID")/config/1_0_0/sidecar.toml"
+    local PATH_TO_CONFIG="$(get_path_to_node "$NODE_ID")/config/2_0_0/sidecar.toml"
     local SCRIPT
 
     if [ "$(get_os)" = "macosx" ]; then
@@ -486,7 +477,7 @@ stdout_logfile=$PATH_TO_NODE_LOGS/stdout.log ;
 stdout_logfile_backups=5 ;
 stdout_logfile_maxbytes=500MB ;
 
-[program:cctl-sidecar-$IDX]
+[program:cctl-node-$IDX-sidecar]
 autostart=false
 autorestart=false
 command=$CCTL/cmds/infra/node/sidecar/start.sh node_dir=$PATH_TO_NODE

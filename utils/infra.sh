@@ -373,7 +373,7 @@ function get_process_group_members()
         fi
         RESULT=$RESULT$(get_process_name_of_node "$NODE_ID")
         RESULT=$RESULT", "
-        RESULT=$RESULT$(get_process_name_of_sidecar "$NODE_ID")
+        RESULT=$RESULT$(get_process_name_of_node_sidecar "$NODE_ID")
     done
 
     echo "$RESULT"
@@ -432,11 +432,11 @@ function get_process_name_of_node_group()
 #   Network ordinal identifier.
 #   Node ordinal identifier.
 #######################################
-function get_process_name_of_sidecar()
+function get_process_name_of_node_sidecar()
 {
     local NODE_ID=${1}
 
-    echo "cctl-sidecar-$NODE_ID"
+    echo "cctl-node-$NODE_ID-sidecar"
 }
 
 #######################################

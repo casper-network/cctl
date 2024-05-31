@@ -16,9 +16,7 @@
     "schema": {
       "description": "Result for \"chain_get_block\" RPC response.",
       "type": "object",
-      "required": [
-        "api_version"
-      ],
+      "required": ["api_version"],
       "properties": {
         "api_version": {
           "description": "The RPC API version.",
@@ -95,7 +93,7 @@
               "timestamp": "2020-11-17T00:39:24.072Z",
               "era_id": 1,
               "height": 10,
-              "protocol_version": "1.0.0"
+              "protocol_version": "2.0.0"
             },
             "body": {
               "proposer": "01d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c",

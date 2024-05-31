@@ -43,11 +43,7 @@
     "schema": {
       "description": "Result for \"query_global_state\" RPC response.",
       "type": "object",
-      "required": [
-        "api_version",
-        "merkle_proof",
-        "stored_value"
-      ],
+      "required": ["api_version", "merkle_proof", "stored_value"],
       "properties": {
         "api_version": {
           "description": "The RPC API version.",
@@ -138,7 +134,7 @@
             "timestamp": "2020-11-17T00:39:24.072Z",
             "era_id": 1,
             "height": 10,
-            "protocol_version": "1.0.0"
+            "protocol_version": "2.0.0"
           },
           "stored_value": {
             "Account": {
