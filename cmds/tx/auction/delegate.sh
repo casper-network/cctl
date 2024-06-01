@@ -34,7 +34,7 @@ function _main()
     local CHAIN_NAME=$CCTL_NET_NAME
     local GAS_PAYMENT=$CCTL_DEFAULT_GAS_PAYMENT
     local NODE_ADDRESS
-    local PATH_TO_CLIENT=$(get_path_to_client)
+    local PATH_TO_CLIENT=$(get_path_to_node_client)
     local PATH_TO_CONTRACT="$(get_path_to_assets)/bin/delegate.wasm"
     local TX_HASH
     local USER_ACCOUNT_KEY=$(get_account_key "$CCTL_ACCOUNT_TYPE_USER" "$USER_ID")

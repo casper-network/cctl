@@ -22,7 +22,7 @@ function _main()
     local ACCOUNT_HASH=${1}
     local STATE_ROOT_HASH=${2}
 
-    $(get_path_to_client) query-global-state \
+    $(get_path_to_node_client) query-global-state \
         --node-address "$(get_node_address_rpc)" \
         --key "account-hash-$ACCOUNT_HASH" \
         --state-root-hash "${STATE_ROOT_HASH:-$(get_state_root_hash)}" \

@@ -35,7 +35,7 @@ function _main()
 
     local DISPATCH_NODE_ADDRESS
     local NODE_ADDRESS
-    local PATH_TO_CLIENT=$(get_path_to_client)
+    local PATH_TO_CLIENT=$(get_path_to_node_client)
     local PATH_TO_TX
     local PATH_TO_TX_BATCH
     local PATH_TO_TX_ROOT="$(get_path_to_assets)"/transactions

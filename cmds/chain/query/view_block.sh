@@ -22,12 +22,12 @@ function _main()
     local BLOCK_ID=${1}
 
     if [ "$BLOCK_ID" ]; then
-        $(get_path_to_client) get-block \
+        $(get_path_to_node_client) get-block \
             --node-address "$(get_node_address_rpc)" \
             --block-identifier "$BLOCK_ID" \
             | jq '.result.block'
     else
-        $(get_path_to_client) get-block \
+        $(get_path_to_node_client) get-block \
             --node-address "$(get_node_address_rpc)" \
             | jq '.result.block'
     fi

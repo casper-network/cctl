@@ -174,7 +174,7 @@ function get_state_root_hash()
     local NODE_ID=${1}
     local BLOCK_ID=${2:-""}
 
-    $(get_path_to_client) get-state-root-hash \
+    $(get_path_to_node_client) get-state-root-hash \
         --node-address "$(get_node_address_rpc "$NODE_ID")" \
         --block-identifier "$BLOCK_ID" \
         | jq '.result.state_root_hash' \

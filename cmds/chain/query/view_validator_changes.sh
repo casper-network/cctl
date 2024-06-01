@@ -26,7 +26,7 @@ function _main()
 
     echo "$(get_node_address_rpc "$NODE_ID")"
 
-    $(get_path_to_client) get-validator-changes \
+    $(get_path_to_node_client) get-validator-changes \
         --node-address "$(get_node_address_rpc "$NODE_ID")" \
         | jq '.result.changes'
 }

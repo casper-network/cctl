@@ -26,7 +26,7 @@ function _main()
     local NODE_ID=${1}
     local BLOCK_ID=${2}
 
-    $(get_path_to_client) get-era-summary \
+    $(get_path_to_node_client) get-era-summary \
         --node-address "$(get_node_address_rpc "$NODE_ID")" \
         --block-identifier "$BLOCK_ID" \
         | jq '.result'

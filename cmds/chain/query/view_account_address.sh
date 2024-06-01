@@ -21,7 +21,7 @@ function _main()
     local PUBLIC_KEY=${1}
     local ADDRESS
     
-    ADDRESS=$($(get_path_to_client) account-address --public-key "$PUBLIC_KEY")
+    ADDRESS=$($(get_path_to_node_client) account-address --public-key "$PUBLIC_KEY")
     ADDRESS=${ADDRESS:13}
 
     log_break

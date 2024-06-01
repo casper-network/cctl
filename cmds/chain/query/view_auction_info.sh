@@ -14,7 +14,7 @@ function _help() {
 
 function _main()
 {
-    $(get_path_to_client) get-auction-info \
+    $(get_path_to_node_client) get-auction-info \
         --node-address "$(get_node_address_rpc)" \
         | jq '.result'
 }

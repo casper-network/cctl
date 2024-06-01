@@ -15,7 +15,7 @@ function get_account_balance()
     local NODE_ADDRESS=$(get_node_address_rpc)
 
     ACCOUNT_BALANCE=$(
-        $(get_path_to_client) query-balance \
+        $(get_path_to_node_client) query-balance \
             --node-address "$NODE_ADDRESS" \
             --state-root-hash "$STATE_ROOT_HASH" \
             --purse-uref "$PURSE_UREF" \
@@ -86,7 +86,7 @@ function get_main_purse_uref()
     local STATE_ROOT_HASH=${2:-$(get_state_root_hash)}
 
     echo $(
-        $(get_path_to_client) query-global-state \
+        $(get_path_to_node_client) query-global-state \
             --node-address "$(get_node_address_rpc)" \
             --key "account-hash-$ACCOUNT_HASH" \
             --state-root-hash "$STATE_ROOT_HASH" \

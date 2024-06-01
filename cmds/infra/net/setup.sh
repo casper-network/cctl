@@ -20,8 +20,8 @@ function _help() {
     DEFAULTS
     ----------------------------------------------------------------
     accounts    static
-    chainspec   $(get_path_to_resources_of_node)/local/chainspec.toml.in
-    config      $(get_path_to_resources_of_node)/local/config.toml
+    chainspec   $(get_path_to_config_templates_of_node)/local/chainspec.toml.in
+    config      $(get_path_to_config_templates_of_node)/local/config.toml
     delay       30 seconds
 
     NOTES
@@ -273,7 +273,7 @@ function _setup_keys_dynamic()
 
     local PATH_TO_ASSETS=$(get_path_to_assets)
     local IDX
-    local CASPER_CLIENT="$(get_path_to_client)"
+    local CASPER_CLIENT="$(get_path_to_node_client)"
 
     "$CASPER_CLIENT" \
         keygen -f "$PATH_TO_ASSETS/faucet" > /dev/null 2>&1
@@ -587,7 +587,7 @@ else
     _main \
         "${_GENESIS_ACCOUNTS_TYPE:-"static"}" \
         "${_GENESIS_DELAY:-30}" \
-        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_resources_of_node)/local/chainspec.toml.in"}" \
-        "${_PATH_TO_CONFIG_OF_NODE:-"$(get_path_to_resources_of_node)/local/config.toml"}" \
-        "${_PATH_TO_CONFIG_OF_SIDECAR:-"$(get_path_to_resources_of_sidecar)/example_configs/default_rpc_only_config.toml"}"
+        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_config_templates_of_node)/local/chainspec.toml.in"}" \
+        "${_PATH_TO_CONFIG_OF_NODE:-"$(get_path_to_config_templates_of_node)/local/config.toml"}" \
+        "${_PATH_TO_CONFIG_OF_SIDECAR:-"$(get_path_to_config_templates_of_sidecar)/example_configs/default_rpc_only_config.toml"}"
 fi

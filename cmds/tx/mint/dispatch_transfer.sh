@@ -54,7 +54,7 @@ function _main()
     local GAS_PAYMENT=$CCTL_DEFAULT_GAS_PAYMENT
     local NODE_ADDRESS
     local OUTPUT
-    local PATH_TO_CLIENT=$(get_path_to_client)
+    local PATH_TO_CLIENT=$(get_path_to_node_client)
     local PATH_TO_CONTRACT="$(get_path_to_assets)"/bin/transfer_to_account_u512.wasm
     local SUCCESSFUL_DISPATCH_COUNT=0
 
