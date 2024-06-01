@@ -26,7 +26,7 @@ function _main()
 
     for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
     do
-        if [ $(get_node_is_up "$NODE_ID") = true ]; then
+        if [ $(get_is_node_up "$NODE_ID") = true ]; then
             log "chain era @ node-$NODE_ID = $(get_chain_era "$NODE_ID" "$TIMEOUT_SEC")"
         fi
     done

@@ -20,8 +20,8 @@ function _main()
 {
     local NODE_ID=${1}
 
-    if [ "$(get_net_is_up)" = true ]; then
-        if [ "$(get_node_is_up "$NODE_ID")" = true ]; then
+    if [ "$(get_is_net_up)" = true ]; then
+        if [ "$(get_is_node_up "$NODE_ID")" = true ]; then
             log "stopping node $NODE_ID ... please wait"
             _stop_node "$NODE_ID"
             log "$NODE_ID stopped"

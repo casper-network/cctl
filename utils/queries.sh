@@ -214,7 +214,7 @@ function _get_from_status_with_retry()
 
     while [ "$ATTEMPTS" -le "$TIMEOUT_SEC" ]; do
         NODE_ID=${INITIAL_NODE_ID:-$(get_node_for_dispatch)}
-        if [ $(get_node_is_up "$NODE_ID") = true ]; then
+        if [ $(get_is_node_up "$NODE_ID") = true ]; then
             OUTPUT=$(
                 curl \
                     $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \

@@ -25,7 +25,7 @@ function _main()
 
     for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
     do
-        if [ $(get_node_is_up "$NODE_ID") = true ]; then
+        if [ $(get_is_node_up "$NODE_ID") = true ]; then
             NODE_SRH=$(get_state_root_hash "$NODE_ID" "$BLOCK_ID")
             log "state root @ node-$NODE_ID = ${NODE_SRH:-'N/A'}"
         fi

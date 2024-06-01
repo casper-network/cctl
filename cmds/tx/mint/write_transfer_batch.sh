@@ -60,7 +60,7 @@ function _main()
         log "batch #$BATCH_ID"
 
         # Enumerate set of users.
-        for USER_ID in $(seq 1 "$(get_count_of_users)")
+        for USER_ID in $(seq 1 "$CCTL_COUNT_OF_USERS")
         do
             log "... user #$USER_ID"
 

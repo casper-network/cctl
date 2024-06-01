@@ -20,7 +20,7 @@ function _main()
 {
     local NODE_ID=${1}
 
-    if [ "$(get_node_is_up "$NODE_ID")" = true ]; then
+    if [ "$(get_is_node_up "$NODE_ID")" = true ]; then
         log "Node $NODE_ID is currently running ... please stop prior to cleaning."
     else
         log "cleaning node $NODE_ID ... please wait"

@@ -25,7 +25,7 @@ function get_count_of_up_nodes()
 
     for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
     do
-        if [ "$(get_node_is_up "$NODE_ID")" == true ]; then
+        if [ "$(get_is_node_up "$NODE_ID")" == true ]; then
             COUNT=$((COUNT + 1))
         fi
     done
@@ -34,11 +34,35 @@ function get_count_of_up_nodes()
 }
 
 #######################################
-# Returns count of test users.
+# Returns flag indicating whether network is currently up.
 #######################################
-function get_count_of_users()
+function get_is_net_up()
 {
-    find "$(get_path_to_assets)"/users/* -maxdepth 0 -type d | wc -l
+    # Presence of supervisord socket indicates true.
+    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_supervisord_sock)
+    if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
+        echo true
+    else
+        echo false
+    fi
+}
+
+#######################################
+# Returns flag indicating whether a node is currently up.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_is_node_up()
+{
+    local NODE_ID=${1}
+
+    local NODE_PORT=$(get_port_of_sidecar_main_server  "$NODE_ID")
+
+    if grep -q "$NODE_PORT (LISTEN)" <<< "$(lsof -i -P -n)"; then
+        echo true
+    else
+        echo false
+    fi
 }
 
 #######################################
@@ -78,20 +102,6 @@ function get_network_known_addresses()
     fi
 
     echo "$RESULT"
-}
-
-#######################################
-# Returns flag indicating whether network is currently up.
-#######################################
-function get_net_is_up()
-{
-    # Presence of supervisord socket indicates true.
-    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_supervisord_sock)
-    if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
-        echo true
-    else
-        echo false
-    fi
 }
 
 #######################################
@@ -163,7 +173,7 @@ function get_node_for_dispatch()
 {
     for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES" | shuf)
     do
-        if [ "$(get_node_is_up "$NODE_ID")" = true ]; then
+        if [ "$(get_is_node_up "$NODE_ID")" = true ]; then
             echo "$NODE_ID"
             break
         fi
@@ -171,21 +181,15 @@ function get_node_for_dispatch()
 }
 
 #######################################
-# Returns flag indicating whether a node is currently up.
+# Calculates a node's default staking weight.
 # Arguments:
 #   Node ordinal identifier.
 #######################################
-function get_node_is_up()
+function get_node_staking_weight()
 {
     local NODE_ID=${1}
 
-    local NODE_PORT=$(get_port_of_sidecar_main_server  "$NODE_ID")
-
-    if grep -q "$NODE_PORT (LISTEN)" <<< "$(lsof -i -P -n)"; then
-        echo true
-    else
-        echo false
-    fi
+    echo $((CCTL_VALIDATOR_BASE_WEIGHT + NODE_ID))
 }
 
 #######################################
@@ -267,7 +271,7 @@ function get_port_of_node_sse_server()
 }
 
 #######################################
-# Calculates RPC port.
+# Calculates a sidecar's main (RPC) port.
 # Arguments:
 #   Node ordinal identifier.
 #######################################
@@ -283,7 +287,7 @@ function get_port_of_sidecar_main_server ()
 }
 
 #######################################
-# Calculates speculative execution port.
+# Calculates a sidecar's speculative execution port.
 # Arguments:
 #   Node ordinal identifier.
 #######################################
@@ -296,18 +300,6 @@ function get_port_of_sidecar_speculative_exec_server()
     else
         get_port "$CCTL_BASE_PORT_SPEC_EXEC" "$NODE_ID"
     fi
-}
-
-#######################################
-# Calculates a node's default staking weight.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_node_staking_weight()
-{
-    local NODE_ID=${1}
-
-    echo $((CCTL_VALIDATOR_BASE_WEIGHT + NODE_ID))
 }
 
 #######################################
