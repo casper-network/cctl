@@ -10,35 +10,9 @@
 function get_bootstrap_known_address()
 {
     local NODE_ID=${1}
-    local NET_ID=${NET_ID:-1}
-    local NODE_PORT=$((CCTL_BASE_PORT_NETWORK + (NET_ID * 100) + NODE_ID))
+    local NODE_PORT=$((CCTL_BASE_PORT_NETWORK + 100 + NODE_ID))
 
     echo "'127.0.0.1:$NODE_PORT'"
-}
-
-#######################################
-# Returns count of a network's bootstrap nodes.
-#######################################
-function get_count_of_bootstrap_nodes()
-{
-    # Hard-coded.
-    echo 3
-}
-
-#######################################
-# Returns count of a network's bootstrap nodes.
-#######################################
-function get_count_of_genesis_nodes()
-{
-    echo $(($(get_count_of_nodes) / 2))
-}
-
-#######################################
-# Returns count of all network nodes.
-#######################################
-function get_count_of_nodes()
-{
-    find "$(get_path_to_assets)"/nodes/* -maxdepth 0 -type d | wc -l
 }
 
 #######################################
@@ -49,7 +23,7 @@ function get_count_of_up_nodes()
     local COUNT=0
     local NODE_ID
 
-    for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
+    for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
     do
         if [ "$(get_node_is_up "$NODE_ID")" == true ]; then
             COUNT=$((COUNT + 1))
@@ -76,7 +50,7 @@ function get_network_bind_address()
 {
     local NODE_ID=${1}
 
-    echo "0.0.0.0:$(get_node_port "$CCTL_BASE_PORT_NETWORK" "$NODE_ID")"
+    echo "0.0.0.0:$(get_port "$CCTL_BASE_PORT_NETWORK" "$NODE_ID")"
 }
 
 #######################################
@@ -89,8 +63,8 @@ function get_network_known_addresses()
 
     # If a bootstrap node then return set of bootstraps.
     RESULT=$(get_bootstrap_known_address 1)
-    if [ "$NODE_ID" -lt "$(get_count_of_bootstrap_nodes)" ]; then
-        for IDX in $(seq 2 "$(get_count_of_bootstrap_nodes)")
+    if [ "$NODE_ID" -lt "$CCTL_COUNT_OF_BOOTSTRAP_NODES" ]; then
+        for IDX in $(seq 2 "$CCTL_COUNT_OF_BOOTSTRAP_NODES")
         do
             RESULT=$RESULT","$(get_bootstrap_known_address "$IDX")
         done
@@ -129,7 +103,7 @@ function get_node_address_binary()
 {
     local NODE_ID=${1}
 
-    echo "http://localhost:$(get_node_port "$CCTL_BASE_PORT_BINARY" "$NODE_ID")"
+    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_BINARY" "$NODE_ID")"
 }
 
 #######################################
@@ -141,7 +115,7 @@ function get_node_address_event()
 {
     local NODE_ID=${1}
 
-    echo "http://localhost:$(get_node_port "$CCTL_BASE_PORT_SSE" "$NODE_ID")"
+    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_SSE" "$NODE_ID")"
 }
 
 #######################################
@@ -153,7 +127,7 @@ function get_node_address_rest()
 {
     local NODE_ID=${1}
 
-    echo "http://localhost:$(get_node_port "$CCTL_BASE_PORT_REST" "$NODE_ID")"
+    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_REST" "$NODE_ID")"
 }
 
 #######################################
@@ -165,7 +139,7 @@ function get_node_address_rpc()
 {
     local NODE_ID=${1}
 
-    echo "http://localhost:$(get_node_port "$CCTL_BASE_PORT_RPC" "$NODE_ID")"
+    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_RPC" "$NODE_ID")"
 }
 
 #######################################
@@ -187,7 +161,7 @@ function get_node_address_rpc_for_curl()
 #######################################
 function get_node_for_dispatch()
 {
-    for NODE_ID in $(seq 1 "$(get_count_of_nodes)" | shuf)
+    for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES" | shuf)
     do
         if [ "$(get_node_is_up "$NODE_ID")" = true ]; then
             echo "$NODE_ID"
@@ -205,29 +179,13 @@ function get_node_is_up()
 {
     local NODE_ID=${1}
 
-    local NODE_PORT=$(get_sidecar_port_speculative_exec "$NODE_ID")
+    local NODE_PORT=$(get_port_of_sidecar_main_server  "$NODE_ID")
 
     if grep -q "$NODE_PORT (LISTEN)" <<< "$(lsof -i -P -n)"; then
         echo true
     else
         echo false
     fi
-}
-
-#######################################
-# Calculate port for a given base port, network id, and node id.
-# Arguments:
-#   Base starting port.
-#   Node ordinal identifier.
-#######################################
-function get_node_port()
-{
-    local BASE_PORT=${1}
-    local NODE_ID=${2:-$(get_node_for_dispatch)}
-    local NET_ID=${NET_ID:-1}
-
-    # TODO: Need to handle case of more than 99 nodes.
-    echo $((BASE_PORT + (NET_ID * 100) + NODE_ID))
 }
 
 #######################################
@@ -240,57 +198,71 @@ function get_node_port_bind()
     local NODE_ID=${1}
 
     if ((${#CSPR_BASE_PORT_NETWORK[@]})); then
-        get_node_port "$CSPR_BASE_PORT_NETWORK" "$NODE_ID"
+        get_port "$CSPR_BASE_PORT_NETWORK" "$NODE_ID"
     else
-        get_node_port "$CCTL_BASE_PORT_NETWORK" "$NODE_ID"
+        get_port "$CCTL_BASE_PORT_NETWORK" "$NODE_ID"
     fi
 }
 
 #######################################
-# Calculates binary port.
+# Calculate port for a given base port, network id, and optional node id.
+# Arguments:
+#   Base starting port.
+#   Node ordinal identifier.
+#######################################
+function get_port()
+{
+    local BASE_PORT=${1}
+    local NODE_ID=${2:-$(get_node_for_dispatch)}
+
+    echo $((BASE_PORT + 100 + NODE_ID))
+}
+
+#######################################
+# Calculates a node's binary port.
 # Arguments:
 #   Node ordinal identifier.
 #######################################
-function get_node_port_binary()
+function get_port_of_node_binary_server()
 {
     local NODE_ID=${1}
 
     if ((${#CSPR_BASE_PORT_BINARY[@]})); then
-        get_node_port "$CSPR_BASE_PORT_BINARY" "$NODE_ID"
+        get_port "$CSPR_BASE_PORT_BINARY" "$NODE_ID"
     else
-        get_node_port "$CCTL_BASE_PORT_BINARY" "$NODE_ID"
+        get_port "$CCTL_BASE_PORT_BINARY" "$NODE_ID"
     fi
 }
 
 #######################################
-# Calculates speculative execution port.
+# Calculates a node's REST port.
 # Arguments:
 #   Node ordinal identifier.
 #######################################
-function get_node_port_speculative_exec()
-{
-    local NODE_ID=${1}
-
-    if ((${#CSPR_BASE_PORT_SPEC_EXEC[@]})); then
-        get_node_port "$CSPR_BASE_PORT_SPEC_EXEC" "$NODE_ID"
-    else
-        get_node_port "$CCTL_BASE_PORT_SPEC_EXEC" "$NODE_ID"
-    fi
-}
-
-#######################################
-# Calculates REST port.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_node_port_rest()
+function get_port_of_node_rest_server()
 {
     local NODE_ID=${1}
 
     if ((${#CSPR_BASE_PORT_REST[@]})); then
-        get_node_port "$CSPR_BASE_PORT_REST" "$NODE_ID"
+        get_port "$CSPR_BASE_PORT_REST" "$NODE_ID"
     else
-        get_node_port "$CCTL_BASE_PORT_REST" "$NODE_ID"
+        get_port "$CCTL_BASE_PORT_REST" "$NODE_ID"
+    fi
+}
+
+#######################################
+# Calculates a node's SSE port.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_port_of_node_sse_server()
+{
+    local NODE_ID=${1}
+
+    if ((${#CSPR_BASE_PORT_SSE[@]})); then
+        get_port "$CSPR_BASE_PORT_SSE" "$NODE_ID"
+    else
+        get_port "$CCTL_BASE_PORT_SSE" "$NODE_ID"
     fi
 }
 
@@ -299,30 +271,30 @@ function get_node_port_rest()
 # Arguments:
 #   Node ordinal identifier.
 #######################################
-function get_sidecar_port_speculative_exec()
+function get_port_of_sidecar_main_server ()
 {
     local NODE_ID=${1}
 
     if ((${#CSPR_BASE_PORT_RPC[@]})); then
-        get_node_port "$CSPR_BASE_PORT_RPC" "$NODE_ID"
+        get_port "$CSPR_BASE_PORT_RPC" "$NODE_ID"
     else
-        get_node_port "$CCTL_BASE_PORT_RPC" "$NODE_ID"
+        get_port "$CCTL_BASE_PORT_RPC" "$NODE_ID"
     fi
 }
 
 #######################################
-# Calculates SSE port.
+# Calculates speculative execution port.
 # Arguments:
 #   Node ordinal identifier.
 #######################################
-function get_node_port_sse()
+function get_port_of_sidecar_speculative_exec_server()
 {
     local NODE_ID=${1}
 
-    if ((${#CSPR_BASE_PORT_SSE[@]})); then
-        get_node_port "$CSPR_BASE_PORT_SSE" "$NODE_ID"
+    if ((${#CSPR_BASE_PORT_SPEC_EXEC[@]})); then
+        get_port "$CSPR_BASE_PORT_SPEC_EXEC" "$NODE_ID"
     else
-        get_node_port "$CCTL_BASE_PORT_SSE" "$NODE_ID"
+        get_port "$CCTL_BASE_PORT_SPEC_EXEC" "$NODE_ID"
     fi
 }
 
@@ -353,15 +325,15 @@ function get_process_group_members()
     # Set range.
     if [ "$PROCESS_GROUP" == "$CCTL_PROCESS_GROUP_1" ]; then
         SEQ_START=1
-        SEQ_END=$(get_count_of_bootstrap_nodes)
+        SEQ_END=$CCTL_COUNT_OF_BOOTSTRAP_NODES
 
     elif [ "$PROCESS_GROUP" == "$CCTL_PROCESS_GROUP_2" ]; then
-        SEQ_START=$(($(get_count_of_bootstrap_nodes) + 1))
-        SEQ_END=$(get_count_of_genesis_nodes)
+        SEQ_START=$(($CCTL_COUNT_OF_BOOTSTRAP_NODES + 1))
+        SEQ_END=$CCTL_COUNT_OF_GENESIS_NODES
 
     elif [ "$PROCESS_GROUP" == "$CCTL_PROCESS_GROUP_3" ]; then
-        SEQ_START=$(($(get_count_of_genesis_nodes) + 1))
-        SEQ_END=$(get_count_of_nodes)
+        SEQ_START=$(($CCTL_COUNT_OF_GENESIS_NODES + 1))
+        SEQ_END=$CCTL_COUNT_OF_NODES
     fi
 
     # Set members of process group.
@@ -417,9 +389,9 @@ function get_process_name_of_node_group()
 {
     local NODE_ID=${1}
 
-    if [ "$NODE_ID" -le "$(get_count_of_bootstrap_nodes)" ]; then
+    if [ "$NODE_ID" -le "$CCTL_COUNT_OF_BOOTSTRAP_NODES" ]; then
         echo "$CCTL_PROCESS_GROUP_1"
-    elif [ "$NODE_ID" -le "$(get_count_of_genesis_nodes)" ]; then
+    elif [ "$NODE_ID" -le "$CCTL_COUNT_OF_GENESIS_NODES" ]; then
         echo "$CCTL_PROCESS_GROUP_2"
     else
         echo "$CCTL_PROCESS_GROUP_3"
@@ -452,44 +424,4 @@ function get_process_name_of_node_sidecar_in_group()
     local PROCESS_GROUP_NAME=$(get_process_name_of_node_group "$NODE_ID")
 
     echo "$PROCESS_GROUP_NAME:$PROCESS_NAME"
-}
-
-#######################################
-# Returns count of nodes that atleast attempted to start
-#######################################
-function get_count_of_started_nodes()
-{
-    cctl-status | grep -v 'Not started' | wc -l
-}
-
-
-#######################################
-# Returns only if the chain has reached genesis (interpreted as era>=2)
-#######################################
-function do_await_genesis_era_to_complete() {
-    local LOG_STEP=${1:-'true'}
-    local TIMEOUT=${2:-'240'}
-    local CURRENT_ERA
-
-    if [ "$LOG_STEP" = "true" ]; then
-        log_step "awaiting genesis era to complete: timeout=$TIMEOUT"
-    fi
-
-    while :
-    do
-        CURRENT_ERA=$(get_chain_era)
-        if [ "$CURRENT_ERA" -ge "2" ]
-        then
-            log "genesis reached, era=$CURRENT_ERA"
-            return
-        fi
-        TIMEOUT=$((TIMEOUT-1))
-        if [ "$TIMEOUT" = '0' ]; then
-            log "ERROR: Timed out before genesis era completed"
-            exit 1
-        else
-            log "... waiting for genesis era to complete: timeout=$TIMEOUT, current era=$CURRENT_ERA"
-        fi
-        sleep 1.0
-    done
 }

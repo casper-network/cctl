@@ -25,7 +25,7 @@ function _main()
     local NODE_ID=${1}
 
     if [ "$NODE_ID" = "all" ]; then
-        for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
+        for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
         do
             log "------------------------------------------------------------------------------------------------------"
             _display_ports "$NODE_ID"
@@ -45,10 +45,10 @@ function _display_ports()
     local PORT_SPECULATIVE_EXEC
 
     PORT_BIND=$(get_node_port_bind "$NODE_ID")
-    PORT_REST=$(get_node_port_rest "$NODE_ID")
-    PORT_RPC=$(get_sidecar_port_speculative_exec "$NODE_ID")
-    PORT_SSE=$(get_node_port_sse "$NODE_ID")
-    PORT_SPECULATIVE_EXEC=$(get_node_port_speculative_exec "$NODE_ID")
+    PORT_REST=$(get_port_of_node_rest_server "$NODE_ID")
+    PORT_RPC=$(get_port_of_sidecar_main_server  "$NODE_ID")
+    PORT_SSE=$(get_port_of_node_sse_server "$NODE_ID")
+    PORT_SPECULATIVE_EXEC=$(get_port_of_sidecar_speculative_exec_server "$NODE_ID")
 
     log "node-$NODE_ID -> CONSENSUS @ $PORT_BIND :: RPC @ $PORT_RPC :: REST @ $PORT_REST :: SSE @ $PORT_SSE :: SPECULATIVE_EXEC @ $PORT_SPECULATIVE_EXEC"
 }

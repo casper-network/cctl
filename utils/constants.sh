@@ -87,3 +87,8 @@ declare CCTL_SMART_CONTRACTS=(
     "undelegate.wasm"
     "withdraw_bid.wasm"
 )
+
+# Node counts by type.
+declare CCTL_COUNT_OF_BOOTSTRAP_NODES=3
+declare CCTL_COUNT_OF_GENESIS_NODES=5
+declare CCTL_COUNT_OF_NODES=10

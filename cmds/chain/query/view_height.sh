@@ -24,7 +24,7 @@ function _main()
 {
     local TIMEOUT_SEC=${1}
 
-    for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
+    for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
     do
         if [ $(get_node_is_up "$NODE_ID") = true ]; then
             log "chain height @ node-$NODE_ID = $(get_chain_height "$NODE_ID" "$TIMEOUT_SEC")"

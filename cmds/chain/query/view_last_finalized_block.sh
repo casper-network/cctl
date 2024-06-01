@@ -17,7 +17,7 @@ function _main()
     local NODE_ID
     local NODE_LFB_HASH
 
-    for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
+    for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
     do
         if [ $(get_node_is_up "$NODE_ID") = true ]; then
             NODE_LFB=$(get_chain_latest_block_hash "$NODE_ID")

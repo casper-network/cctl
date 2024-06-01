@@ -360,14 +360,14 @@ function _setup_node_binary_config()
     SCRIPT=(
         "import toml;"
         "cfg=toml.load('$PATH_TO_TEMPLATE_OF_CONFIG');"
-        "cfg['binary_port_server']['address']='0.0.0.0:$(get_node_port_binary "$NODE_ID")';"
+        "cfg['binary_port_server']['address']='0.0.0.0:$(get_port_of_node_binary_server "$NODE_ID")';"
         "cfg['consensus']['secret_key_path']='../../keys/secret_key.pem';"
         "cfg['diagnostics_port']['enabled']=False;"
-        "cfg['event_stream_server']['address']='0.0.0.0:$(get_node_port_sse "$NODE_ID")';"
+        "cfg['event_stream_server']['address']='0.0.0.0:$(get_port_of_node_sse_server "$NODE_ID")';"
         "cfg['logging']['format']='json';"
         "cfg['network']['bind_address']='$(get_network_bind_address "$NODE_ID")';"
         "cfg['network']['known_addresses']=[$(get_network_known_addresses "$NODE_ID")];"
-        "cfg['rest_server']['address']='0.0.0.0:$(get_node_port_rest "$NODE_ID")';"
+        "cfg['rest_server']['address']='0.0.0.0:$(get_port_of_node_rest_server "$NODE_ID")';"
         "cfg['storage']['path']='../../storage';"
         "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
     )
@@ -391,9 +391,9 @@ function _setup_node_sidecar_config()
     SCRIPT=(
         "import toml;"
         "cfg=toml.load('$PATH_TO_CONFIG');"
-        "cfg['rpc_server']['main_server']['address']='0.0.0.0:$(get_sidecar_port_speculative_exec "$NODE_ID")';"
-        "cfg['rpc_server']['speculative_exec_server']['address']='0.0.0.0:$(get_node_port_speculative_exec "$NODE_ID")';"
-        "cfg['rpc_server']['node_client']['address']='0.0.0.0:$(get_node_port_binary "$NODE_ID")';"
+        "cfg['rpc_server']['main_server']['address']='0.0.0.0:$(get_port_of_sidecar_main_server  "$NODE_ID")';"
+        "cfg['rpc_server']['speculative_exec_server']['address']='0.0.0.0:$(get_port_of_sidecar_speculative_exec_server "$NODE_ID")';"
+        "cfg['rpc_server']['node_client']['address']='0.0.0.0:$(get_port_of_node_binary_server "$NODE_ID")';"
         "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
     )
     python3 -c "${SCRIPT[*]}"

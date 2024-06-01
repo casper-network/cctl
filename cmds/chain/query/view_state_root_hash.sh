@@ -23,7 +23,7 @@ function _main()
     local NODE_ID
     local NODE_SRH
 
-    for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
+    for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
     do
         if [ $(get_node_is_up "$NODE_ID") = true ]; then
             NODE_SRH=$(get_state_root_hash "$NODE_ID" "$BLOCK_ID")
