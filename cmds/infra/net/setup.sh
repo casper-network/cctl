@@ -20,8 +20,8 @@ function _help() {
     DEFAULTS
     ----------------------------------------------------------------
     accounts    static
-    chainspec   $(get_path_to_node_resources)/local/chainspec.toml.in
-    config      $(get_path_to_node_resources)/local/config.toml
+    chainspec   $(get_path_to_resources_of_node)/local/chainspec.toml.in
+    config      $(get_path_to_resources_of_node)/local/config.toml
     delay       30 seconds
 
     NOTES
@@ -80,10 +80,10 @@ function _setup_binaries()
     local NODE_COUNT=${1}
 
     local NODE_ID
-    local PATH_TO_BINARY_OF_CLIENT=$(get_path_to_binary_of_casper_client)
+    local PATH_TO_BINARY_OF_CLIENT=$(get_path_to_compiled_client)
     local PATH_TO_BINARY_OF_NODE=$(get_path_to_compiled_node)
     local PATH_TO_BINARY_OF_NODE_LAUNCHER=$(get_path_to_compiled_node_launcher)
-    local PATH_TO_BINARY_OF_SIDECAR=$(get_path_to_compiled_node_sidecar)
+    local PATH_TO_BINARY_OF_SIDECAR=$(get_path_to_compiled_sidecar)
     local PATH_TO_NODE_BIN
 
     cp "$PATH_TO_BINARY_OF_CLIENT" "$(get_path_to_assets)"/bin
@@ -426,8 +426,8 @@ function _setup_supervisor()
     local PATH_TO_NODE_BIN
     local PATH_TO_NODE_CONFIG
     local PATH_TO_NODE_LOGS
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCK=$(get_path_to_net_supervisord_sock)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCK=$(get_path_to_supervisord_sock)
 
     touch "$PATH_TO_SUPERVISOR_CONFIG"
 
@@ -535,8 +535,8 @@ function _teardown()
 
 function _teardown_net()
 {
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_net_supervisord_sock)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_supervisord_sock)
 
     if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
         supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" shutdown > /dev/null 2>&1 || true
@@ -587,7 +587,7 @@ else
     _main \
         "${_GENESIS_ACCOUNTS_TYPE:-"static"}" \
         "${_GENESIS_DELAY:-30}" \
-        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_node_resources)/local/chainspec.toml.in"}" \
-        "${_PATH_TO_CONFIG_OF_NODE:-"$(get_path_to_node_resources)/local/config.toml"}" \
-        "${_PATH_TO_CONFIG_OF_SIDECAR:-"$(get_path_to_sidecar_resources)/example_configs/default_rpc_only_config.toml"}"
+        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_resources_of_node)/local/chainspec.toml.in"}" \
+        "${_PATH_TO_CONFIG_OF_NODE:-"$(get_path_to_resources_of_node)/local/config.toml"}" \
+        "${_PATH_TO_CONFIG_OF_SIDECAR:-"$(get_path_to_resources_of_sidecar)/example_configs/default_rpc_only_config.toml"}"
 fi

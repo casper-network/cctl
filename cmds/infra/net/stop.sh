@@ -14,8 +14,8 @@ function _help() {
 
 function _main()
 {
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_net_supervisord_sock)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_supervisord_sock)
 
     if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
         log "stopping network ... please wait"
@@ -49,4 +49,3 @@ if [ "${_HELP:-""}" = "show" ]; then
 else
     _main
 fi
-

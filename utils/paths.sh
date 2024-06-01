@@ -11,12 +11,12 @@ function get_path_to_assets()
 }
 
 #######################################
-# Returns path to casper client binary.
+# Returns path to compiled client binary.
 # Globals:
 #   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_BIN
 #######################################
-function get_path_to_binary_of_casper_client()
+function get_path_to_compiled_client()
 {
     local COMPILE_TARGET
     local PATH_TO_BINARY
@@ -31,27 +31,7 @@ function get_path_to_binary_of_casper_client()
 }
 
 #######################################
-# Returns path to casper event sidecar binary.
-# Globals:
-#   CSPR_COMPILE_TARGET
-#   CSPR_PATH_TO_BIN.
-#######################################
-function get_path_to_compiled_node_sidecar()
-{
-    local COMPILE_TARGET
-    local PATH_TO_BINARY
-
-    if ((${#CSPR_PATH_TO_BIN[@]})); then
-        echo $CSPR_PATH_TO_BIN/casper-sidecar
-    else
-        COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
-        PATH_TO_BINARY="casper-sidecar/target/$COMPILE_TARGET/casper-sidecar"
-        echo $(get_path_to_working_directory_file $PATH_TO_BINARY)
-    fi
-}
-
-#######################################
-# Returns path to casper node binary.
+# Returns path to compiled node binary.
 # Globals:
 #   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_BIN.
@@ -71,7 +51,7 @@ function get_path_to_compiled_node()
 }
 
 #######################################
-# Returns path to casper node launcher binary.
+# Returns path to compiled node launcher binary.
 # Globals:
 #   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_BIN.
@@ -91,16 +71,22 @@ function get_path_to_compiled_node_launcher()
 }
 
 #######################################
-# Returns path to node resources folder.
+# Returns path to compiled sidecar binary.
 # Globals:
-#   CSPR_PATH_TO_RESOURCES.
+#   CSPR_COMPILE_TARGET
+#   CSPR_PATH_TO_BIN.
 #######################################
-function get_path_to_node_resources()
+function get_path_to_compiled_sidecar()
 {
-    if ((${#CSPR_PATH_TO_RESOURCES[@]})); then
-        echo $CSPR_PATH_TO_RESOURCES
+    local COMPILE_TARGET
+    local PATH_TO_BINARY
+
+    if ((${#CSPR_PATH_TO_BIN[@]})); then
+        echo $CSPR_PATH_TO_BIN/casper-sidecar
     else
-        echo $(get_path_to_working_directory)/casper-node/resources
+        COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
+        PATH_TO_BINARY="casper-sidecar/target/$COMPILE_TARGET/casper-sidecar"
+        echo $(get_path_to_working_directory_file $PATH_TO_BINARY)
     fi
 }
 
@@ -125,11 +111,25 @@ function get_path_to_compiled_wasm()
 }
 
 #######################################
+# Returns path to node resources folder.
+# Globals:
+#   CSPR_PATH_TO_RESOURCES.
+#######################################
+function get_path_to_resources_of_node()
+{
+    if ((${#CSPR_PATH_TO_RESOURCES[@]})); then
+        echo $CSPR_PATH_TO_RESOURCES
+    else
+        echo $(get_path_to_working_directory)/casper-node/resources
+    fi
+}
+
+#######################################
 # Returns path to sidecar resources folder.
 # Globals:
 #   CSPR_PATH_TO_RESOURCES.
 #######################################
-function get_path_to_sidecar_resources()
+function get_path_to_resources_of_sidecar()
 {
     if ((${#CSPR_PATH_TO_RESOURCES[@]})); then
         echo $CSPR_PATH_TO_RESOURCES
@@ -144,6 +144,34 @@ function get_path_to_sidecar_resources()
 function get_path_to_client()
 {
     echo "$(get_path_to_assets)"/bin/casper-client
+}
+
+#######################################
+# Returns path to a network supervisord config file.
+#######################################
+function get_path_to_supervisord_cfg()
+{
+    echo "$(get_path_to_assets)"/daemon/config/supervisord.conf
+}
+
+#######################################
+# Returns path to a network supervisord socket file.
+#######################################
+function get_path_to_supervisord_sock()
+{
+    echo /tmp/cctl-supervisord.sock
+}
+
+#######################################
+# Returns path to a node's local assets.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_path_to_node()
+{
+    local NODE_ID=${1:-1}
+
+    echo "$(get_path_to_assets)"/nodes/node-"$NODE_ID"
 }
 
 #######################################
@@ -162,34 +190,6 @@ function get_path_to_working_directory_file()
     local FILE_SUBPATH=${1}
 
     echo "$(get_path_to_working_directory)"/"$FILE_SUBPATH"
-}
-
-#######################################
-# Returns path to a network supervisord config file.
-#######################################
-function get_path_to_net_supervisord_cfg()
-{
-    echo "$(get_path_to_assets)"/daemon/config/supervisord.conf
-}
-
-#######################################
-# Returns path to a network supervisord socket file.
-#######################################
-function get_path_to_net_supervisord_sock()
-{
-    echo /tmp/cctl-supervisord.sock
-}
-
-#######################################
-# Returns path to a node's local assets.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_path_to_node()
-{
-    local NODE_ID=${1:-1}
-
-    echo "$(get_path_to_assets)"/nodes/node-"$NODE_ID"
 }
 
 #######################################
