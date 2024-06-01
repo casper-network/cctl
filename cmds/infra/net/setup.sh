@@ -20,8 +20,8 @@ function _help() {
     DEFAULTS
     ----------------------------------------------------------------
     accounts    static
-    chainspec   $(get_path_to_casper_node_resources)/local/chainspec.toml.in
-    config      $(get_path_to_casper_node_resources)/local/config.toml
+    chainspec   $(get_path_to_node_resources)/local/chainspec.toml.in
+    config      $(get_path_to_node_resources)/local/config.toml
     delay       30 seconds
 
     NOTES
@@ -36,8 +36,8 @@ function _main()
     local GENESIS_ACCOUNTS_TYPE=${1}
     local GENESIS_DELAY=${2}
     local PATH_TO_CHAINSPEC=${3}
-    local PATH_TO_NODE_CONFIG_TEMPLATE=${4}
-    local PATH_TO_SIDECAR_CONFIG_TEMPLATE=${5}
+    local PATH_TO_CONFIG_TEMPLATE_OF_NODE=${4}
+    local PATH_TO_CONFIG_TEMPLATE_OF_SIDECAR=${5}
 
     local NODE_COUNT=10
     local NODE_COUNT_AT_GENESIS=5
@@ -70,7 +70,7 @@ function _main()
     _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
 
     log "... setting node configs"
-    _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_SIDECAR_CONFIG_TEMPLATE"
+    _setup_node_configs "$NODE_COUNT" "$PATH_TO_CONFIG_TEMPLATE_OF_NODE" "$PATH_TO_CONFIG_TEMPLATE_OF_SIDECAR"
 
     log "network setup complete"
 }
@@ -80,19 +80,20 @@ function _setup_binaries()
     local NODE_COUNT=${1}
 
     local NODE_ID
-    local PATH_TO_BINARY_OF_CASPER_CLIENT=$(get_path_to_binary_of_casper_client)
-    local PATH_TO_BINARY_OF_CASPER_NODE=$(get_path_to_binary_of_casper_node)
-    local PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER=$(get_path_to_binary_of_casper_node_launcher)
-    local PATH_TO_BINARY_OF_CASPER_NODE_SIDECAR=$(get_path_to_binary_of_casper_node_sidecar)
+    local PATH_TO_BINARY_OF_CLIENT=$(get_path_to_binary_of_casper_client)
+    local PATH_TO_BINARY_OF_NODE=$(get_path_to_compiled_node)
+    local PATH_TO_BINARY_OF_NODE_LAUNCHER=$(get_path_to_compiled_node_launcher)
+    local PATH_TO_BINARY_OF_SIDECAR=$(get_path_to_compiled_node_sidecar)
     local PATH_TO_NODE_BIN
 
-    cp "$PATH_TO_BINARY_OF_CASPER_CLIENT" "$(get_path_to_assets)"/bin
+    cp "$PATH_TO_BINARY_OF_CLIENT" "$(get_path_to_assets)"/bin
+
     for NODE_ID in $(seq 1 "$NODE_COUNT")
     do
         PATH_TO_NODE_BIN="$(get_path_to_node "$NODE_ID")"/bin
-        cp "$PATH_TO_BINARY_OF_CASPER_NODE" "$PATH_TO_NODE_BIN/2_0_0"
-        cp "$PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER" "$PATH_TO_NODE_BIN"
-        cp "$PATH_TO_BINARY_OF_CASPER_NODE_SIDECAR" "$PATH_TO_NODE_BIN/2_0_0"
+        cp "$PATH_TO_BINARY_OF_NODE" "$PATH_TO_NODE_BIN/2_0_0"
+        cp "$PATH_TO_BINARY_OF_NODE_LAUNCHER" "$PATH_TO_NODE_BIN"
+        cp "$PATH_TO_BINARY_OF_SIDECAR" "$PATH_TO_NODE_BIN/2_0_0"
     done
 }
 
@@ -390,7 +391,7 @@ function _setup_node_sidecar_config()
     SCRIPT=(
         "import toml;"
         "cfg=toml.load('$PATH_TO_CONFIG');"
-        "cfg['rpc_server']['main_server']['address']='0.0.0.0:$(get_node_port_rpc "$NODE_ID")';"
+        "cfg['rpc_server']['main_server']['address']='0.0.0.0:$(get_sidecar_port_speculative_exec "$NODE_ID")';"
         "cfg['rpc_server']['speculative_exec_server']['address']='0.0.0.0:$(get_node_port_speculative_exec "$NODE_ID")';"
         "cfg['rpc_server']['node_client']['address']='0.0.0.0:$(get_node_port_binary "$NODE_ID")';"
         "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
@@ -516,7 +517,7 @@ EOM
 function _setup_wasm()
 {
     local PATH_TO_ASSETS=$(get_path_to_assets)
-    local PATH_TO_WASM_OF_CASPER_NODE=$(get_path_to_wasm_of_casper_node)
+    local PATH_TO_WASM_OF_CASPER_NODE=$(get_path_to_compiled_wasm)
 
     for CONTRACT in "${CCTL_SMART_CONTRACTS[@]}"
     do
@@ -562,8 +563,8 @@ unset _GENESIS_ACCOUNTS_TYPE
 unset _GENESIS_DELAY
 unset _HELP
 unset _PATH_TO_CHAINSPEC
-unset _PATH_TO_NODE_CONFIG
-unset _PATH_TO_SIDECAR_CONFIG
+unset _PATH_TO_CONFIG_OF_NODE
+unset _PATH_TO_CONFIG_OF_SIDECAR
 
 for ARGUMENT in "$@"
 do
@@ -574,12 +575,11 @@ do
         delay) _GENESIS_DELAY=${VALUE} ;;
         help) _HELP="show" ;;
         chainspec) _PATH_TO_CHAINSPEC=${VALUE} ;;
-        config) _PATH_TO_NODE_CONFIG=${VALUE} ;;
-        sidecar) _PATH_TO_SIDECAR_CONFIG=${VALUE} ;;
+        config) _PATH_TO_CONFIG_OF_NODE=${VALUE} ;;
+        sidecar) _PATH_TO_CONFIG_OF_SIDECAR=${VALUE} ;;
         *)
     esac
 done
-
 
 if [ "${_HELP:-""}" = "show" ]; then
     _help
@@ -587,7 +587,7 @@ else
     _main \
         "${_GENESIS_ACCOUNTS_TYPE:-"static"}" \
         "${_GENESIS_DELAY:-30}" \
-        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_casper_node_resources)/local/chainspec.toml.in"}" \
-        "${_PATH_TO_NODE_CONFIG:-"$(get_path_to_casper_node_resources)/local/config.toml"}" \
-        "${_PATH_TO_SIDECAR_CONFIG:-"$(get_path_to_casper_sidecar_resources)/example_configs/default_rpc_only_config.toml"}"
+        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_node_resources)/local/chainspec.toml.in"}" \
+        "${_PATH_TO_CONFIG_OF_NODE:-"$(get_path_to_node_resources)/local/config.toml"}" \
+        "${_PATH_TO_CONFIG_OF_SIDECAR:-"$(get_path_to_sidecar_resources)/example_configs/default_rpc_only_config.toml"}"
 fi

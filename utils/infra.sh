@@ -205,7 +205,7 @@ function get_node_is_up()
 {
     local NODE_ID=${1}
 
-    local NODE_PORT=$(get_node_port_rpc "$NODE_ID")
+    local NODE_PORT=$(get_sidecar_port_speculative_exec "$NODE_ID")
 
     if grep -q "$NODE_PORT (LISTEN)" <<< "$(lsof -i -P -n)"; then
         echo true
@@ -299,7 +299,7 @@ function get_node_port_rest()
 # Arguments:
 #   Node ordinal identifier.
 #######################################
-function get_node_port_rpc()
+function get_sidecar_port_speculative_exec()
 {
     local NODE_ID=${1}
 

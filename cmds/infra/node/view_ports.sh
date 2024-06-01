@@ -23,7 +23,7 @@ function _help() {
 function _main()
 {
     local NODE_ID=${1}
-    
+
     if [ "$NODE_ID" = "all" ]; then
         for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
         do
@@ -46,7 +46,7 @@ function _display_ports()
 
     PORT_BIND=$(get_node_port_bind "$NODE_ID")
     PORT_REST=$(get_node_port_rest "$NODE_ID")
-    PORT_RPC=$(get_node_port_rpc "$NODE_ID")
+    PORT_RPC=$(get_sidecar_port_speculative_exec "$NODE_ID")
     PORT_SSE=$(get_node_port_sse "$NODE_ID")
     PORT_SPECULATIVE_EXEC=$(get_node_port_speculative_exec "$NODE_ID")
 

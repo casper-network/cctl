@@ -36,7 +36,7 @@ function get_path_to_binary_of_casper_client()
 #   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_BIN.
 #######################################
-function get_path_to_binary_of_casper_node_sidecar()
+function get_path_to_compiled_node_sidecar()
 {
     local COMPILE_TARGET
     local PATH_TO_BINARY
@@ -56,7 +56,7 @@ function get_path_to_binary_of_casper_node_sidecar()
 #   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_BIN.
 #######################################
-function get_path_to_binary_of_casper_node()
+function get_path_to_compiled_node()
 {
     local COMPILE_TARGET
     local PATH_TO_BINARY
@@ -76,26 +76,26 @@ function get_path_to_binary_of_casper_node()
 #   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_BIN.
 #######################################
-function get_path_to_binary_of_casper_node_launcher()
+function get_path_to_compiled_node_launcher()
 {
     local COMPILE_TARGET
-    local PATH_TO_BINARY
+    local RELATIVE_PATH_TO_BINARY
 
     if ((${#CSPR_PATH_TO_BIN[@]})); then
         echo $CSPR_PATH_TO_BIN/casper-node-launcher
     else
         COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
-        PATH_TO_BINARY="casper-node-launcher/target/$COMPILE_TARGET/casper-node-launcher"
-        echo $(get_path_to_working_directory_file $PATH_TO_BINARY)
+        RELATIVE_PATH_TO_BINARY="casper-node-launcher/target/$COMPILE_TARGET/casper-node-launcher"
+        echo $(get_path_to_working_directory_file $RELATIVE_PATH_TO_BINARY)
     fi
 }
 
 #######################################
-# Returns path to casper node resources folder.
+# Returns path to node resources folder.
 # Globals:
 #   CSPR_PATH_TO_RESOURCES.
 #######################################
-function get_path_to_casper_node_resources()
+function get_path_to_node_resources()
 {
     if ((${#CSPR_PATH_TO_RESOURCES[@]})); then
         echo $CSPR_PATH_TO_RESOURCES
@@ -105,36 +105,36 @@ function get_path_to_casper_node_resources()
 }
 
 #######################################
-# Returns path to casper sidecar resources folder.
-# Globals:
-#   CSPR_PATH_TO_RESOURCES.
-#######################################
-function get_path_to_casper_sidecar_resources()
-{
-    if ((${#CSPR_PATH_TO_RESOURCES[@]})); then
-        echo $CSPR_PATH_TO_RESOURCES
-    else
-        echo $(get_path_to_working_directory)/casper-sidecar/resources
-    fi
-}
-
-#######################################
-# Returns path to casper node wasm folder.
+# Returns path to compiled wasm folder.
 # Globals:
 #   CSPR_COMPILE_TARGET
 #   CSPR_PATH_TO_BIN.
 #######################################
-function get_path_to_wasm_of_casper_node()
+function get_path_to_compiled_wasm()
 {
     local COMPILE_TARGET
-    local PATH_TO_WASM
+    local RELATIVE_PATH_TO_WASM
 
     if ((${#CSPR_PATH_TO_BIN[@]})); then
         echo $CSPR_PATH_TO_BIN
     else
         COMPILE_TARGET=${CSPR_COMPILE_TARGET:-release}
-        PATH_TO_WASM="casper-node/target/wasm32-unknown-unknown/$COMPILE_TARGET"
-        echo $(get_path_to_working_directory_file $PATH_TO_WASM)
+        RELATIVE_PATH_TO_WASM="casper-node/target/wasm32-unknown-unknown/$COMPILE_TARGET"
+        echo $(get_path_to_working_directory_file $RELATIVE_PATH_TO_WASM)
+    fi
+}
+
+#######################################
+# Returns path to sidecar resources folder.
+# Globals:
+#   CSPR_PATH_TO_RESOURCES.
+#######################################
+function get_path_to_sidecar_resources()
+{
+    if ((${#CSPR_PATH_TO_RESOURCES[@]})); then
+        echo $CSPR_PATH_TO_RESOURCES
+    else
+        echo $(get_path_to_working_directory)/casper-sidecar/resources
     fi
 }
 
