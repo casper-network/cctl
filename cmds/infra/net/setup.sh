@@ -365,7 +365,7 @@ function _setup_node_binary_config()
         "cfg['diagnostics_port']['enabled']=False;"
         "cfg['event_stream_server']['address']='0.0.0.0:$(get_port_of_node_sse_server "$NODE_ID")';"
         "cfg['logging']['format']='json';"
-        "cfg['network']['bind_address']='$(get_network_bind_address "$NODE_ID")';"
+        "cfg['network']['bind_address']='$(get_address_of_node_net_bind "$NODE_ID")';"
         "cfg['network']['known_addresses']=[$(get_network_known_addresses "$NODE_ID")];"
         "cfg['rest_server']['address']='0.0.0.0:$(get_port_of_node_rest_server "$NODE_ID")';"
         "cfg['storage']['path']='../../storage';"

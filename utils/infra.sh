@@ -1,16 +1,89 @@
 #!/usr/bin/env bash
 
 #######################################
+# Returns address to a node's binary server.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_address_of_node_binary_server()
+{
+    local NODE_ID=${1}
+
+    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_NODE_BINARY" "$NODE_ID")"
+}
+
+#######################################
+# Returns address to a node's network bind server.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_address_of_node_net_bind()
+{
+    local NODE_ID=${1}
+
+    echo "0.0.0.0:$(get_port "$CCTL_BASE_PORT_NODE_NETWORK" "$NODE_ID")"
+}
+
+#######################################
+# Returns address to a node's rest server.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_address_of_node_rest_server()
+{
+    local NODE_ID=${1}
+    local PORT=$(get_port "$CCTL_BASE_PORT_NODE_REST" "$NODE_ID")
+
+    echo "http://localhost:$PORT"
+}
+
+#######################################
+# Returns address to a sidecar's main server.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_address_of_sidecar_main_server()
+{
+    local NODE_ID=${1}
+
+    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_SIDECAR_MAIN" "$NODE_ID")"
+}
+
+#######################################
+# Returns address to a sidecar's main server for use with cURL.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_address_of_sidecar_main_server_for_curl()
+{
+    local NODE_ID=${1}
+
+    echo "$(get_address_of_sidecar_main_server "$NODE_ID")/rpc"
+}
+
+#######################################
+# Returns address to a sidecar's sse server.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_address_of_sidecar_sse_server()
+{
+    local NODE_ID=${1}
+
+    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_NODE_SSE" "$NODE_ID")"
+}
+
+#######################################
 # Returns a bootstrap known address - i.e. those of bootstrap nodes.
 # Globals:
-#   CCTL_BASE_PORT_NETWORK - base network port number.
+#   CCTL_BASE_PORT_NODE_NETWORK - base network port number.
 # Arguments:
 #   Node ordinal identifier.
 #######################################
 function get_bootstrap_known_address()
 {
     local NODE_ID=${1}
-    local NODE_PORT=$((CCTL_BASE_PORT_NETWORK + 100 + NODE_ID))
+    local NODE_PORT=$((CCTL_BASE_PORT_NODE_NETWORK + 100 + NODE_ID))
 
     echo "'127.0.0.1:$NODE_PORT'"
 }
@@ -66,19 +139,9 @@ function get_is_node_up()
 }
 
 #######################################
-# Returns network bind address.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_network_bind_address()
-{
-    local NODE_ID=${1}
-
-    echo "0.0.0.0:$(get_port "$CCTL_BASE_PORT_NETWORK" "$NODE_ID")"
-}
-
-#######################################
 # Returns network known addresses.
+# Arguments:
+#   Network ordinal identifier.
 #######################################
 function get_network_known_addresses()
 {
@@ -105,66 +168,6 @@ function get_network_known_addresses()
 }
 
 #######################################
-# Returns node binary address.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_node_address_binary()
-{
-    local NODE_ID=${1}
-
-    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_BINARY" "$NODE_ID")"
-}
-
-#######################################
-# Returns node event address.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_node_address_event()
-{
-    local NODE_ID=${1}
-
-    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_SSE" "$NODE_ID")"
-}
-
-#######################################
-# Returns node JSON address.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_node_address_rest()
-{
-    local NODE_ID=${1}
-
-    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_REST" "$NODE_ID")"
-}
-
-#######################################
-# Returns node RPC address.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_node_address_rpc()
-{
-    local NODE_ID=${1}
-
-    echo "http://localhost:$(get_port "$CCTL_BASE_PORT_RPC" "$NODE_ID")"
-}
-
-#######################################
-# Returns node RPC address, intended for use with cURL.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_node_address_rpc_for_curl()
-{
-    local NODE_ID=${1}
-
-    echo "$(get_node_address_rpc "$NODE_ID")/rpc"
-}
-
-#######################################
 # Returns ordinal identifier of a random validator node able to be used for deploy dispatch.
 # Arguments:
 #   Network ordinal identifier.
@@ -181,6 +184,22 @@ function get_node_for_dispatch()
 }
 
 #######################################
+# Returns network bind port.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_port_of_node_to_net_bind()
+{
+    local NODE_ID=${1}
+
+    if ((${#CSPR_BASE_PORT_NETWORK[@]})); then
+        get_port "$CSPR_BASE_PORT_NETWORK" "$NODE_ID"
+    else
+        get_port "$CCTL_BASE_PORT_NODE_NETWORK" "$NODE_ID"
+    fi
+}
+
+#######################################
 # Calculates a node's default staking weight.
 # Arguments:
 #   Node ordinal identifier.
@@ -190,22 +209,6 @@ function get_node_staking_weight()
     local NODE_ID=${1}
 
     echo $((CCTL_VALIDATOR_BASE_WEIGHT + NODE_ID))
-}
-
-#######################################
-# Returns network bind port.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_node_port_bind()
-{
-    local NODE_ID=${1}
-
-    if ((${#CSPR_BASE_PORT_NETWORK[@]})); then
-        get_port "$CSPR_BASE_PORT_NETWORK" "$NODE_ID"
-    else
-        get_port "$CCTL_BASE_PORT_NETWORK" "$NODE_ID"
-    fi
 }
 
 #######################################
@@ -234,7 +237,7 @@ function get_port_of_node_binary_server()
     if ((${#CSPR_BASE_PORT_BINARY[@]})); then
         get_port "$CSPR_BASE_PORT_BINARY" "$NODE_ID"
     else
-        get_port "$CCTL_BASE_PORT_BINARY" "$NODE_ID"
+        get_port "$CCTL_BASE_PORT_NODE_BINARY" "$NODE_ID"
     fi
 }
 
@@ -250,7 +253,7 @@ function get_port_of_node_rest_server()
     if ((${#CSPR_BASE_PORT_REST[@]})); then
         get_port "$CSPR_BASE_PORT_REST" "$NODE_ID"
     else
-        get_port "$CCTL_BASE_PORT_REST" "$NODE_ID"
+        get_port "$CCTL_BASE_PORT_NODE_REST" "$NODE_ID"
     fi
 }
 
@@ -266,7 +269,7 @@ function get_port_of_node_sse_server()
     if ((${#CSPR_BASE_PORT_SSE[@]})); then
         get_port "$CSPR_BASE_PORT_SSE" "$NODE_ID"
     else
-        get_port "$CCTL_BASE_PORT_SSE" "$NODE_ID"
+        get_port "$CCTL_BASE_PORT_NODE_SSE" "$NODE_ID"
     fi
 }
 
@@ -282,7 +285,7 @@ function get_port_of_sidecar_main_server ()
     if ((${#CSPR_BASE_PORT_RPC[@]})); then
         get_port "$CSPR_BASE_PORT_RPC" "$NODE_ID"
     else
-        get_port "$CCTL_BASE_PORT_RPC" "$NODE_ID"
+        get_port "$CCTL_BASE_PORT_SIDECAR_MAIN" "$NODE_ID"
     fi
 }
 
@@ -298,7 +301,7 @@ function get_port_of_sidecar_speculative_exec_server()
     if ((${#CSPR_BASE_PORT_SPEC_EXEC[@]})); then
         get_port "$CSPR_BASE_PORT_SPEC_EXEC" "$NODE_ID"
     else
-        get_port "$CCTL_BASE_PORT_SPEC_EXEC" "$NODE_ID"
+        get_port "$CCTL_BASE_PORT_SIDECAR_SPEC_EXEC" "$NODE_ID"
     fi
 }
 
@@ -337,7 +340,7 @@ function get_process_group_members()
         fi
         RESULT=$RESULT$(get_process_name_of_node "$NODE_ID")
         RESULT=$RESULT", "
-        RESULT=$RESULT$(get_process_name_of_node_sidecar "$NODE_ID")
+        RESULT=$RESULT$(get_process_name_of_sidecar "$NODE_ID")
     done
 
     echo "$RESULT"
@@ -396,7 +399,7 @@ function get_process_name_of_node_group()
 #   Network ordinal identifier.
 #   Node ordinal identifier.
 #######################################
-function get_process_name_of_node_sidecar()
+function get_process_name_of_sidecar()
 {
     local NODE_ID=${1}
 
@@ -408,11 +411,11 @@ function get_process_name_of_node_sidecar()
 # Arguments:
 #   Node ordinal identifier.
 #######################################
-function get_process_name_of_node_sidecar_in_group()
+function get_process_name_of_sidecar_in_group()
 {
     local NODE_ID=${1}
 
-    local PROCESS_NAME=$(get_process_name_of_node_sidecar "$NODE_ID")
+    local PROCESS_NAME=$(get_process_name_of_sidecar "$NODE_ID")
     local PROCESS_GROUP_NAME=$(get_process_name_of_node_group "$NODE_ID")
 
     echo "$PROCESS_GROUP_NAME:$PROCESS_NAME"

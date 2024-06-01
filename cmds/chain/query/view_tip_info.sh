@@ -30,7 +30,7 @@ function _main()
 function _render()
 {
     local NODE_ID=${1}
-    local NODE_ADDRESS_CURL=$(get_node_address_rpc_for_curl "$NODE_ID")
+    local NODE_ADDRESS_CURL=$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")
     local NODE_API_RESPONSE
     
     curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \

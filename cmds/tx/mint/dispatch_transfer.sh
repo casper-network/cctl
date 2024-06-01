@@ -61,9 +61,9 @@ function _main()
     if [ "$NODE_ID" == "random" ]; then
         unset NODE_ADDRESS
     elif [ "$NODE_ID" -eq 0 ]; then
-        NODE_ADDRESS=$(get_node_address_rpc)
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server)
     else
-        NODE_ADDRESS=$(get_node_address_rpc "$NODE_ID")
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server "$NODE_ID")
     fi
 
     if [ $VERBOSE == true ]; then
@@ -83,7 +83,7 @@ function _main()
     while [ $DISPATCH_ATTEMPTS -lt "$TRANSFERS" ]; do
         # Increment counts.
         DISPATCH_ATTEMPTS=$((DISPATCH_ATTEMPTS + 1))
-        DISPATCH_NODE_ADDRESS=${NODE_ADDRESS:-$(get_node_address_rpc)}
+        DISPATCH_NODE_ADDRESS=${NODE_ADDRESS:-$(get_address_of_sidecar_main_server)}
 
         # Dispatch deploy.
         if [ $TYPEOF == "wasm" ]; then

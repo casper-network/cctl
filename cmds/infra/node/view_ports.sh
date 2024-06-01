@@ -39,18 +39,24 @@ function _main()
 function _display_ports()
 {
     local NODE_ID=${1}
-    local PORT_REST
-    local PORT_RPC
-    local PORT_SSE
-    local PORT_SPECULATIVE_EXEC
 
-    PORT_BIND=$(get_node_port_bind "$NODE_ID")
-    PORT_REST=$(get_port_of_node_rest_server "$NODE_ID")
-    PORT_RPC=$(get_port_of_sidecar_main_server  "$NODE_ID")
-    PORT_SSE=$(get_port_of_node_sse_server "$NODE_ID")
-    PORT_SPECULATIVE_EXEC=$(get_port_of_sidecar_speculative_exec_server "$NODE_ID")
+    local PORT_NODE_BINARY=$(get_port_of_node_binary_server "$NODE_ID")
+    local PORT_NODE_NET_BIND=$(get_port_of_node_to_net_bind "$NODE_ID")
+    local PORT_NODE_REST=$(get_port_of_node_rest_server "$NODE_ID")
+    local PORT_NODE_SSE=$(get_port_of_node_sse_server "$NODE_ID")
+    local PORT_SIDECAR_MAIN=$(get_port_of_sidecar_main_server  "$NODE_ID")
+    local PORT_SIDECAR_SPEC_EXEC=$(get_port_of_sidecar_speculative_exec_server "$NODE_ID")
 
-    log "node-$NODE_ID -> CONSENSUS @ $PORT_BIND :: RPC @ $PORT_RPC :: REST @ $PORT_REST :: SSE @ $PORT_SSE :: SPECULATIVE_EXEC @ $PORT_SPECULATIVE_EXEC"
+    log "NODE-$NODE_ID"
+    log "    NODE"
+    log "        NETWORK -----> $PORT_NODE_NET_BIND"
+    log "        BINARY ------> $PORT_NODE_BINARY"
+    log "        REST --------> $PORT_NODE_REST"
+    log "        SSE ---------> $PORT_NODE_SSE"
+    log "    SIDECAR"
+    log "        NODE-CLIENT -> $PORT_NODE_BINARY"
+    log "        MAIN-RPC ----> $PORT_SIDECAR_MAIN"
+    log "        SPEC-EXEC ---> $PORT_SIDECAR_SPEC_EXEC"
 }
 
 # ----------------------------------------------------------------

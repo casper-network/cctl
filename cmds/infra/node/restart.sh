@@ -89,7 +89,7 @@ function _start_sidecar()
 {
     local NODE_ID=${1}
 
-    local PROCESS_NAME=$(get_process_name_of_node_sidecar_in_group "$NODE_ID")
+    local PROCESS_NAME=$(get_process_name_of_sidecar_in_group "$NODE_ID")
     local SUPERVISORD_CONFIG=$(get_path_to_supervisord_cfg)
 
     supervisorctl -c "$SUPERVISORD_CONFIG" start "$PROCESS_NAME" > /dev/null 2>&1

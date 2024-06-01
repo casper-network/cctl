@@ -9,23 +9,23 @@ declare CCTL_ACCOUNT_TYPE_NODE="node"
 # A type of actor representing a user.
 declare CCTL_ACCOUNT_TYPE_USER="user"
 
-# Base binary server port number.
-declare CCTL_BASE_PORT_BINARY=28000
+# Base node binary server port number.
+declare CCTL_BASE_PORT_NODE_BINARY=12000
 
-# Base network server port number.
-declare CCTL_BASE_PORT_NETWORK=22000
+# Base node network server port number.
+declare CCTL_BASE_PORT_NODE_NETWORK=11000
 
 # Base JSON server port number.
-declare CCTL_BASE_PORT_REST=14000
-
-# Base RPC server port number.
-declare CCTL_BASE_PORT_RPC=11000
-
-# Base speculative execution RPC server port number.
-declare CCTL_BASE_PORT_SPEC_EXEC=25000
+declare CCTL_BASE_PORT_NODE_REST=13000
 
 # Base event server port number.
-declare CCTL_BASE_PORT_SSE=18000
+declare CCTL_BASE_PORT_NODE_SSE=14000
+
+# Base RPC server port number.
+declare CCTL_BASE_PORT_SIDECAR_MAIN=21000
+
+# Base speculative execution RPC server port number.
+declare CCTL_BASE_PORT_SIDECAR_SPEC_EXEC=22000
 
 # cURL arguments which are used when talking to the CCTL nodes.
 # We need to allow retires and limit the default timeouts because not all

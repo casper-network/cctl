@@ -175,7 +175,7 @@ function get_state_root_hash()
     local BLOCK_ID=${2:-""}
 
     $(get_path_to_node_client) get-state-root-hash \
-        --node-address "$(get_node_address_rpc "$NODE_ID")" \
+        --node-address "$(get_address_of_sidecar_main_server "$NODE_ID")" \
         --block-identifier "$BLOCK_ID" \
         | jq '.result.state_root_hash' \
         | sed -e 's/^"//' -e 's/"$//'
@@ -218,7 +218,7 @@ function _get_from_status_with_retry()
             OUTPUT=$(
                 curl \
                     $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
-                    "$(get_node_address_rest $NODE_ID)/status" \
+                    "$(get_address_of_node_rest_server $NODE_ID)/status" \
                     | jq "$JQ_QRY" \
                 )
         fi

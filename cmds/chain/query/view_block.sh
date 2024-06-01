@@ -23,12 +23,12 @@ function _main()
 
     if [ "$BLOCK_ID" ]; then
         $(get_path_to_node_client) get-block \
-            --node-address "$(get_node_address_rpc)" \
+            --node-address "$(get_address_of_sidecar_main_server)" \
             --block-identifier "$BLOCK_ID" \
             | jq '.result.block'
     else
         $(get_path_to_node_client) get-block \
-            --node-address "$(get_node_address_rpc)" \
+            --node-address "$(get_address_of_sidecar_main_server)" \
             | jq '.result.block'
     fi
 }

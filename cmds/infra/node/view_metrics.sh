@@ -48,7 +48,7 @@ function _display_metric()
     local NODE_ID=${1}
     local METRIC=${2}
 
-    local ENDPOINT="$(get_node_address_rest "$NODE_ID")"/metrics
+    local ENDPOINT="$(get_address_of_node_rest_server "$NODE_ID")"/metrics
 
     log "------------------------------------------------------------------------------------------------------"
     if [ "$METRIC" = "all" ]; then

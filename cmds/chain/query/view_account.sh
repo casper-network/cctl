@@ -23,7 +23,7 @@ function _main()
     local STATE_ROOT_HASH=${2}
 
     $(get_path_to_node_client) query-global-state \
-        --node-address "$(get_node_address_rpc)" \
+        --node-address "$(get_address_of_sidecar_main_server)" \
         --key "account-hash-$ACCOUNT_HASH" \
         --state-root-hash "${STATE_ROOT_HASH:-$(get_state_root_hash)}" \
         | jq '.result.stored_value.Account'

@@ -36,11 +36,11 @@ function _main()
     local VALIDATOR_SECRET_KEY=$(get_path_to_secret_key "$CCTL_ACCOUNT_TYPE_NODE" "$VALIDATOR_ID")
 
     if [ "$NODE_ID" == "random" ]; then
-        NODE_ADDRESS=$(get_node_address_rpc)
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server)
     elif [ "$NODE_ID" -eq 0 ]; then
-        NODE_ADDRESS=$(get_node_address_rpc)
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server)
     else
-        NODE_ADDRESS=$(get_node_address_rpc "$NODE_ID")
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server "$NODE_ID")
     fi
 
     log_break

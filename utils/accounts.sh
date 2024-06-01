@@ -12,7 +12,7 @@ function get_account_balance()
     local STATE_ROOT_HASH=${2:-$(get_state_root_hash)}
 
     local ACCOUNT_BALANCE
-    local NODE_ADDRESS=$(get_node_address_rpc)
+    local NODE_ADDRESS=$(get_address_of_sidecar_main_server)
 
     ACCOUNT_BALANCE=$(
         $(get_path_to_node_client) query-balance \
@@ -87,7 +87,7 @@ function get_main_purse_uref()
 
     echo $(
         $(get_path_to_node_client) query-global-state \
-            --node-address "$(get_node_address_rpc)" \
+            --node-address "$(get_address_of_sidecar_main_server)" \
             --key "account-hash-$ACCOUNT_HASH" \
             --state-root-hash "$STATE_ROOT_HASH" \
             | jq '.result.stored_value.Account.main_purse' \

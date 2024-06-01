@@ -46,7 +46,7 @@ function _display_peer_count()
     local NODE_ADDRESS_CURL
     local NODE_PEER_COUNT
     
-    NODE_ADDRESS_CURL=$(get_node_address_rpc_for_curl "$NODE_ID")
+    NODE_ADDRESS_CURL=$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")
     NODE_PEER_COUNT=$(
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             -s \

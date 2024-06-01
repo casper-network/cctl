@@ -24,10 +24,10 @@ function _main()
 {
     local NODE_ID=${1}
 
-    echo "$(get_node_address_rpc "$NODE_ID")"
+    echo "$(get_address_of_sidecar_main_server "$NODE_ID")"
 
     $(get_path_to_node_client) get-validator-changes \
-        --node-address "$(get_node_address_rpc "$NODE_ID")" \
+        --node-address "$(get_address_of_sidecar_main_server "$NODE_ID")" \
         | jq '.result.changes'
 }
 

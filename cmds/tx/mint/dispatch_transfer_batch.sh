@@ -45,9 +45,9 @@ function _main()
     if [ "$NODE_ID" == "random" ]; then
         unset NODE_ADDRESS
     elif [ "$NODE_ID" -eq 0 ]; then
-        NODE_ADDRESS=$(get_node_address_rpc)
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server)
     else
-        NODE_ADDRESS=$(get_node_address_rpc "$NODE_ID")
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server "$NODE_ID")
     fi
 
     log_break
@@ -69,7 +69,7 @@ function _main()
                     break
                 else
                     TX_ID=$((TX_ID + 1)) 
-                    DISPATCH_NODE_ADDRESS=${NODE_ADDRESS:-$(get_node_address_rpc)}
+                    DISPATCH_NODE_ADDRESS=${NODE_ADDRESS:-$(get_address_of_sidecar_main_server)}
                     DEPLOY_HASH=$(
                         $PATH_TO_CLIENT send-deploy \
                             --node-address "$DISPATCH_NODE_ADDRESS" \

@@ -27,7 +27,7 @@ function _main()
     local BLOCK_ID=${2}
 
     $(get_path_to_node_client) get-era-summary \
-        --node-address "$(get_node_address_rpc "$NODE_ID")" \
+        --node-address "$(get_address_of_sidecar_main_server "$NODE_ID")" \
         --block-identifier "$BLOCK_ID" \
         | jq '.result'
 }

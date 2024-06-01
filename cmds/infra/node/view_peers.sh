@@ -46,7 +46,7 @@ function _display_peers()
     local NODE_ADDRESS_CURL
     local NODE_API_RESPONSE
     
-    NODE_ADDRESS_CURL=$(get_node_address_rpc_for_curl "$NODE_ID")
+    NODE_ADDRESS_CURL=$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")
     NODE_API_RESPONSE=$(
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             -s \
