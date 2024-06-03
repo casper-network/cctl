@@ -22,6 +22,10 @@ function _main()
 
     if [ "$(get_is_net_up)" = true ]; then
         if [ "$(get_is_node_up "$NODE_ID")" = true ]; then
+            if [ "$(get_is_sidecar_up "$NODE_ID")" = true ]; then
+                log "stopping sidecar $NODE_ID ... please wait"
+                _stop_sidecar "$NODE_ID"
+            fi
             log "stopping node $NODE_ID ... please wait"
             _stop_node "$NODE_ID"
             log "$NODE_ID stopped"
@@ -37,13 +41,26 @@ function _stop_node()
 {
     local NODE_ID=${1}
 
-    local NODE_PROCESS_NAME=$(get_process_name_of_node_in_group "$NODE_ID")
+    local PROCESS_NAME=$(get_process_name_of_node_in_group "$NODE_ID")
     local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
 
-    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" stop "$NODE_PROCESS_NAME" > /dev/null 2>&1
+    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" stop "$PROCESS_NAME" > /dev/null 2>&1
     sleep 1.0
 
     log "... node $NODE_ID stopped"
+}
+
+function _stop_sidecar()
+{
+    local NODE_ID=${1}
+
+    local PROCESS_NAME=$(get_process_name_of_sidecar_in_group "$NODE_ID")
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+
+    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" stop "$PROCESS_NAME" > /dev/null 2>&1
+    sleep 1.0
+
+    log "... sidecar $NODE_ID stopped"
 }
 
 # ----------------------------------------------------------------

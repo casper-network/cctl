@@ -129,6 +129,24 @@ function get_is_node_up()
 {
     local NODE_ID=${1}
 
+    local NODE_PORT=$(get_port_of_node_to_net_bind  "$NODE_ID")
+
+    if grep -q "$NODE_PORT (LISTEN)" <<< "$(lsof -i -P -n)"; then
+        echo true
+    else
+        echo false
+    fi
+}
+
+#######################################
+# Returns flag indicating whether a sidecar is currently up.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_is_sidecar_up()
+{
+    local NODE_ID=${1}
+
     local NODE_PORT=$(get_port_of_sidecar_main_server  "$NODE_ID")
 
     if grep -q "$NODE_PORT (LISTEN)" <<< "$(lsof -i -P -n)"; then
@@ -181,22 +199,6 @@ function get_node_for_dispatch()
             break
         fi
     done
-}
-
-#######################################
-# Returns network bind port.
-# Arguments:
-#   Node ordinal identifier.
-#######################################
-function get_port_of_node_to_net_bind()
-{
-    local NODE_ID=${1}
-
-    if ((${#CSPR_BASE_PORT_NETWORK[@]})); then
-        get_port "$CSPR_BASE_PORT_NETWORK" "$NODE_ID"
-    else
-        get_port "$CCTL_BASE_PORT_NODE_NETWORK" "$NODE_ID"
-    fi
 }
 
 #######################################
@@ -270,6 +272,22 @@ function get_port_of_node_sse_server()
         get_port "$CSPR_BASE_PORT_SSE" "$NODE_ID"
     else
         get_port "$CCTL_BASE_PORT_NODE_SSE" "$NODE_ID"
+    fi
+}
+
+#######################################
+# Returns network bind port.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_port_of_node_to_net_bind()
+{
+    local NODE_ID=${1}
+
+    if ((${#CSPR_BASE_PORT_NETWORK[@]})); then
+        get_port "$CSPR_BASE_PORT_NETWORK" "$NODE_ID"
+    else
+        get_port "$CCTL_BASE_PORT_NODE_NETWORK" "$NODE_ID"
     fi
 }
 
