@@ -65,8 +65,8 @@ function _clean_node()
     local NODE_LOGS=$(get_path_to_node_logs "$NODE_ID")
     local NODE_STORAGE=$(get_path_to_node_storage "$NODE_ID")
 
-    rm "$NODE_LOGS"/stderr.log > /dev/null 2>&1
-    rm "$NODE_LOGS"/stdout.log > /dev/null 2>&1
+    rm "$NODE_LOGS"/node-stderr.log > /dev/null 2>&1
+    rm "$NODE_LOGS"/node-stdout.log > /dev/null 2>&1
     rm -rf "$NODE_STORAGE"/"$CCTL_NET_NAME" > /dev/null 2>&1
 }
 

@@ -471,17 +471,17 @@ startsecs=0
 stopsignal=TERM
 stopwaitsecs=5
 stopasgroup=true
-stderr_logfile=$PATH_TO_NODE_LOGS/stderr.log ;
+stderr_logfile=$PATH_TO_NODE_LOGS/node-stderr.log ;
 stderr_logfile_backups=5 ;
 stderr_logfile_maxbytes=500MB ;
-stdout_logfile=$PATH_TO_NODE_LOGS/stdout.log ;
+stdout_logfile=$PATH_TO_NODE_LOGS/node-stdout.log ;
 stdout_logfile_backups=5 ;
 stdout_logfile_maxbytes=500MB ;
 
 [program:cctl-node-$IDX-sidecar]
 autostart=false
 autorestart=false
-command=$CCTL/cmds/infra/node/sidecar/start.sh node_dir=$PATH_TO_NODE
+command=$CCTL/cmds/infra/sidecar/start.sh node_dir=$PATH_TO_NODE
 environment=NODE_DIR="$PATH_TO_NODE"
 numprocs=1
 numprocs_start=0

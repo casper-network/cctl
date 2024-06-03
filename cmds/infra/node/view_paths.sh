@@ -23,7 +23,7 @@ function _help() {
 function _main()
 {
     local NODE_ID=${1}
-    
+
     if [ "$NODE_ID" = "all" ]; then
         for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
         do
@@ -42,24 +42,26 @@ function _display_paths()
     local PATH_TO_NODE="$(get_path_to_node "$NODE_ID")"
 
     log "------------------------------------------------------------------------------------------------------"
-    log "Paths of node-$NODE_ID assets:" 
+    log "Paths of node-$NODE_ID assets:"
     log "------------------------------------------------------------------------------------------------------"
     log "binaries"
-    log "... $PATH_TO_NODE/bin/casper-node-launcher" 
-    log "... $PATH_TO_NODE/bin/1_0_0/casper-node" 
+    log "... $PATH_TO_NODE/bin/casper-node-launcher"
+    log "... $PATH_TO_NODE/bin/1_0_0/casper-node"
     log "config"
-    log "... $PATH_TO_NODE/config/casper-node-launcher-state.toml" 
-    log "... $PATH_TO_NODE/config/1_0_0/accounts.toml" 
-    log "... $PATH_TO_NODE/config/1_0_0/chainspec.toml" 
-    log "... $PATH_TO_NODE/config/1_0_0/config.toml" 
+    log "... $PATH_TO_NODE/config/casper-node-launcher-state.toml"
+    log "... $PATH_TO_NODE/config/1_0_0/accounts.toml"
+    log "... $PATH_TO_NODE/config/1_0_0/chainspec.toml"
+    log "... $PATH_TO_NODE/config/1_0_0/config.toml"
     log "keys"
-    log "... $PATH_TO_NODE/keys/public_key_hex" 
-    log "... $PATH_TO_NODE/keys/public_key.pem" 
-    log "... $PATH_TO_NODE/keys/secret_key.pem" 
+    log "... $PATH_TO_NODE/keys/public_key_hex"
+    log "... $PATH_TO_NODE/keys/public_key.pem"
+    log "... $PATH_TO_NODE/keys/secret_key.pem"
     log "logs"
-    log "... $PATH_TO_NODE/logs/stderr.log" 
-    log "... $PATH_TO_NODE/logs/stdout.log" 
-    log "... $PATH_TO_NODE/storage/$CCTL_NET_NAME" 
+    log "... $PATH_TO_NODE/logs/node-stderr.log"
+    log "... $PATH_TO_NODE/logs/node-stdout.log"
+    log "... $PATH_TO_NODE/logs/sidecar-stderr.log"
+    log "... $PATH_TO_NODE/logs/sidecar-stdout.log"
+    log "... $PATH_TO_NODE/storage/$CCTL_NET_NAME"
 }
 
 # ----------------------------------------------------------------
