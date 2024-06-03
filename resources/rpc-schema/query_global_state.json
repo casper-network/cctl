@@ -5,15 +5,15 @@
     {
       "name": "key",
       "schema": {
-        "description": "`casper_types::Key` as formatted string.",
-        "type": "string"
+        "description": "The key under which to query.",
+        "$ref": "#/components/schemas/Key"
       },
       "required": true
     },
     {
       "name": "state_identifier",
       "schema": {
-        "description": "The identifier used for the query. If none is passed the tip of the chain will be used.",
+        "description": "The identifier used for the query. If not provided, the tip of the chain will be used.",
         "anyOf": [
           {
             "$ref": "#/components/schemas/GlobalStateIdentifier"
@@ -43,7 +43,11 @@
     "schema": {
       "description": "Result for \"query_global_state\" RPC response.",
       "type": "object",
-      "required": ["api_version", "merkle_proof", "stored_value"],
+      "required": [
+        "api_version",
+        "merkle_proof",
+        "stored_value"
+      ],
       "properties": {
         "api_version": {
           "description": "The RPC API version.",
@@ -53,7 +57,7 @@
           "description": "The block header if a Block hash was provided.",
           "anyOf": [
             {
-              "$ref": "#/components/schemas/JsonBlockHeader"
+              "$ref": "#/components/schemas/BlockHeader"
             },
             {
               "type": "null"
@@ -79,7 +83,7 @@
         {
           "name": "state_identifier",
           "value": {
-            "BlockHash": "13c2d7a68ecdd4b74bf4393c88915c836c863fc4bf11d7f2bd930a1bbccacdcb"
+            "BlockHash": "40fa940e609972313a6d598712fcb9cced789ed237bdac67aa1fe546e624c884"
           }
         },
         {
@@ -94,52 +98,56 @@
       "result": {
         "name": "query_global_state_example_result",
         "value": {
-          "api_version": "1.5.6",
+          "api_version": "2.0.0",
           "block_header": {
-            "parent_hash": "0707070707070707070707070707070707070707070707070707070707070707",
-            "state_root_hash": "0808080808080808080808080808080808080808080808080808080808080808",
-            "body_hash": "cd502c5393a3c8b66d6979ad7857507c9baf5a8ba16ba99c28378d3a970fff42",
-            "random_bit": true,
-            "accumulated_seed": "ac979f51525cfd979b14aa7dc0737c5154eabe0db9280eceaa8dc8d2905b20d5",
-            "era_end": {
-              "era_report": {
+            "Version2": {
+              "parent_hash": "0707070707070707070707070707070707070707070707070707070707070707",
+              "state_root_hash": "0808080808080808080808080808080808080808080808080808080808080808",
+              "body_hash": "0505050505050505050505050505050505050505050505050505050505050505",
+              "random_bit": true,
+              "accumulated_seed": "ac979f51525cfd979b14aa7dc0737c5154eabe0db9280eceaa8dc8d2905b20d5",
+              "era_end": {
                 "equivocators": [
                   "013b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29"
                 ],
-                "rewards": [
-                  {
-                    "validator": "018a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c",
-                    "amount": 1000
-                  }
-                ],
                 "inactive_validators": [
                   "018139770ea87d175f56a35466c34c7ecccb8d8a91b4ee37a25df60f5b8fc9b394"
-                ]
+                ],
+                "next_era_validator_weights": [
+                  {
+                    "validator": "013b6a27bcceb6a42d62a3a8d02a6f0d73653215771de243a63ac048a18b59da29",
+                    "weight": "123"
+                  },
+                  {
+                    "validator": "016e7a1cdd29b0b78fd13af4c5598feff4ef2a97166e3ca6f2e4fbfccd80505bf1",
+                    "weight": "456"
+                  },
+                  {
+                    "validator": "018a875fff1eb38451577acd5afee405456568dd7c89e090863a0557bc7af49f17",
+                    "weight": "789"
+                  }
+                ],
+                "rewards": {},
+                "next_era_gas_price": 1
               },
-              "next_era_validator_weights": [
-                {
-                  "validator": "016e7a1cdd29b0b78fd13af4c5598feff4ef2a97166e3ca6f2e4fbfccd80505bf1",
-                  "weight": "456"
-                },
-                {
-                  "validator": "018a875fff1eb38451577acd5afee405456568dd7c89e090863a0557bc7af49f17",
-                  "weight": "789"
-                },
-                {
-                  "validator": "01d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c",
-                  "weight": "123"
-                }
-              ]
-            },
-            "timestamp": "2020-11-17T00:39:24.072Z",
-            "era_id": 1,
-            "height": 10,
-            "protocol_version": "2.0.0"
+              "timestamp": "2020-11-17T00:39:24.072Z",
+              "era_id": 1,
+              "height": 10,
+              "protocol_version": "1.0.0",
+              "proposer": "01d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c",
+              "current_gas_price": 1,
+              "last_switch_block_hash": "0909090909090909090909090909090909090909090909090909090909090909"
+            }
           },
           "stored_value": {
             "Account": {
               "account_hash": "account-hash-e94daaff79c2ab8d9c31d9c3058d7d0a0dd31204a5638dc1451fa67b2e3fb88c",
-              "named_keys": [],
+              "named_keys": [
+                {
+                  "name": "main_purse",
+                  "key": "uref-09480c3248ef76b603d386f3f4f8a5f87f597d4eaffd475433f861af187ab5db-007"
+                }
+              ],
               "main_purse": "uref-09480c3248ef76b603d386f3f4f8a5f87f597d4eaffd475433f861af187ab5db-007",
               "associated_keys": [
                 {

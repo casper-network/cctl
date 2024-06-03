@@ -24,11 +24,11 @@ function _main()
 {
     local MODE=${1}
 
+    source "$CCTL"/cmds/infra/bin/compile_client.sh mode="$MODE"
+    source "$CCTL"/cmds/infra/bin/compile_contracts.sh
     source "$CCTL"/cmds/infra/bin/compile_node.sh mode="$MODE"
     source "$CCTL"/cmds/infra/bin/compile_node_launcher.sh mode="$MODE"
-    source "$CCTL"/cmds/infra/bin/compile_client.sh mode="$MODE"
-    source "$CCTL"/cmds/infra/bin/compile_node_sidecar.sh mode="$MODE"
-    source "$CCTL"/cmds/infra/bin/compile_contracts.sh
+    source "$CCTL"/cmds/infra/bin/compile_sidecar.sh mode="$MODE"
 }
 
 # ----------------------------------------------------------------

@@ -13,8 +13,8 @@
     {
       "name": "key",
       "schema": {
-        "description": "`casper_types::Key` as formatted string.",
-        "type": "string"
+        "description": "The key under which to query.",
+        "$ref": "#/components/schemas/Key"
       },
       "required": true
     },
@@ -80,7 +80,7 @@
       "result": {
         "name": "state_get_item_example_result",
         "value": {
-          "api_version": "1.5.6",
+          "api_version": "2.0.0",
           "stored_value": {
             "CLValue": {
               "cl_type": "U64",

@@ -64,17 +64,22 @@
         {
           "name": "block_identifier",
           "value": {
-            "Hash": "13c2d7a68ecdd4b74bf4393c88915c836c863fc4bf11d7f2bd930a1bbccacdcb"
+            "Hash": "0707070707070707070707070707070707070707070707070707070707070707"
           }
         }
       ],
       "result": {
         "name": "state_get_account_info_example_result",
         "value": {
-          "api_version": "1.5.6",
+          "api_version": "2.0.0",
           "account": {
             "account_hash": "account-hash-e94daaff79c2ab8d9c31d9c3058d7d0a0dd31204a5638dc1451fa67b2e3fb88c",
-            "named_keys": [],
+            "named_keys": [
+              {
+                "name": "main_purse",
+                "key": "uref-09480c3248ef76b603d386f3f4f8a5f87f597d4eaffd475433f861af187ab5db-007"
+              }
+            ],
             "main_purse": "uref-09480c3248ef76b603d386f3f4f8a5f87f597d4eaffd475433f861af187ab5db-007",
             "associated_keys": [
               {
