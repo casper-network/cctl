@@ -481,7 +481,7 @@ stdout_logfile_maxbytes=500MB ;
 [program:cctl-node-$IDX-sidecar]
 autostart=false
 autorestart=false
-command=$CCTL/cmds/infra/sidecar/start.sh node_dir=$PATH_TO_NODE
+command=$PATH_TO_NODE_BIN/2_0_0/casper-sidecar --path-to-config $PATH_TO_NODE_CONFIG/2_0_0/sidecar.toml
 environment=NODE_DIR="$PATH_TO_NODE"
 numprocs=1
 numprocs_start=0
