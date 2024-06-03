@@ -4,11 +4,11 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-node-view-config
+    cctl-infra-sidecar-view-log-stdout
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Displays a node's configuration toml file.
+    Displays a sidecar's log file.
 
     ARGS
     ----------------------------------------------------------------
@@ -20,9 +20,7 @@ function _main()
 {
     local NODE_ID=${1}
 
-    local PATH_TO_NODE_CONFIG="$(get_path_to_node "$NODE_ID")/config/2_0_0/config.toml"
-
-    less $PATH_TO_NODE_CONFIG
+    less "$(get_path_to_node "${NODE_ID:-1}")"/logs/sidecar-stdout.log
 }
 
 # ----------------------------------------------------------------

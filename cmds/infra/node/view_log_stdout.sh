@@ -20,7 +20,7 @@ function _main()
 {
     local NODE_ID=${1}
 
-    less "$(get_path_to_node "${NODE_ID:-1}")"/logs/stdout.log
+    less "$(get_path_to_node "${NODE_ID:-1}")"/logs/node-stdout.log
 }
 
 # ----------------------------------------------------------------

@@ -45,7 +45,10 @@ alias cctl-infra-node-view-rpc-schema='source $CCTL/cmds/infra/node/view_rpc_sch
 alias cctl-infra-node-view-status='source $CCTL/cmds/infra/node/view_status.sh'
 alias cctl-infra-node-view-storage='source $CCTL/cmds/infra/node/view_storage.sh'
 alias cctl-infra-node-write-rpc-schema='source $CCTL/cmds/infra/node/write_rpc_schema.sh'
-
+# ... sidecar views
+alias cctl-infra-sidecar-view-config='source $CCTL/cmds/infra/sidecar/view_config.sh'
+alias cctl-infra-sidecar-view-error-log='source $CCTL/cmds/infra/sidecar/view_log_stderr.sh'
+alias cctl-infra-sidecar-view-log='source $CCTL/cmds/infra/sidecar/view_log_stdout.sh'
 # Chain commands:
 # ... awaiting
 alias cctl-chain-await-n-blocks='source $CCTL/cmds/chain/await/n_blocks.sh'
