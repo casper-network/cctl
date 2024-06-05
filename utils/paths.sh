@@ -221,6 +221,18 @@ function get_path_to_secret_key()
 }
 
 #######################################
+# Returns path to a sidecar's local assets.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_path_to_sidecar()
+{
+    local NODE_ID=${1:-1}
+
+    echo "$(get_path_to_assets)"/sidecars/sidecar-"$NODE_ID"
+}
+
+#######################################
 # Returns path to a network supervisord config file.
 #######################################
 function get_path_to_supervisord_cfg()

@@ -20,9 +20,9 @@ function _main()
 {
     local NODE_ID=${1}
 
-    local PATH_TO_NODE_CONFIG="$(get_path_to_node "$NODE_ID")/config/2_0_0/sidecar.toml"
+    local PATH_TO_CONFIG="$(get_path_to_sidecar "$NODE_ID")/config/sidecar.toml"
 
-    less $PATH_TO_NODE_CONFIG
+    less $PATH_TO_CONFIG
 }
 
 # ----------------------------------------------------------------

@@ -8,7 +8,7 @@ function _help() {
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Displays ports exposed by each running node.
+    Displays ports exposed by each running sidecar.
 
     ARGS
     ----------------------------------------------------------------
@@ -41,15 +41,13 @@ function _display_ports()
     local NODE_ID=${1}
 
     local PORT_NODE_BINARY=$(get_port_of_node_binary_server "$NODE_ID")
-    local PORT_NODE_NET_BIND=$(get_port_of_node_to_net_bind "$NODE_ID")
-    local PORT_NODE_REST=$(get_port_of_node_rest_server "$NODE_ID")
-    local PORT_NODE_SSE=$(get_port_of_node_sse_server "$NODE_ID")
+    local PORT_SIDECAR_MAIN=$(get_port_of_sidecar_main_server  "$NODE_ID")
+    local PORT_SIDECAR_SPEC_EXEC=$(get_port_of_sidecar_speculative_exec_server "$NODE_ID")
 
-    log "NODE-$NODE_ID"
-    log "    PROTOCOL -----> $PORT_NODE_NET_BIND"
-    log "    BINARY ------> $PORT_NODE_BINARY"
-    log "    REST --------> $PORT_NODE_REST"
-    log "    SSE ---------> $PORT_NODE_SSE"
+    log "SIDECAR-$NODE_ID"
+    log "    NODE-CLIENT -> $PORT_NODE_BINARY"
+    log "    MAIN-RPC ----> $PORT_SIDECAR_MAIN"
+    log "    SPEC-EXEC ---> $PORT_SIDECAR_SPEC_EXEC"
 }
 
 # ----------------------------------------------------------------

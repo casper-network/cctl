@@ -65,34 +65,6 @@ function _main()
     log "... $PATH_TO_ASSETS/users/user-10"
 }
 
-function _display_paths()
-{
-    local NODE_ID=${1}
-    local PATH_TO_NODE="$(get_path_to_node "$NODE_ID")"
-
-    log "------------------------------------------------------------------------------------------------------"
-    log "Paths of node-$NODE_ID assets:"
-    log "------------------------------------------------------------------------------------------------------"
-    log "binaries"
-    log "... $PATH_TO_NODE/bin/casper-node-launcher"
-    log "... $PATH_TO_NODE/bin/2_0_0/casper-node"
-    log "config"
-    log "... $PATH_TO_NODE/config/casper-node-launcher-state.toml"
-    log "... $PATH_TO_NODE/config/2_0_0/accounts.toml"
-    log "... $PATH_TO_NODE/config/2_0_0/chainspec.toml"
-    log "... $PATH_TO_NODE/config/2_0_0/config.toml"
-    log "keys"
-    log "... $PATH_TO_NODE/keys/public_key_hex"
-    log "... $PATH_TO_NODE/keys/public_key.pem"
-    log "... $PATH_TO_NODE/keys/secret_key.pem"
-    log "logs"
-    log "... $PATH_TO_NODE/logs/node-stderr.log"
-    log "... $PATH_TO_NODE/logs/node-stdout.log"
-    log "... $PATH_TO_NODE/logs/sidecar-stderr.log"
-    log "... $PATH_TO_NODE/logs/sidecar-stdout.log"
-    log "... $PATH_TO_NODE/storage/$CCTL_NET_NAME"
-}
-
 # ----------------------------------------------------------------
 # ENTRY POINT
 # ----------------------------------------------------------------

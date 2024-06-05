@@ -60,7 +60,7 @@ function _main()
     log "... setting cryptographic keys"
     _setup_keys "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$USER_COUNT"
 
-    log "... setting supervisor config"
+    log "... setting supervisor"
     _setup_supervisor "$NODE_COUNT"
 
     log "... setting genesis chainspec.toml"
@@ -69,8 +69,8 @@ function _main()
     log "... setting genesis accounts.toml"
     _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
 
-    log "... setting node configs"
-    _setup_node_configs "$NODE_COUNT" "$PATH_TO_CONFIG_TEMPLATE_OF_NODE" "$PATH_TO_CONFIG_TEMPLATE_OF_SIDECAR"
+    log "... setting configuration files"
+    _setup_configs "$NODE_COUNT" "$PATH_TO_CONFIG_TEMPLATE_OF_NODE" "$PATH_TO_CONFIG_TEMPLATE_OF_SIDECAR"
 
     log "network setup complete"
 }
@@ -85,6 +85,7 @@ function _setup_binaries()
     local PATH_TO_BINARY_OF_NODE_LAUNCHER=$(get_path_to_compiled_node_launcher)
     local PATH_TO_BINARY_OF_SIDECAR=$(get_path_to_compiled_sidecar)
     local PATH_TO_NODE_BIN
+    local PATH_TO_SIDECAR_BIN
 
     cp "$PATH_TO_BINARY_OF_CLIENT" "$(get_path_to_assets)"/bin
 
@@ -95,6 +96,30 @@ function _setup_binaries()
         cp "$PATH_TO_BINARY_OF_NODE_LAUNCHER" "$PATH_TO_NODE_BIN"
         cp "$PATH_TO_BINARY_OF_SIDECAR" "$PATH_TO_NODE_BIN/2_0_0"
     done
+
+    for NODE_ID in $(seq 1 "$NODE_COUNT")
+    do
+        PATH_TO_SIDECAR_BIN="$(get_path_to_sidecar "$NODE_ID")"/bin
+        cp "$PATH_TO_BINARY_OF_SIDECAR" "$PATH_TO_SIDECAR_BIN"
+    done
+}
+
+function _setup_configs()
+{
+    local NODE_COUNT=${1}
+    local PATH_TO_TEMPLATE_OF_NODE_CONFIG=${2}
+    local PATH_TO_TEMPLATE_OF_SIDECAR_CONFIG=${3}
+
+    local NODE_ID
+    local PATH_TO_ASSETS=$(get_path_to_assets)
+
+    for NODE_ID in $(seq 1 "$NODE_COUNT")
+    do
+        _setup_node_genesis_config $NODE_ID
+        _setup_node_binary_config $NODE_ID $PATH_TO_TEMPLATE_OF_NODE_CONFIG
+        _setup_sidecar_config $NODE_ID $PATH_TO_TEMPLATE_OF_SIDECAR_CONFIG
+        _setup_sidecar_config1 $NODE_ID $PATH_TO_TEMPLATE_OF_SIDECAR_CONFIG
+    done
 }
 
 function _setup_fs()
@@ -104,6 +129,7 @@ function _setup_fs()
 
     local PATH_TO_ASSETS=$(get_path_to_assets)
     local PATH_TO_NODE
+    local PATH_TO_SIDECAR
     local IDX
 
     mkdir -p "$PATH_TO_ASSETS"
@@ -115,6 +141,7 @@ function _setup_fs()
     mkdir "$PATH_TO_ASSETS/faucet"
     mkdir "$PATH_TO_ASSETS/genesis"
     mkdir "$PATH_TO_ASSETS/nodes"
+    mkdir "$PATH_TO_ASSETS/sidecars"
     mkdir "$PATH_TO_ASSETS/users"
 
     for IDX in $(seq 1 "$NODE_COUNT")
@@ -128,6 +155,15 @@ function _setup_fs()
         mkdir "$PATH_TO_NODE/keys"
         mkdir "$PATH_TO_NODE/logs"
         mkdir "$PATH_TO_NODE/storage"
+    done
+
+    for IDX in $(seq 1 "$NODE_COUNT")
+    do
+        PATH_TO_SIDECAR="$PATH_TO_ASSETS"/sidecars/sidecar-"$IDX"
+        mkdir "$PATH_TO_SIDECAR"
+        mkdir "$PATH_TO_SIDECAR/bin"
+        mkdir "$PATH_TO_SIDECAR/config"
+        mkdir "$PATH_TO_SIDECAR/logs"
     done
 
     for IDX in $(seq 1 "$USER_COUNT")
@@ -314,24 +350,6 @@ function _setup_keys_static()
     done
 }
 
-function _setup_node_configs()
-{
-    local NODE_COUNT=${1}
-    local PATH_TO_TEMPLATE_OF_NODE_CONFIG=${2}
-    local PATH_TO_TEMPLATE_OF_SIDECAR_CONFIG=${3}
-
-    local NODE_ID
-    local PATH_TO_ASSETS=$(get_path_to_assets)
-
-    for NODE_ID in $(seq 1 "$NODE_COUNT")
-    do
-        _setup_node_genesis_config $NODE_ID
-        _setup_node_binary_config $NODE_ID $PATH_TO_TEMPLATE_OF_NODE_CONFIG
-        _setup_node_sidecar_config $NODE_ID $PATH_TO_TEMPLATE_OF_SIDECAR_CONFIG
-
-    done
-}
-
 function _setup_node_genesis_config()
 {
     local NODE_ID=${1}
@@ -374,7 +392,25 @@ function _setup_node_binary_config()
     python3 -c "${SCRIPT[*]}"
 }
 
-function _setup_node_sidecar_config()
+function _get_node_pos_stake_weight()
+{
+    local NODE_COUNT_AT_GENESIS=${1}
+    local NODE_ID=${2}
+    local POS_WEIGHT
+
+    if [ "$NODE_ID" -le "$NODE_COUNT_AT_GENESIS" ]; then
+        POS_WEIGHT=$(get_node_staking_weight "$NODE_ID")
+    else
+        POS_WEIGHT="0"
+    fi
+    if [ "x$POS_WEIGHT" = 'x' ]; then
+        POS_WEIGHT="0"
+    fi
+
+    echo $POS_WEIGHT
+}
+
+function _setup_sidecar_config()
 {
     local NODE_ID=${1}
     local PATH_TO_TEMPLATE=${2}
@@ -399,23 +435,31 @@ function _setup_node_sidecar_config()
     python3 -c "${SCRIPT[*]}"
 }
 
-function _get_node_pos_stake_weight()
+function _setup_sidecar_config1()
 {
-    local NODE_COUNT_AT_GENESIS=${1}
-    local NODE_ID=${2}
-    local POS_WEIGHT
+    local NODE_ID=${1}
+    local PATH_TO_TEMPLATE=${2}
 
-    if [ "$NODE_ID" -le "$NODE_COUNT_AT_GENESIS" ]; then
-        POS_WEIGHT=$(get_node_staking_weight "$NODE_ID")
+    local PATH_TO_CONFIG="$(get_path_to_sidecar "$NODE_ID")/config/sidecar.toml"
+    local SCRIPT
+
+    if [ "$(get_os)" = "macosx" ]; then
+        cp "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
     else
-        POS_WEIGHT="0"
-    fi
-    if [ "x$POS_WEIGHT" = 'x' ]; then
-        POS_WEIGHT="0"
+        cp --no-preserve=mode "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
     fi
 
-    echo $POS_WEIGHT
+    SCRIPT=(
+        "import toml;"
+        "cfg=toml.load('$PATH_TO_CONFIG');"
+        "cfg['rpc_server']['main_server']['address']='0.0.0.0:$(get_port_of_sidecar_main_server  "$NODE_ID")';"
+        "cfg['rpc_server']['speculative_exec_server']['address']='0.0.0.0:$(get_port_of_sidecar_speculative_exec_server "$NODE_ID")';"
+        "cfg['rpc_server']['node_client']['address']='0.0.0.0:$(get_port_of_node_binary_server "$NODE_ID")';"
+        "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
+    )
+    python3 -c "${SCRIPT[*]}"
 }
+
 
 function _setup_supervisor()
 {
@@ -426,6 +470,11 @@ function _setup_supervisor()
     local PATH_TO_NODE_BIN
     local PATH_TO_NODE_CONFIG
     local PATH_TO_NODE_LOGS
+
+    local PATH_TO_SIDECAR_BIN
+    local PATH_TO_SIDECAR_CONFIG
+    local PATH_TO_SIDECAR_LOGS
+
     local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
     local PATH_TO_SUPERVISOR_SOCK=$(get_path_to_supervisord_sock)
 
@@ -457,6 +506,9 @@ do
     PATH_TO_NODE_BIN="$(get_path_to_node "$IDX")"/bin
     PATH_TO_NODE_CONFIG="$(get_path_to_node "$IDX")"/config
     PATH_TO_NODE_LOGS=$(get_path_to_node_logs "$IDX")
+    PATH_TO_SIDECAR_BIN="$(get_path_to_sidecar "$IDX")"/bin
+    PATH_TO_SIDECAR_CONFIG="$(get_path_to_sidecar "$IDX")"/config
+    PATH_TO_SIDECAR_LOGS="$(get_path_to_sidecar "$IDX")"/logs
 
     cat >> "$PATH_TO_SUPERVISOR_CONFIG" <<- EOM
 
@@ -481,7 +533,7 @@ stdout_logfile_maxbytes=500MB ;
 [program:cctl-node-$IDX-sidecar]
 autostart=false
 autorestart=false
-command=$PATH_TO_NODE_BIN/2_0_0/casper-sidecar --path-to-config $PATH_TO_NODE_CONFIG/2_0_0/sidecar.toml
+command=$PATH_TO_SIDECAR_BIN/casper-sidecar --path-to-config $PATH_TO_SIDECAR_CONFIG/sidecar.toml
 environment=NODE_DIR="$PATH_TO_NODE"
 numprocs=1
 numprocs_start=0
@@ -489,10 +541,10 @@ startsecs=0
 stopsignal=TERM
 stopwaitsecs=5
 stopasgroup=true
-stderr_logfile=$PATH_TO_NODE_LOGS/sidecar-stderr.log ;
+stderr_logfile=$PATH_TO_SIDECAR_LOGS/stderr.log ;
 stderr_logfile_backups=5 ;
 stderr_logfile_maxbytes=500MB ;
-stdout_logfile=$PATH_TO_NODE_LOGS/sidecar-stdout.log ;
+stdout_logfile=$PATH_TO_SIDECAR_LOGS/stdout.log ;
 stdout_logfile_backups=5 ;
 stdout_logfile_maxbytes=500MB ;
 EOM
