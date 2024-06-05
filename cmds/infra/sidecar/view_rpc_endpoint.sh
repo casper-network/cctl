@@ -26,7 +26,8 @@ function _main()
                 "method": "rpc.discover"
             }' \
             | jq '.result.schema.methods[].name' \
-            | sed -e 's/^"//' -e 's/"$//'
+            | sed -e 's/^"//' -e 's/"$//' \
+            | sort
     else
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \
