@@ -43,26 +43,19 @@ function _main()
 function _display_peers()
 {
     local NODE_ID=${1}
-    local NODE_ADDRESS_CURL
-    local NODE_API_RESPONSE
-    
-    NODE_ADDRESS_CURL=$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")
-    NODE_API_RESPONSE=$(
-        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
-            -s \
-            --header 'Content-Type: application/json' \
-            --request POST "$NODE_ADDRESS_CURL" \
-            --data-raw '{
-                "id": 1,
-                "jsonrpc": "2.0",
-                "method": "info_get_peers"
-            }' | jq '.result.peers | sort_by(.address)'
+
+    local API_ENDPOINT="$(get_address_of_node_rest_server "$NODE_ID")"/status
+    local API_RESPONSE=$(
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES --header 'Content-Type: application/json' \
+            --location \
+            --request GET "$API_ENDPOINT" \
+            | jq '.peers | sort_by(.address)'
     )
 
     log "------------------------------------------------------------------------------------------------------"
     log "peers of node $NODE_ID"
     log "------------------------------------------------------------------------------------------------------"
-    echo "$NODE_API_RESPONSE" | jq
+    echo "$API_RESPONSE" | jq
 }
 
 # ----------------------------------------------------------------

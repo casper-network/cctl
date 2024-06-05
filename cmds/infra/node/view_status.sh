@@ -45,16 +45,15 @@ function _display_status()
 {
     local NODE_ID=${1}
 
-    local ENDPOINT="$(get_address_of_node_rest_server "$NODE_ID")"/status
-
-    NODE_API_RESPONSE=$(
+    local API_ENDPOINT="$(get_address_of_node_rest_server "$NODE_ID")"/status
+    local API_RESPONSE=$(
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES --header 'Content-Type: application/json' \
             --location \
-            --request GET "$ENDPOINT" \
+            --request GET "$API_ENDPOINT" \
             | jq '.'
     )
 
-    if [ -z "$NODE_API_RESPONSE" ]; then
+    if [ -z "$API_RESPONSE" ]; then
         log "------------------------------------------------------------------------------------------------------------------------------------"
         log "node #$NODE_ID :: status: N/A"
         log "------------------------------------------------------------------------------------------------------------------------------------"
@@ -62,7 +61,7 @@ function _display_status()
         log "------------------------------------------------------------------------------------------------------------------------------------"
         log "node #$NODE_ID :: status:"
         log "------------------------------------------------------------------------------------------------------------------------------------"
-        echo "$NODE_API_RESPONSE" | jq '.'
+        echo "$API_RESPONSE" | jq '.'
     fi
 }
 
