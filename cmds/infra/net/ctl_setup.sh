@@ -541,10 +541,10 @@ startsecs=0
 stopsignal=TERM
 stopwaitsecs=5
 stopasgroup=true
-stderr_logfile=$PATH_TO_SIDECAR_LOGS/stderr.log ;
+stderr_logfile=$PATH_TO_SIDECAR_LOGS/sidecar-stderr.log ;
 stderr_logfile_backups=5 ;
 stderr_logfile_maxbytes=500MB ;
-stdout_logfile=$PATH_TO_SIDECAR_LOGS/stdout.log ;
+stdout_logfile=$PATH_TO_SIDECAR_LOGS/sidecar-stdout.log ;
 stdout_logfile_backups=5 ;
 stdout_logfile_maxbytes=500MB ;
 EOM

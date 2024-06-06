@@ -43,6 +43,9 @@ alias cctl-infra-node-view-ports='source $CCTL/cmds/infra/node/view_ports.sh'
 alias cctl-infra-node-view-reactor-state='source $CCTL/cmds/infra/node/view_reactor_state.sh'
 alias cctl-infra-node-view-status='source $CCTL/cmds/infra/node/view_status.sh'
 alias cctl-infra-node-view-storage='source $CCTL/cmds/infra/node/view_storage.sh'
+# ... sidecar control
+alias cctl-infra-sidecar-stop='source $CCTL/cmds/infra/sidecar/ctl_stop.sh'
+alias cctl-infra-sidecar-clean='source $CCTL/cmds/infra/sidecar/ctl_clean.sh'
 # ... sidecar views
 alias cctl-infra-sidecar-view-config='source $CCTL/cmds/infra/sidecar/view_config.sh'
 alias cctl-infra-sidecar-view-error-log='source $CCTL/cmds/infra/sidecar/view_log_stderr.sh'

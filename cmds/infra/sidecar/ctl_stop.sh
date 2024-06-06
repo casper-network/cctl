@@ -4,15 +4,15 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-sidecar-view-log-stdout
+    cctl-infra-sidecar-stop
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Displays a sidecar's log file.
+    Stops a sidecar.
 
     ARGS
     ----------------------------------------------------------------
-    node        Ordinal identifier of a node.
+    node        Ordinal identifier of node sidecar to be stopped.
     "
 }
 
@@ -20,7 +20,28 @@ function _main()
 {
     local NODE_ID=${1}
 
-    less "$(get_path_to_sidecar "${NODE_ID:-1}")"/logs/sidecar-stdout.log
+    if [ "$(get_is_net_up)" = true ]; then
+        if [ "$(get_is_sidecar_up "$NODE_ID")" = true ]; then
+            log "sidecar $NODE_ID :: stopping ... please wait"
+            _stop_sidecar "$NODE_ID"
+            log "sidecar $NODE_ID : stopped"
+        else
+            log_warning "sidecar $NODE_ID is already stopped"
+        fi
+    else
+        log_warning "network not running - no need to stop sidecar"
+    fi
+}
+
+function _stop_sidecar()
+{
+    local NODE_ID=${1}
+
+    local PROCESS_NAME=$(get_process_name_of_sidecar_in_group "$NODE_ID")
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+
+    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" stop "$PROCESS_NAME" > /dev/null 2>&1
+    sleep 1.0
 }
 
 # ----------------------------------------------------------------
