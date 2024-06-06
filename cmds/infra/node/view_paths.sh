@@ -59,7 +59,9 @@ function _display_paths()
     log "logs"
     log "... $PATH_TO_NODE/logs/node-stderr.log"
     log "... $PATH_TO_NODE/logs/node-stdout.log"
+    log "storage"
     log "... $PATH_TO_NODE/storage/$CCTL_NET_NAME"
+    log "... $PATH_TO_NODE/storage/$CCTL_NET_NAME/unit_files"
 }
 
 # ----------------------------------------------------------------

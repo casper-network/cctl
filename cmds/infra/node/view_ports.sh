@@ -46,7 +46,7 @@ function _display_ports()
     local PORT_NODE_SSE=$(get_port_of_node_sse_server "$NODE_ID")
 
     log "NODE-$NODE_ID"
-    log "    PROTOCOL -----> $PORT_NODE_NET_BIND"
+    log "    PROTOCOL ----> $PORT_NODE_NET_BIND"
     log "    BINARY ------> $PORT_NODE_BINARY"
     log "    REST --------> $PORT_NODE_REST"
     log "    SSE ---------> $PORT_NODE_SSE"
