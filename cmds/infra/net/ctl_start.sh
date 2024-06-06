@@ -18,34 +18,37 @@ function _help() {
 
 function _main()
 {
-    log "network spin up begins ... please wait"
+    log "Network start begins"
+    log_break
 
     if [ ! -e "$(get_path_to_supervisord_sock)" ]; then
-        log "... starting supervisord"
         _start_supervisord
     fi
-
-    log "... starting network"
     _start_net
+
+    log_break
+    log "Network start ends"
 }
 
 function _start_supervisord()
 {
     supervisord -c "$(get_path_to_supervisord_cfg)"
     sleep 2.0
+    log "Daemon supervisor -> started"
 }
 
 function _start_net()
 {
     local PATH_TO_CFG=$(get_path_to_supervisord_cfg)
 
-    log "... ... genesis bootstrap nodes"
     supervisorctl -c "$PATH_TO_CFG" start "$CCTL_PROCESS_GROUP_1":*  > /dev/null 2>&1
     sleep 1.0
+    log "Genesis bootstrap nodes -> started"
 
-    log "... ... genesis non-bootstrap nodes"
+
     supervisorctl -c "$PATH_TO_CFG" start "$CCTL_PROCESS_GROUP_2":*  > /dev/null 2>&1
     sleep 1.0
+    log "Genesis non-bootstrap nodes -> started"
 
     supervisorctl -c "$PATH_TO_CFG" status all || true
 }
@@ -71,5 +74,7 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
+    log_break
     _main
+    log_break
 fi

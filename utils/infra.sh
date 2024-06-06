@@ -1,6 +1,139 @@
 #!/usr/bin/env bash
 
 #######################################
+# Cleans a node.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function do_node_clean()
+{
+    local NODE_ID=${1}
+
+    do_node_clean_logs "$NODE_ID"
+    do_node_clean_storage "$NODE_ID"
+}
+
+#######################################
+# Cleans a node's logs.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function do_node_clean_logs()
+{
+    local NODE_ID=${1}
+
+    local PATH_TO_LOGS=$(get_path_to_node_logs "$NODE_ID")
+
+    rm "$PATH_TO_LOGS"/node-*.log > /dev/null 2>&1
+}
+
+#######################################
+# Cleans a node's storage.
+# Arguments:
+#   Node ordinal identifier.
+# Globals:
+#   CCTL_NET_NAME
+#######################################
+function do_node_clean_storage()
+{
+    local NODE_ID=${1}
+
+    local PATH_TO_STORAGE=$(get_path_to_node_storage "$NODE_ID")
+
+    rm -rf "$PATH_TO_STORAGE"/"$CCTL_NET_NAME" > /dev/null 2>&1
+}
+
+#######################################
+# Starts a node.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function do_node_start()
+{
+    local NODE_ID=${1}
+
+    local PROCESS_NAME=$(get_process_name_of_node_in_group "$NODE_ID")
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+
+    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" start "$PROCESS_NAME" > /dev/null 2>&1
+    sleep 1.0
+}
+
+#######################################
+# Stops a node.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function do_node_stop()
+{
+    local NODE_ID=${1}
+
+    local PROCESS_NAME=$(get_process_name_of_node_in_group "$NODE_ID")
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+
+    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" stop "$PROCESS_NAME" > /dev/null 2>&1
+    sleep 1.0
+}
+
+#######################################
+# Cleans a sidecar.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function do_sidecar_clean()
+{
+    local NODE_ID=${1}
+
+    do_sidecar_clean_logs "$NODE_ID"
+}
+
+#######################################
+# Cleans a sidecar's logs.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function do_sidecar_clean_logs()
+{
+    local NODE_ID=${1}
+
+    local PATH_TO_LOGS=$(get_path_to_sidecar "$NODE_ID")/logs
+
+    rm "$PATH_TO_LOGS"/sidecar-*.log > /dev/null 2>&1
+}
+
+#######################################
+# Starts a sidecar.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function do_sidecar_start()
+{
+    local NODE_ID=${1}
+
+    local PROCESS_NAME=$(get_process_name_of_sidecar_in_group "$NODE_ID")
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+
+    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" start "$PROCESS_NAME" > /dev/null 2>&1
+    sleep 1.0
+}
+
+#######################################
+# Stops a sidecar.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function do_sidecar_stop()
+{
+    local NODE_ID=${1}
+
+    local PROCESS_NAME=$(get_process_name_of_sidecar_in_group "$NODE_ID")
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+
+    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" stop "$PROCESS_NAME" > /dev/null 2>&1
+    sleep 1.0
+}
+
+#######################################
 # Returns address to a node's binary server.
 # Arguments:
 #   Node ordinal identifier.

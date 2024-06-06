@@ -18,11 +18,12 @@ function _main()
     local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_supervisord_sock)
 
     if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
-        log "stopping network ... please wait"
+        log "Daemon supervisor -> stopping"
         supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" shutdown > /dev/null 2>&1 || true
         sleep 2.0
+        log "Network stopped"
     else
-        log "network not running - no need to stop"
+        log "Network not running - no need to stop"
     fi
 }
 
@@ -47,5 +48,7 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
+    log_break
     _main
+    log_break
 fi

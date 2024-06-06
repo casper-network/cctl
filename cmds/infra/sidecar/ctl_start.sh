@@ -4,15 +4,15 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-node-stop
+    cctl-infra-sidecar-start
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Stops a node.
+    Starts a sidecar.
 
     ARGS
     ----------------------------------------------------------------
-    node        Ordinal identifier of node to be stopped.
+    node        Ordinal identifier of node sidecar to be started.
     "
 }
 
@@ -22,17 +22,17 @@ function _main()
 
     if [ "$(get_is_net_up)" = true ]; then
         if [ "$(get_is_node_up "$NODE_ID")" = true ]; then
-            if [ "$(get_is_sidecar_up "$NODE_ID")" = true ]; then
-                do_sidecar_stop "$NODE_ID"
-                log "Sidecar $NODE_ID -> stopped"
+            if [ "$(get_is_sidecar_up "$NODE_ID")" = false ]; then
+                do_sidecar_start "$NODE_ID"
+                log "Sidecar $NODE_ID -> started"
+            else
+                log_warning "Node $NODE_ID -> not running, no need to start sidecar"
             fi
-            do_node_stop "$NODE_ID"
-            log "Node $NODE_ID -> stopped"
         else
-            log_warning "Node $NODE_ID -> already stopped"
+            log_warning "Node $NODE_ID -> not running, no need to start sidecar"
         fi
     else
-        log_warning "Network not running - no need to stop node"
+        log_warning "Network not running - no need to start sidecar"
     fi
 }
 

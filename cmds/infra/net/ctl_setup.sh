@@ -43,36 +43,41 @@ function _main()
     local NODE_COUNT_AT_GENESIS=5
     local USER_COUNT=10
 
-    log "network setup begins ... please wait"
+    log "Network setup begins"
+    log_break
 
-    log "... tearing down existing"
     _teardown
+    log "Network -> tore down existing"
 
-    log "... setting assets directory"
     _setup_fs "$NODE_COUNT" "$USER_COUNT"
+    log "Assets directory -> initialised"
 
-    log "... setting binaries"
     _setup_binaries "$NODE_COUNT"
+    log "Binaries -> assigned"
 
-    log "... setting wasm payloads"
     _setup_wasm
+    log "Wasm payloads -> assigned"
 
-    log "... setting cryptographic keys"
     _setup_keys "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$USER_COUNT"
+    log "Cryptographic keys -> assigned"
 
-    log "... setting supervisor"
     _setup_supervisor "$NODE_COUNT"
+    log "Daemon supervisor -> assigned"
 
-    log "... setting genesis chainspec.toml"
     _setup_genesis_chainspec "$GENESIS_DELAY" "$NODE_COUNT" "$PATH_TO_CHAINSPEC"
+    log "Genesis chainspec.toml -> assigned"
 
-    log "... setting genesis accounts.toml"
     _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
+    log "Genesis accounts.toml -> assigned"
 
-    log "... setting configuration files"
-    _setup_configs "$NODE_COUNT" "$PATH_TO_CONFIG_TEMPLATE_OF_NODE" "$PATH_TO_CONFIG_TEMPLATE_OF_SIDECAR"
+    _setup_config_of_nodes "$NODE_COUNT" "$PATH_TO_CONFIG_TEMPLATE_OF_NODE"
+    log "Node configuration files -> assigned"
 
-    log "network setup complete"
+    _setup_config_of_sidecars "$NODE_COUNT" "$PATH_TO_CONFIG_TEMPLATE_OF_SIDECAR"
+    log "Sidecar configuration files -> assigned"
+
+    log_break
+    log "Network setup complete"
 }
 
 function _setup_binaries()
@@ -104,21 +109,28 @@ function _setup_binaries()
     done
 }
 
-function _setup_configs()
+function _setup_config_of_nodes()
 {
     local NODE_COUNT=${1}
-    local PATH_TO_TEMPLATE_OF_NODE_CONFIG=${2}
-    local PATH_TO_TEMPLATE_OF_SIDECAR_CONFIG=${3}
-
+    local PATH_TO_TEMPLATE_OF_CONFIG=${2}
     local NODE_ID
-    local PATH_TO_ASSETS=$(get_path_to_assets)
 
     for NODE_ID in $(seq 1 "$NODE_COUNT")
     do
         _setup_node_genesis_config $NODE_ID
-        _setup_node_binary_config $NODE_ID $PATH_TO_TEMPLATE_OF_NODE_CONFIG
-        _setup_sidecar_config $NODE_ID $PATH_TO_TEMPLATE_OF_SIDECAR_CONFIG
-        _setup_sidecar_config1 $NODE_ID $PATH_TO_TEMPLATE_OF_SIDECAR_CONFIG
+        _setup_node_binary_config $NODE_ID $PATH_TO_TEMPLATE_OF_CONFIG
+    done
+}
+
+function _setup_config_of_sidecars()
+{
+    local NODE_COUNT=${1}
+    local PATH_TO_TEMPLATE_OF_CONFIG=${2}
+    local NODE_ID
+
+    for NODE_ID in $(seq 1 "$NODE_COUNT")
+    do
+        _setup_sidecar_config $NODE_ID $PATH_TO_TEMPLATE_OF_CONFIG
     done
 }
 
@@ -415,31 +427,6 @@ function _setup_sidecar_config()
     local NODE_ID=${1}
     local PATH_TO_TEMPLATE=${2}
 
-    local PATH_TO_CONFIG="$(get_path_to_node "$NODE_ID")/config/2_0_0/sidecar.toml"
-    local SCRIPT
-
-    if [ "$(get_os)" = "macosx" ]; then
-        cp "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
-    else
-        cp --no-preserve=mode "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
-    fi
-
-    SCRIPT=(
-        "import toml;"
-        "cfg=toml.load('$PATH_TO_CONFIG');"
-        "cfg['rpc_server']['main_server']['address']='0.0.0.0:$(get_port_of_sidecar_main_server  "$NODE_ID")';"
-        "cfg['rpc_server']['speculative_exec_server']['address']='0.0.0.0:$(get_port_of_sidecar_speculative_exec_server "$NODE_ID")';"
-        "cfg['rpc_server']['node_client']['address']='0.0.0.0:$(get_port_of_node_binary_server "$NODE_ID")';"
-        "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
-    )
-    python3 -c "${SCRIPT[*]}"
-}
-
-function _setup_sidecar_config1()
-{
-    local NODE_ID=${1}
-    local PATH_TO_TEMPLATE=${2}
-
     local PATH_TO_CONFIG="$(get_path_to_sidecar "$NODE_ID")/config/sidecar.toml"
     local SCRIPT
 
@@ -459,7 +446,6 @@ function _setup_sidecar_config1()
     )
     python3 -c "${SCRIPT[*]}"
 }
-
 
 function _setup_supervisor()
 {
@@ -636,10 +622,12 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
+    log_break
     _main \
         "${_GENESIS_ACCOUNTS_TYPE:-"static"}" \
         "${_GENESIS_DELAY:-30}" \
         "${_PATH_TO_CHAINSPEC:-"$(get_path_to_config_templates_of_node)/local/chainspec.toml.in"}" \
         "${_PATH_TO_CONFIG_OF_NODE:-"$(get_path_to_config_templates_of_node)/local/config.toml"}" \
         "${_PATH_TO_CONFIG_OF_SIDECAR:-"$(get_path_to_config_templates_of_sidecar)/example_configs/default_rpc_only_config.toml"}"
+    log_break
 fi

@@ -19,15 +19,17 @@ function _help() {
 
 function _main()
 {
-    log "teardown begins ... please wait"
+    log "Network teardown -> begins"
+    log_break
 
-    log "... stopping network"
     _teardown_net
+    log "Network processes -> stopped"
 
-    log "... deleting assets"
     _teardown_assets
+    log "Network assets -> deleted"
 
-    log "teardown complete"
+    log_break
+    log "Network teardown -> complete"
 }
 
 function _teardown_net()
@@ -71,5 +73,7 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
+    log_break
     _main
+    log_break
 fi

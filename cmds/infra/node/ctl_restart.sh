@@ -29,97 +29,30 @@ function _main()
     local CLEAN=${2}
     local TRUSTED_HASH=${3}
 
-    log "node restart begins ... please wait"
-
     if [ "$(get_is_sidecar_up "$NODE_ID")" = true ]; then
-        log "... stopping sidecar $NODE_ID"
-        _stop_sidecar "$NODE_ID"
+        do_sidecar_stop "$NODE_ID"
+        log "Sidecar $NODE_ID -> stopped"
     fi
 
     if [ "$(get_is_node_up "$NODE_ID")" = true ]; then
-        log "... stopping node $NODE_ID"
-        _stop_node "$NODE_ID"
+        do_node_stop "$NODE_ID"
+        log "Node $NODE_ID -> stopped"
     fi
 
     if [ "$CLEAN" = true ]; then
-        log "... cleaning sidecar $NODE_ID"
-        _clean_sidecar "$NODE_ID"
+        do_sidecar_clean "$NODE_ID"
+        log "Sidecar $NODE_ID -> cleaned"
 
-        log "... cleaning node $NODE_ID"
-        _clean_node "$NODE_ID"
+        do_node_clean "$NODE_ID"
+        log "Node $NODE_ID -> cleaned"
     fi
 
-    log "... starting node $NODE_ID"
-    _start_node "$NODE_ID"
-
-    log "... starting node sidecar $NODE_ID"
-    _start_sidecar "$NODE_ID"
-
-    log "node restart complete"
-}
-
-function _clean_node()
-{
-    local NODE_ID=${1}
-
-    local NODE_LOGS=$(get_path_to_node_logs "$NODE_ID")
-    local NODE_STORAGE=$(get_path_to_node_storage "$NODE_ID")
-
-    rm "$NODE_LOGS"/node-stderr.log > /dev/null 2>&1
-    rm "$NODE_LOGS"/node-stdout.log > /dev/null 2>&1
-    rm -rf "$NODE_STORAGE"/"$CCTL_NET_NAME" > /dev/null 2>&1
-}
-
-function _clean_sidecar()
-{
-    local NODE_ID=${1}
-
-    local NODE_LOGS=$(get_path_to_node_logs "$NODE_ID")
-
-    rm "$NODE_LOGS"/sidecar-*.log > /dev/null 2>&1
-}
-
-function _start_node()
-{
-    local NODE_ID=${1}
-
-    local PROCESS_NAME=$(get_process_name_of_node_in_group "$NODE_ID")
-    local SUPERVISORD_CONFIG=$(get_path_to_supervisord_cfg)
-
-    supervisorctl -c "$SUPERVISORD_CONFIG" start "$PROCESS_NAME" > /dev/null 2>&1
+    do_node_start "$NODE_ID" "$TRUSTED_HASH"
+    log "Node $NODE_ID -> started"
     sleep 1.0
-}
 
-function _start_sidecar()
-{
-    local NODE_ID=${1}
-
-    local PROCESS_NAME=$(get_process_name_of_sidecar_in_group "$NODE_ID")
-    local SUPERVISORD_CONFIG=$(get_path_to_supervisord_cfg)
-
-    supervisorctl -c "$SUPERVISORD_CONFIG" start "$PROCESS_NAME" > /dev/null 2>&1
-    sleep 1.0
-}
-
-function _stop_node()
-{
-    local NODE_ID=${1}
-
-    local PROCESS_NAME=$(get_process_name_of_node_in_group "$NODE_ID")
-    local SUPERVISORD_CONFIG=$(get_path_to_supervisord_cfg)
-
-    supervisorctl -c "$SUPERVISORD_CONFIG" stop "$PROCESS_NAME" > /dev/null 2>&1
-    sleep 1.0
-}
-
-function _stop_sidecar()
-{
-    local NODE_ID=${1}
-
-    local PROCESS_NAME=$(get_process_name_of_sidecar_in_group "$NODE_ID")
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
-
-    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" stop "$PROCESS_NAME" > /dev/null 2>&1
+    do_sidecar_start "$NODE_ID"
+    log "Sidecar $NODE_ID -> started"
     sleep 1.0
 }
 
@@ -150,5 +83,7 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
+    log_break
     _main "$_NODE_ID" ${_CLEAN:-true} ${_TRUSTED_HASH:-""}
+    log_break
 fi

@@ -21,22 +21,11 @@ function _main()
     local NODE_ID=${1}
 
     if [ "$(get_is_sidecar_up "$NODE_ID")" = true ]; then
-        log "sidecar $NODE_ID :: currently running ... please stop prior to cleaning."
+        log "Sidecar $NODE_ID -> currently running ... please stop prior to cleaning"
     else
-        log "sidecar $NODE_ID :: cleaning ... please wait"
-        _clean_node "$NODE_ID"
-        log "sidecar $NODE_ID :: cleaned"
+        do_sidecar_clean_logs "$NODE_ID"
+        log "Sidecar $NODE_ID -> cleaned"
     fi
-}
-
-function _clean_node()
-{
-    local NODE_ID=${1}
-
-    local PATH_TO_LOGS=$(get_path_to_sidecar_logs "$NODE_ID")
-
-    log "sidecar $NODE_ID :: cleaning logs"
-    rm "$PATH_TO_LOGS"/sidecar-*.log > /dev/null 2>&1
 }
 
 # ----------------------------------------------------------------
@@ -62,5 +51,7 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
+    log_break
     _main "$_NODE_ID"
+    log_break
 fi

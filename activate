@@ -19,18 +19,22 @@ alias cctl-infra-bin-compile-contracts='source $CCTL/cmds/infra/bin/compile_cont
 alias cctl-infra-bin-compile-node='source $CCTL/cmds/infra/bin/compile_node.sh'
 alias cctl-infra-bin-compile-node-launcher='source $CCTL/cmds/infra/bin/compile_node_launcher.sh'
 alias cctl-infra-bin-compile-sidecar='source $CCTL/cmds/infra/bin/compile_sidecar.sh'
-# ... network
+
+# ... network control
 alias cctl-infra-net-setup='source $CCTL/cmds/infra/net/ctl_setup.sh'
 alias cctl-infra-net-start='source $CCTL/cmds/infra/net/ctl_start.sh'
 alias cctl-infra-net-status='source $CCTL/cmds/infra/net/view_status.sh'
 alias cctl-infra-net-stop='source $CCTL/cmds/infra/net/ctl_stop.sh'
 alias cctl-infra-net-teardown='source $CCTL/cmds/infra/net/ctl_teardown.sh'
+# ... network views
 alias cctl-infra-net-view-paths='source $CCTL/cmds/infra/net/view_paths.sh'
 alias cctl-infra-net-view-status='source $CCTL/cmds/infra/net/view_status.sh'
+
 # ... node control
 alias cctl-infra-node-clean='source $CCTL/cmds/infra/node/ctl_clean.sh'
-alias cctl-infra-node-stop='source $CCTL/cmds/infra/node/ctl_stop.sh'
 alias cctl-infra-node-restart='source $CCTL/cmds/infra/node/ctl_restart.sh'
+alias cctl-infra-node-start='source $CCTL/cmds/infra/node/ctl_start.sh'
+alias cctl-infra-node-stop='source $CCTL/cmds/infra/node/ctl_stop.sh'
 # ... node views
 alias cctl-infra-node-view-config='source $CCTL/cmds/infra/node/view_config.sh'
 alias cctl-infra-node-view-error-log='source $CCTL/cmds/infra/node/view_log_stderr.sh'
@@ -43,7 +47,9 @@ alias cctl-infra-node-view-ports='source $CCTL/cmds/infra/node/view_ports.sh'
 alias cctl-infra-node-view-reactor-state='source $CCTL/cmds/infra/node/view_reactor_state.sh'
 alias cctl-infra-node-view-status='source $CCTL/cmds/infra/node/view_status.sh'
 alias cctl-infra-node-view-storage='source $CCTL/cmds/infra/node/view_storage.sh'
+
 # ... sidecar control
+alias cctl-infra-sidecar-start='source $CCTL/cmds/infra/sidecar/ctl_start.sh'
 alias cctl-infra-sidecar-stop='source $CCTL/cmds/infra/sidecar/ctl_stop.sh'
 alias cctl-infra-sidecar-clean='source $CCTL/cmds/infra/sidecar/ctl_clean.sh'
 # ... sidecar views
@@ -54,6 +60,7 @@ alias cctl-infra-sidecar-view-ports='source $CCTL/cmds/infra/sidecar/view_ports.
 alias cctl-infra-sidecar-view-rpc-endpoint='source $CCTL/cmds/infra/sidecar/view_rpc_endpoint.sh'
 alias cctl-infra-sidecar-view-rpc-schema='source $CCTL/cmds/infra/sidecar/view_rpc_schema.sh'
 alias cctl-infra-sidecar-write-rpc-schema='source $CCTL/cmds/infra/sidecar/write_rpc_schema.sh'
+
 # Chain commands:
 # ... awaiting
 alias cctl-chain-await-n-blocks='source $CCTL/cmds/chain/await/n_blocks.sh'
