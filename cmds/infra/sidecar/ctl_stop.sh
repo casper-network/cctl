@@ -24,7 +24,7 @@ function _main()
         if [ "$(get_is_sidecar_up "$NODE_ID")" = true ]; then
             log "sidecar $NODE_ID :: stopping ... please wait"
             _stop_sidecar "$NODE_ID"
-            log "sidecar $NODE_ID : stopped"
+            log "sidecar $NODE_ID :: stopped"
         else
             log_warning "sidecar $NODE_ID is already stopped"
         fi
