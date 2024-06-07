@@ -197,6 +197,16 @@ function get_path_to_node_storage()
 }
 
 #######################################
+# Returns path to CCTL static resources folder.
+# Arguments:
+#   Node ordinal identifier.
+#######################################
+function get_path_to_static_resources()
+{
+    echo "$CCTL"/resources
+}
+
+#######################################
 # Returns path to a secret key.
 # Globals:
 #   CCTL_ACCOUNT_TYPE_FAUCET - faucet account type.

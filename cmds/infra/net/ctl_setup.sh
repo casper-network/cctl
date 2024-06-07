@@ -268,7 +268,7 @@ EOM
 function _setup_genesis_accounts_static()
 {
     cp \
-        "$CCTL"/resources/static/accounts/accounts.toml \
+        "$CCTL"/resources/accounts/accounts.toml \
         "$(get_path_to_assets)"/genesis/accounts.toml
 }
 
@@ -344,20 +344,20 @@ function _setup_keys_static()
     local IDX
 
     cp \
-        "$CCTL"/resources/static/accounts/faucet/* \
+        "$CCTL"/resources/accounts/faucet/* \
         "$(get_path_to_assets)"/faucet
 
     for IDX in $(seq 1 "$NODE_COUNT")
     do
         cp \
-            "$CCTL"/resources/static/accounts/nodes/node-$IDX/* \
+            "$CCTL"/resources/accounts/nodes/node-$IDX/* \
             "$(get_path_to_assets)"/nodes/node-$IDX/keys
     done
 
     for IDX in $(seq 1 "$USER_COUNT")
     do
         cp \
-            "$CCTL"/resources/static/accounts/users/user-$IDX/* \
+            "$CCTL"/resources/accounts/users/user-$IDX/* \
             "$(get_path_to_assets)"/users/user-$IDX
     done
 }
