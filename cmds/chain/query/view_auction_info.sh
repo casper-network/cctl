@@ -14,9 +14,14 @@ function _help() {
 
 function _main()
 {
-    $(get_path_to_node_client) get-auction-info \
-        --node-address "$(get_address_of_sidecar_main_server)" \
-        | jq '.result'
+    curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+        --header 'Content-Type: application/json' \
+        --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
+        --data-raw '{
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "state_get_auction_info"
+        }' | jq '.result.auction_state'
 }
 
 # ----------------------------------------------------------------
