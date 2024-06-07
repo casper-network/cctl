@@ -24,11 +24,15 @@ function _main()
 {
     local NODE_ID=${1}
 
-    echo "$(get_address_of_sidecar_main_server "$NODE_ID")"
-
-    $(get_path_to_node_client) get-validator-changes \
-        --node-address "$(get_address_of_sidecar_main_server "$NODE_ID")" \
-        | jq '.result.changes'
+    curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+        --header 'Content-Type: application/json' \
+        --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+        --data-raw '{
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "info_get_validator_changes"
+        }' \
+    | jq '.result.changes'
 }
 
 # ----------------------------------------------------------------

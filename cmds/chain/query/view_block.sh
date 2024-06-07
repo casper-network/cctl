@@ -24,7 +24,7 @@ function _main()
     if [ "$BLOCK_ID" ]; then
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \
-            --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
             --data-raw '{
                 "id": 1,
                 "jsonrpc": "2.0",
@@ -34,16 +34,18 @@ function _main()
                         "Hash": "'"$BLOCK_ID"'"
                     }
                 }
-            }' | jq '.result.block_with_signatures'
+            }' \
+        | jq '.result.block_with_signatures'
     else
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \
-            --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
             --data-raw '{
                 "id": 1,
                 "jsonrpc": "2.0",
                 "method": "chain_get_block"
-            }' | jq '.result.block_with_signatures'
+            }' \
+        | jq '.result.block_with_signatures'
     fi
 }
 
