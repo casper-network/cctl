@@ -4,26 +4,36 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-view-chain-deploy
+    cctl-view-chain-tx
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Renders on-chain deploy information.
+    Renders on-chain transaction information.
 
     ARGS
     ----------------------------------------------------------------
-    deploy       Identifier of a deploy (hash).
+    tx      Identifier of a transaction (hash).
     "
 }
 
 function _main()
 {
-    local DEPLOY_ID=${1}
+    local TX_ID=${1}
 
-    $(get_path_to_node_client) get-deploy \
-        --node-address "$(get_address_of_sidecar_main_server)" \
-        "$DEPLOY_ID" \
-        | jq '.result'
+    curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+        --header 'Content-Type: application/json' \
+        --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+        --data-raw '{
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "info_get_transaction",
+            "params": {
+                "transaction_hash": {
+                    "Version1": "'"$TX_ID"'"
+                }
+            }
+        }' \
+    | jq
 }
 
 # ----------------------------------------------------------------
@@ -32,16 +42,16 @@ function _main()
 
 source "$CCTL"/utils/main.sh
 
-unset _DEPLOY_ID
 unset _HELP
+unset _TX_ID
 
 for ARGUMENT in "$@"
 do
     KEY=$(echo "$ARGUMENT" | cut -f1 -d=)
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
     case "$KEY" in
-        deploy) _DEPLOY_ID=${VALUE} ;;
         help) _HELP="show" ;;
+        tx) _TX_ID=${VALUE} ;;
         *)
     esac
 done
@@ -49,5 +59,5 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    _main $_DEPLOY_ID
+    _main $_TX_ID
 fi

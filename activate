@@ -78,7 +78,6 @@ alias cctl-chain-view-account-of-validator='source $CCTL/cmds/chain/query/view_a
 alias cctl-chain-view-auction-info='source $CCTL/cmds/chain/query/view_auction_info.sh'
 alias cctl-chain-view-block='source $CCTL/cmds/chain/query/view_block.sh'
 alias cctl-chain-view-block-transfers='source $CCTL/cmds/chain/query/view_block_transfers.sh'
-alias cctl-chain-view-deploy='source $CCTL/cmds/chain/query/view_deploy.sh'
 alias cctl-chain-view-era='source $CCTL/cmds/chain/query/view_era.sh'
 alias cctl-chain-view-era-summary='source $CCTL/cmds/chain/query/view_era_summary.sh'
 alias cctl-chain-view-genesis-accounts='source $CCTL/cmds/chain/query/view_genesis_accounts.sh'
@@ -86,6 +85,7 @@ alias cctl-chain-view-genesis-chainspec='source $CCTL/cmds/chain/query/view_gene
 alias cctl-chain-view-height='source $CCTL/cmds/chain/query/view_height.sh'
 alias cctl-chain-view-last-finalized-block='source $CCTL/cmds/chain/query/view_last_finalized_block.sh'
 alias cctl-chain-view-state-root-hash='source $CCTL/cmds/chain/query/view_state_root_hash.sh'
+alias cctl-chain-view-tx='source $CCTL/cmds/chain/query/view_tx.sh'
 alias cctl-chain-view-tip-info='source $CCTL/cmds/chain/query/view_tip_info.sh'
 alias cctl-chain-view-validator-changes='source $CCTL/cmds/chain/query/view_validator_changes.sh'
 
