@@ -174,11 +174,34 @@ function get_state_root_hash()
     local NODE_ID=${1}
     local BLOCK_ID=${2:-""}
 
-    $(get_path_to_node_client) get-state-root-hash \
-        --node-address "$(get_address_of_sidecar_main_server "$NODE_ID")" \
-        --block-identifier "$BLOCK_ID" \
-        | jq '.result.state_root_hash' \
-        | sed -e 's/^"//' -e 's/"$//'
+    if [ "$BLOCK_ID" ]; then
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+            --header 'Content-Type: application/json' \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
+            --data-raw '{
+                "id": 1,
+                "jsonrpc": "2.0",
+                "method": "chain_get_state_root_hash",
+                "params": {
+                    "block_identifier": {
+                        "Hash": "'"$BLOCK_ID"'"
+                    }
+                }
+            }' \
+            | jq '.result.state_root_hash' \
+            | sed -e 's/^"//' -e 's/"$//'
+    else
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+            --header 'Content-Type: application/json' \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl  "$NODE_ID")" \
+            --data-raw '{
+                "id": 1,
+                "jsonrpc": "2.0",
+                "method": "chain_get_state_root_hash"
+            }' \
+            | jq '.result.state_root_hash' \
+            | sed -e 's/^"//' -e 's/"$//'
+    fi
 }
 
 #######################################
@@ -233,4 +256,3 @@ function _get_from_status_with_retry()
     done
     echo ""
 }
-

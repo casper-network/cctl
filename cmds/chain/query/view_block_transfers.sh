@@ -21,14 +21,28 @@ function _main()
     local BLOCK_ID=${1}
 
     if [ "$BLOCK_ID" ]; then
-        $(get_path_to_node_client) get-block-transfers \
-            --node-address "$(get_address_of_sidecar_main_server)" \
-            --block-identifier "$BLOCK_ID" \
-            | jq '.result.transfers' 
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+            --header 'Content-Type: application/json' \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
+            --data-raw '{
+                "id": 1,
+                "jsonrpc": "2.0",
+                "method": "chain_get_block_transfers",
+                "params": {
+                    "block_identifier": {
+                        "Hash": "'"$BLOCK_ID"'"
+                    }
+                }
+            }' | jq '.result.transfers'
     else
-        $(get_path_to_node_client) get-block-transfers \
-            --node-address "$(get_address_of_sidecar_main_server)" \
-            | jq '.result.transfers' 
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+            --header 'Content-Type: application/json' \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
+            --data-raw '{
+                "id": 1,
+                "jsonrpc": "2.0",
+                "method": "chain_get_block_transfers"
+            }' | jq '.result.transfers'
     fi
 }
 
