@@ -3,27 +3,27 @@
 #######################################
 # Returns an on-chain account balance.
 # Arguments:
-#   Purse URef.
-#   State root hash at a certain block height.
+#   Identifier of an account.
 #######################################
 function get_account_balance()
 {
-    local PURSE_UREF=${1}
-    local STATE_ROOT_HASH=${2:-$(get_state_root_hash)}
+    local ACCOUNT_ID=${1}
 
-    local ACCOUNT_BALANCE
-    local NODE_ADDRESS=$(get_address_of_sidecar_main_server)
-
-    ACCOUNT_BALANCE=$(
-        $(get_path_to_node_client) query-balance \
-            --node-address "$NODE_ADDRESS" \
-            --state-root-hash "$STATE_ROOT_HASH" \
-            --purse-uref "$PURSE_UREF" \
-            | jq '.result.balance' \
-            | sed -e 's/^"//' -e 's/"$//'
-        )
-
-    echo "$ACCOUNT_BALANCE"
+    curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+        --header 'Content-Type: application/json' \
+        --request POST "$(get_address_of_sidecar_main_server_for_curl "1")" \
+        --data-raw '{
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "query_balance",
+            "params": {
+                "purse_identifier": {
+                    "main_purse_under_account_hash": "account-hash-'"$ACCOUNT_ID"'"
+                }
+            }
+        }' \
+    | jq '.result.balance' \
+    | sed -e 's/^"//' -e 's/"$//'
 }
 
 #######################################
@@ -74,23 +74,46 @@ function get_account_key()
 
 #######################################
 # Returns a main purse uref.
-# Globals:
-#   CCTL - path to cctl home directory.
 # Arguments:
-#   Account key.
-#   State root hash.
+#   Identifier of an account.
+#   Identifier of a block.
 #######################################
-function get_main_purse_uref()
+function get_main_purse_id()
 {
-    local ACCOUNT_HASH=${1}
-    local STATE_ROOT_HASH=${2:-$(get_state_root_hash)}
+    local ACCOUNT_ID=${1}
+    local STATE_ID=${2}
 
-    echo $(
-        $(get_path_to_node_client) query-global-state \
-            --node-address "$(get_address_of_sidecar_main_server)" \
-            --key "account-hash-$ACCOUNT_HASH" \
-            --state-root-hash "$STATE_ROOT_HASH" \
-            | jq '.result.stored_value.Account.main_purse' \
-            | sed -e 's/^"//' -e 's/"$//'
-        )
+    if [ "$STATE_ID" ]; then
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+            --header 'Content-Type: application/json' \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl "1")" \
+            --data-raw '{
+                "id": 1,
+                "jsonrpc": "2.0",
+                "method": "state_get_entity",
+                "params": {
+                    "entity_identifier": {
+                        "AccountHash": "account-hash-'"$ACCOUNT_ID"'"
+                    }
+                }
+            }' \
+        | jq '.result.entity.AddressableEntity.entity.main_purse' \
+        | sed -e 's/^"//' -e 's/"$//'
+    else
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+            --header 'Content-Type: application/json' \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl "1")" \
+            --data-raw '{
+                "id": 1,
+                "jsonrpc": "2.0",
+                "method": "state_get_entity",
+                "params": {
+                    "entity_identifier": {
+                        "AccountHash": "account-hash-'"$ACCOUNT_ID"'"
+                    }
+                }
+            }' \
+        | jq '.result.entity.AddressableEntity.entity.main_purse' \
+        | sed -e 's/^"//' -e 's/"$//'
+    fi
 }

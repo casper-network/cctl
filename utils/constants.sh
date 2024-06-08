@@ -33,7 +33,7 @@ declare CCTL_BASE_PORT_SIDECAR_SPEC_EXEC=22000
 # lead to the test being stuck. The exponential backoff delay used for reties
 # is replaced with a constant 1 sec. delay.
 # In addition, we don't want cURL to put anything on the standard output.
-declare CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES="--max-time 4 --connect-timeout 2 --retry 20 --retry-connrefused --retry-delay 1 -s"
+declare CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES="--max-time 4 --connect-timeout 2 --retry 5 --retry-connrefused --retry-delay 1 -s"
 
 # Default amount used when delegating.
 declare CCTL_DEFAULT_AUCTION_DELEGATE_AMOUNT=1000000000000   # (1e12)

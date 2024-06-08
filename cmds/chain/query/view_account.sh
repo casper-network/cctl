@@ -12,22 +12,37 @@ function _help() {
 
     ARGS
     ----------------------------------------------------------------
-    account     Hash of account to be displayed.
-    root        State root hash at a specific block height, defaults to tip.  Optional.
+    account     Address/hash of account to be displayed.
     "
 }
 
 function _main()
 {
-    local ACCOUNT_HASH=${1}
-    local STATE_ROOT_HASH=${2}
+    local ACCOUNT_ID=${1}
 
-    $(get_path_to_node_client) query-global-state \
-        --node-address "$(get_address_of_sidecar_main_server)" \
-        --key "account-hash-$ACCOUNT_HASH" \
-        --state-root-hash "${STATE_ROOT_HASH:-$(get_state_root_hash)}" \
-        | jq '.result.stored_value.Account'
+    curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+        --header 'Content-Type: application/json' \
+        --request POST "$(get_address_of_sidecar_main_server_for_curl "1")" \
+        --data-raw "$(_get_json_rpc_request_data "$ACCOUNT_ID")" \
+    | jq
 }
+
+function _get_json_rpc_request_data()
+{
+    local ACCOUNT_ID=${1}
+
+    echo '{
+        "id": 1,
+        "jsonrpc": "2.0",
+        "method": "state_get_entity",
+        "params": {
+            "entity_identifier": {
+                "AccountHash": "account-hash-'"$ACCOUNT_ID"'"
+            }
+        }
+    }'
+}
+
 
 # ----------------------------------------------------------------
 # ENTRY POINT
@@ -35,18 +50,16 @@ function _main()
 
 source "$CCTL"/utils/main.sh
 
-unset _ACCOUNT_HASH
+unset _ACCOUNT_ID
 unset _HELP
-unset _STATE_ROOT_HASH
 
 for ARGUMENT in "$@"
 do
     KEY=$(echo "$ARGUMENT" | cut -f1 -d=)
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
     case "$KEY" in
-        account) _ACCOUNT_HASH=${VALUE} ;;
+        account) _ACCOUNT_ID=${VALUE} ;;
         help) _HELP="show" ;;
-        root) _STATE_ROOT_HASH=${VALUE} ;;
         *)
     esac
 done
@@ -54,5 +67,5 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    _main "$_ACCOUNT_HASH" "$_STATE_ROOT_HASH"
+    _main "$_ACCOUNT_ID"
 fi
