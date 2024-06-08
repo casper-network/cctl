@@ -323,19 +323,16 @@ function _setup_keys_dynamic()
     local IDX
     local CASPER_CLIENT="$(get_path_to_node_client)"
 
-    "$CASPER_CLIENT" \
-        keygen -f "$PATH_TO_ASSETS/faucet" > /dev/null 2>&1
+    "$CASPER_CLIENT" keygen -f "$PATH_TO_ASSETS/faucet" > /dev/null 2>&1
 
     for IDX in $(seq 1 "$NODE_COUNT")
     do
-        "$CASPER_CLIENT" \
-            keygen -f "$PATH_TO_ASSETS/nodes/node-$IDX/keys" > /dev/null 2>&1
+        "$CASPER_CLIENT" keygen -f "$PATH_TO_ASSETS/nodes/node-$IDX/keys" > /dev/null 2>&1
     done
 
     for IDX in $(seq 1 "$USER_COUNT")
     do
-        "$CASPER_CLIENT" \
-            keygen -f "$PATH_TO_ASSETS/users/user-$IDX" > /dev/null 2>&1
+        "$CASPER_CLIENT" keygen -f "$PATH_TO_ASSETS/users/user-$IDX" > /dev/null 2>&1
     done
 }
 
