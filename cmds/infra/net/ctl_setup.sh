@@ -283,11 +283,8 @@ function _setup_genesis_chainspec()
     local PROTOCOL_VERSION=2.0.0
     local SCRIPT
 
-    if [ "$(get_os)" = "macosx" ]; then
-        cp "$PATH_TO_CHAINSPEC_TEMPLATE" "$PATH_TO_CHAINSPEC"
-    else
-        cp --no-preserve=mode "$PATH_TO_CHAINSPEC_TEMPLATE" "$PATH_TO_CHAINSPEC"
-    fi
+    cp "$PATH_TO_CHAINSPEC_TEMPLATE" "$PATH_TO_CHAINSPEC"
+    chmod 644 "$PATH_TO_CHAINSPEC"
 
     SCRIPT=(
         "import toml;"
@@ -378,11 +375,8 @@ function _setup_node_binary_config()
     local SCRIPT
 
     PATH_TO_CONFIG="$(get_path_to_node "$NODE_ID")/config/2_0_0/config.toml"
-    if [ "$(get_os)" = "macosx" ]; then
-        cp "$PATH_TO_TEMPLATE_OF_CONFIG" "$PATH_TO_CONFIG"
-    else
-        cp --no-preserve=mode "$PATH_TO_TEMPLATE_OF_CONFIG" "$PATH_TO_CONFIG"
-    fi
+    cp "$PATH_TO_TEMPLATE_OF_CONFIG" "$PATH_TO_CONFIG"
+    chmod 644 "$PATH_TO_CONFIG"
 
     SCRIPT=(
         "import toml;"
