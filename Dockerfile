@@ -4,7 +4,7 @@
 # install rust and build the casper-node
 # Run: install run time dependencies, create a non root user and
 # copy over the compiled binaries from the build ready for cctl start
-FROM debian:buster as build
+FROM debian:buster AS build
 
 # Allow users to specify forked node, or specific commit
 # If not fallback to release branch (or alternatively just specify branch)
@@ -58,7 +58,7 @@ RUN chmod +x ./build.sh && source build.sh
 COPY ./docker/clean.sh .
 RUN chmod +x clean.sh && source clean.sh
 
-FROM debian:buster as run
+FROM debian:buster AS run
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
