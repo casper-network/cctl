@@ -14,7 +14,7 @@ rm -r casper-client-rs/target/release/build
 rm -r casper-client-rs/target/release/deps
 rm -r casper-client-rs/target/release/.fingerprint
 rm -r casper-node/.git
-rm -r casper-clinet-rs/.git
+rm -r casper-client-rs/.git
 rm -r casper-node-launcher/.git
 rm -r cctl/.git
 rm -r casper-node/utils/nctl
