@@ -82,4 +82,7 @@ RUN chmod +x start.sh
 
 EXPOSE 11101-11105 14101-14105 18101-18105
 
+HEALTHCHECK --interval=10s --timeout=5s --retries=4 --start-period=20s \
+    CMD curl --silent --location 'http://127.0.0.1:11101/rpc' --header 'Content-Type: application/json' --data '{"id": "1", "jsonrpc": "2.0", "method": "info_get_status", "params": []}' | jq -e -n 'input.result.reactor_state' | grep "Validate"
+
 CMD ["/bin/bash", "-c", "source start.sh"]
