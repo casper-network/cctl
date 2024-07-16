@@ -28,8 +28,7 @@ RUN curl -f -L https://static.rust-lang.org/rustup.sh -O \
     && sh rustup.sh -y
 ENV PATH="$PATH:/root/.cargo/bin"
 
-RUN git clone https://github.com/casper-network/casper-node-launcher.git \
-    && git clone https://github.com/casper-network/cctl.git
+RUN git clone https://github.com/casper-network/casper-node-launcher.git
 RUN if [ -n "$NODE_COMMIT" ]; then \
         git clone -b $NODE_COMMIT $NODE_REPO; \
     else \
@@ -41,16 +40,22 @@ RUN if [ -n "$NODE_COMMIT" ]; then \
         git clone -b $CLIENT_GITBRANCH $CLIENT_REPO; \
     fi
 
+# Local CCTL source code.
+COPY ./cmds ./cctl/cmds
+COPY ./resources ./cctl/resources
+COPY ./utils ./cctl/utils
+COPY ./activate ./cctl/activate
+
 WORKDIR /casper-node
 
 RUN make setup-rs && echo '. /cctl/activate' >> ~/.bashrc
 
 WORKDIR /
 
-COPY ./build.sh .
-RUN chmod +x build.sh && source build.sh
+COPY ./docker/build.sh .
+RUN chmod +x ./build.sh && source build.sh
 
-COPY ./clean.sh .
+COPY ./docker/clean.sh .
 RUN chmod +x clean.sh && source clean.sh
 
 FROM debian:buster AS run
@@ -77,7 +82,7 @@ ENV CCTL="/home/cctl/cctl"
 
 RUN echo "source $CCTL/activate" >> .bashrc
 
-COPY --chown=cctl:cctl ./start.sh .
+COPY --chown=cctl:cctl ./docker/start.sh .
 RUN chmod +x start.sh
 
 EXPOSE 11101-11105 14101-14105 18101-18105
