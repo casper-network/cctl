@@ -1,0 +1,11 @@
+# Ignore everything by default
+*
+
+# Expose CCTL source.
+!./cmds
+!./resources
+!./utils
+!./activate
+
+# Expose additional docker scripts.
+!./docker
