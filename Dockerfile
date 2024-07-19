@@ -47,7 +47,7 @@ RUN if [ -n "$NODE_COMMIT" ]; then \
         git clone $SIDECAR_REPO && cd casper-sidecar && git checkout $SIDECAR_COMMIT && cd ..; \
     else \
         git clone -b $SIDECAR_GITBRANCH $SIDECAR_REPO; \
-    fi \
+    fi
 
 # Local CCTL source code.
 COPY ./cmds ./cctl/cmds
