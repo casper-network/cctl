@@ -9,11 +9,15 @@ FROM debian:buster AS build
 # Allow users to specify forked node, or specific commit
 # If not fallback to release branch (or alternatively just specify branch)
 ARG NODE_REPO=https://github.com/casper-network/casper-node.git
-ARG NODE_COMMIT=
 ARG CLIENT_REPO=https://github.com/casper-ecosystem/casper-client-rs.git
-ARG CLIENT_COMMIT=
-ARG NODE_GITBRANCH=release-1.5.6
+ARG SIDECAR_REPO=https://github.com/casper-network/casper-sidecar.git
+
+ARG NODE_COMMIT=
+ARG NODE_GITBRANCH=feat-2.0
 ARG CLIENT_GITBRANCH=release-2.0.0
+ARG CLIENT_COMMIT=
+ARG SIDECAR_GITBRANCH=feat-2.0
+ARG SIDECAR_COMMIT=
 
 RUN apt-get update \
     && DEBIAN_FRONTEND="noninteractive" \
@@ -38,7 +42,12 @@ RUN if [ -n "$NODE_COMMIT" ]; then \
         git clone -b $CLIENT_COMMIT $CLIENT_REPO; \
     else \
         git clone -b $CLIENT_GITBRANCH $CLIENT_REPO; \
-    fi
+    fi \
+    && if [ -n "$SIDECAR_COMMIT" ]; then \
+        git clone $SIDECAR_REPO && cd casper-sidecar && git checkout $SIDECAR_COMMIT && cd ..; \
+    else \
+        git clone -b $SIDECAR_GITBRANCH $SIDECAR_REPO; \
+    fi \
 
 # Local CCTL source code.
 COPY ./cmds ./cctl/cmds
@@ -76,6 +85,7 @@ WORKDIR /home/cctl
 COPY --from=build --chown=cctl:cctl /casper-node-launcher ./casper-node-launcher
 COPY --from=build --chown=cctl:cctl /casper-client-rs ./casper-client-rs
 COPY --from=build --chown=cctl:cctl /casper-node ./casper-node
+COPY --from=build --chown=cctl:cctl /casper-sidecar ./casper-sidecar
 COPY --from=build --chown=cctl:cctl /cctl ./cctl
 
 ENV CCTL="/home/cctl/cctl"
@@ -85,7 +95,7 @@ RUN echo "source $CCTL/activate" >> .bashrc
 COPY --chown=cctl:cctl ./docker/start.sh .
 RUN chmod +x start.sh
 
-EXPOSE 11101-11105 14101-14105 18101-18105
+EXPOSE 11101-11105 14101-14105 18101-18105 25101-25101
 
 HEALTHCHECK --interval=10s --timeout=5s --retries=4 --start-period=20s \
     CMD curl --silent --location 'http://127.0.0.1:11101/rpc' --header 'Content-Type: application/json' --data '{"id": "1", "jsonrpc": "2.0", "method": "info_get_status", "params": []}' | jq -e -n 'input.result.reactor_state' | grep "Validate"
