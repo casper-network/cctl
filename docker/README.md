@@ -8,7 +8,7 @@ After starting docker on your machine follow these simple instructions:
 
 Build and run using `docker build` or `docker compose`:
 ```bash
-git clone git@github.com:casper-network/cctl.git && cd cctl/docker
+git clone git@github.com:casper-network/cctl.git && cd cctl
 
 docker build . --build-arg NODE_GITBRANCH=release-1.5.6 --build-arg CLIENT_GITBRANCH=release-2.0.0 -t cspr-cctl/release-1.5.6
 # or
