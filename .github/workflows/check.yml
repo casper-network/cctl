@@ -1,0 +1,41 @@
+name: check
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-14]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: cachix/cachix-action@v12
+        with:
+          name: cspr
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+
+      - name: System Info
+        run: |
+          uname -a
+          nix --version
+
+      - name: format
+        if: matrix.os == 'ubuntu-latest'
+        run: nix build -L --no-link --show-trace .#checks.x86_64-linux.format
+
+      - name: cctl (x86_64-linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: nix build -L --no-link --show-trace .#packages.x86_64-linux.cctl
+
+      - name: cctl (x86_64-darwin)
+        if: matrix.os == 'macos-latest'
+        run: nix build -L --no-link --show-trace .#packages.x86_64-darwin.cctl
+
+      - name: cctl aarch64-darwin
+        if: matrix.os == 'macos-14'
+        run: nix build -L --no-link --show-trace .#packages.aarch64-darwin.cctl
