@@ -9,11 +9,15 @@ FROM debian:buster AS build
 # Allow users to specify forked node, or specific commit
 # If not fallback to release branch (or alternatively just specify branch)
 ARG NODE_REPO=https://github.com/casper-network/casper-node.git
-ARG NODE_COMMIT=
 ARG CLIENT_REPO=https://github.com/casper-ecosystem/casper-client-rs.git
-ARG CLIENT_COMMIT=
-ARG NODE_GITBRANCH=release-1.5.6
-ARG CLIENT_GITBRANCH=release-2.0.0
+ARG SIDECAR_REPO=https://github.com/casper-network/casper-sidecar.git
+
+ARG NODE_COMMIT=
+ARG NODE_GITBRANCH=release-2.0.0-rc3
+ARG CLIENT_GITBRANCH=feat-track-node-2.0
+ARG CLIENT_COMMIT=317051ddfb372d9404850c6a1787f225d6d32b4e
+ARG SIDECAR_GITBRANCH=release-1.0.0rc2_node-2.0.0rc3
+ARG SIDECAR_COMMIT=
 
 RUN apt-get update \
     && DEBIAN_FRONTEND="noninteractive" \
@@ -30,14 +34,19 @@ ENV PATH="$PATH:/root/.cargo/bin"
 
 RUN git clone https://github.com/casper-network/casper-node-launcher.git
 RUN if [ -n "$NODE_COMMIT" ]; then \
-        git clone -b $NODE_COMMIT $NODE_REPO; \
+        git clone $NODE_REPO && cd casper-node && git checkout $NODE_COMMIT && cd ..; \
     else \
         git clone -b $NODE_GITBRANCH $NODE_REPO; \
     fi \
     && if [ -n "$CLIENT_COMMIT" ]; then \
-        git clone -b $CLIENT_COMMIT $CLIENT_REPO; \
+        git clone $CLIENT_REPO && cd casper-client-rs && git checkout $CLIENT_COMMIT && cd ..; \
     else \
         git clone -b $CLIENT_GITBRANCH $CLIENT_REPO; \
+    fi \
+    && if [ -n "$SIDECAR_COMMIT" ]; then \
+        git clone $SIDECAR_REPO && cd casper-sidecar && git checkout $SIDECAR_COMMIT && cd ..; \
+    else \
+        git clone -b $SIDECAR_GITBRANCH $SIDECAR_REPO; \
     fi
 
 # Local CCTL source code.
@@ -76,6 +85,7 @@ WORKDIR /home/cctl
 COPY --from=build --chown=cctl:cctl /casper-node-launcher ./casper-node-launcher
 COPY --from=build --chown=cctl:cctl /casper-client-rs ./casper-client-rs
 COPY --from=build --chown=cctl:cctl /casper-node ./casper-node
+COPY --from=build --chown=cctl:cctl /casper-sidecar ./casper-sidecar
 COPY --from=build --chown=cctl:cctl /cctl ./cctl
 
 ENV CCTL="/home/cctl/cctl"
@@ -85,9 +95,9 @@ RUN echo "source $CCTL/activate" >> .bashrc
 COPY --chown=cctl:cctl ./docker/start.sh .
 RUN chmod +x start.sh
 
-EXPOSE 11101-11105 14101-14105 18101-18105
+EXPOSE 11101-11105 12101-12105 13101-13105 14101-14105 21101-21105 22101-22105
 
 HEALTHCHECK --interval=10s --timeout=5s --retries=4 --start-period=20s \
-    CMD curl --silent --location 'http://127.0.0.1:11101/rpc' --header 'Content-Type: application/json' --data '{"id": "1", "jsonrpc": "2.0", "method": "info_get_status", "params": []}' | jq -e -n 'input.result.reactor_state' | grep "Validate"
+    CMD curl --silent --location 'http://127.0.0.1:21101/rpc' --header 'Content-Type: application/json' --data '{"id": "1", "jsonrpc": "2.0", "method": "info_get_status", "params": []}' | jq -e -n 'input.result.reactor_state' | grep "Validate"
 
 CMD ["/bin/bash", "-c", "source start.sh"]
