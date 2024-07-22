@@ -4,55 +4,55 @@
 
 To activate the cctl shell application:
 
-```
+```bash copy
 . ./YOUR_WORKING_DIRECTORY/cctl/activate
 ```
 
 To view full set of commands:  
 
-```
+```bash copy
 cctl-[TAB]
 ```
 
 To view commands to start, stop, & set up a network:
 
-```
+```bash copy
 cctl-infra-net-[TAB]
 ```
 
 To view commands to control or query with a node:
 
-```
+```bash copy
 cctl-infra-node-[TAB]
 ```
 
 To view commands to compile network binaries:
 
-```
+```bash copy
 cctl-infra-bin-[TAB]
 ```
 
 To view commands to await progression of chain:
 
-```
+```bash copy
 cctl-chain-await-[TAB]
 ```
 
 To view commands to view chain state:
 
-```
+```bash copy
 cctl-chain-view-[TAB]
 ```
 
 To view commands to send transactions into the network:
 
-```
+```bash copy
 cctl-tx-[TAB]
 ```
 
 To view help text for a command, type command name followed by help. For example:
 
-```
+```bash copy
 cctl-infra-bin-compile help
 ```
 
@@ -60,7 +60,7 @@ cctl-infra-bin-compile help
 
 Prior to testing a network ensure that the binary set is available:
 
-```
+```bash copy
 cctl-infra-bin-compile mode=[debug|release]
 ```
 
@@ -68,7 +68,7 @@ cctl-infra-bin-compile mode=[debug|release]
 
 Upon successful compilation of binaries one can proceed to setting up the assets required to run a local network with a set of pre-funded test accounts.  The assets are copied to `$CCTL/assets`, where $CCTL is the cctl home directory.  
 
-```
+```bash copy
 cctl-infra-net-setup
 ```
 
@@ -104,13 +104,13 @@ cctl-infra-net-setup
 
 To setup & start a network type following commands:
 
-```
+```bash copy
 cctl-infra-net-setup && cctl-infra-net-start
 ```
 
 - To view process status of all nodes:
 
-```
+```bash copy
 cctl-infra-net-status
 ```
 
@@ -120,7 +120,7 @@ NOTE - when viewing network status then you should observe 10 nodes, of which 5 
 
 You can view chain state using the set of `cctl-chain-view-*` commands.  For example:
 
-```
+```bash copy
 # View chain state.
 cctl-chain-view-auction-info
 cctl-chain-view-block
@@ -144,7 +144,7 @@ cctl-chain-view-genesis-chainspec
 
 To teardown a network once a dev/test session is complete:
 
-```
+```bash copy
 cctl-infra-net-teardown
 ```
 

@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-node-view-paths
+    cctl-infra-sidecar-view-paths
 
     DESCRIPTION
     ----------------------------------------------------------------

@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-node-view-ports
+    cctl-infra-sidecar-view-ports
 
     DESCRIPTION
     ----------------------------------------------------------------
