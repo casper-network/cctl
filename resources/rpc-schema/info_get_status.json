@@ -15,6 +15,7 @@
         "chainspec_name",
         "last_progress",
         "peers",
+        "protocol_version",
         "reactor_state",
         "starting_state_root_hash",
         "uptime"
@@ -23,6 +24,10 @@
         "api_version": {
           "description": "The RPC API version.",
           "type": "string"
+        },
+        "protocol_version": {
+          "description": "The current Casper protocol version.",
+          "$ref": "#/components/schemas/ProtocolVersion"
         },
         "peers": {
           "description": "The node ID and network address of each connected peer.",
@@ -127,6 +132,7 @@
         "name": "info_get_status_example_result",
         "value": {
           "api_version": "2.0.0",
+          "protocol_version": "2.0.0",
           "peers": [
             {
               "node_id": "tls:0101..0101",
@@ -137,7 +143,7 @@
           "chainspec_name": "casper-example",
           "starting_state_root_hash": "0000000000000000000000000000000000000000000000000000000000000000",
           "last_added_block_info": {
-            "hash": "40fa940e609972313a6d598712fcb9cced789ed237bdac67aa1fe546e624c884",
+            "hash": "0744fcb72af43c5cc372039bc5a8bfee48808a9ce414acc0d6338a628c20eb42",
             "timestamp": "2020-11-17T00:39:24.072Z",
             "era_id": 1,
             "height": 10,
