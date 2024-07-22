@@ -13,10 +13,10 @@ ARG CLIENT_REPO=https://github.com/casper-ecosystem/casper-client-rs.git
 ARG SIDECAR_REPO=https://github.com/casper-network/casper-sidecar.git
 
 ARG NODE_COMMIT=
-ARG NODE_GITBRANCH=feat-2.0
-ARG CLIENT_GITBRANCH=release-2.0.0
+ARG NODE_GITBRANCH=release-2.0.0-rc3
+ARG CLIENT_GITBRANCH=feat-track-node-2.0
 ARG CLIENT_COMMIT=
-ARG SIDECAR_GITBRANCH=feat-2.0
+ARG SIDECAR_GITBRANCH=release-1.0.0rc2_node-2.0.0rc3
 ARG SIDECAR_COMMIT=
 
 RUN apt-get update \
@@ -34,12 +34,12 @@ ENV PATH="$PATH:/root/.cargo/bin"
 
 RUN git clone https://github.com/casper-network/casper-node-launcher.git
 RUN if [ -n "$NODE_COMMIT" ]; then \
-        git clone -b $NODE_COMMIT $NODE_REPO; \
+        git clone $NODE_REPO && cd casper-node && git checkout $NODE_COMMIT && cd ..; \
     else \
         git clone -b $NODE_GITBRANCH $NODE_REPO; \
     fi \
     && if [ -n "$CLIENT_COMMIT" ]; then \
-        git clone -b $CLIENT_COMMIT $CLIENT_REPO; \
+        git clone $CLIENT_REPO && cd casper-client-rs && git checkout $CLIENT_COMMIT && cd ..; \
     else \
         git clone -b $CLIENT_GITBRANCH $CLIENT_REPO; \
     fi \
@@ -95,9 +95,9 @@ RUN echo "source $CCTL/activate" >> .bashrc
 COPY --chown=cctl:cctl ./docker/start.sh .
 RUN chmod +x start.sh
 
-EXPOSE 11101-11105 14101-14105 18101-18105 25101-25101
+EXPOSE 11101-11105 12101-12105 13101-13105 14101-14105 21101-21105 22101-22105
 
 HEALTHCHECK --interval=10s --timeout=5s --retries=4 --start-period=20s \
-    CMD curl --silent --location 'http://127.0.0.1:11101/rpc' --header 'Content-Type: application/json' --data '{"id": "1", "jsonrpc": "2.0", "method": "info_get_status", "params": []}' | jq -e -n 'input.result.reactor_state' | grep "Validate"
+    CMD curl --silent --location 'http://127.0.0.1:21101/rpc' --header 'Content-Type: application/json' --data '{"id": "1", "jsonrpc": "2.0", "method": "info_get_status", "params": []}' | jq -e -n 'input.result.reactor_state' | grep "Validate"
 
 CMD ["/bin/bash", "-c", "source start.sh"]

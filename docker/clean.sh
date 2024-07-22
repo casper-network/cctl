@@ -19,3 +19,4 @@ rm -r casper-sidecar/target/release/.fingerprint
 rm -r casper-node/.git
 rm -r casper-client-rs/.git
 rm -r casper-node-launcher/.git
+rm -r casper-sidecar/.git
