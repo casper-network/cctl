@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-node-view-paths
+    cctl-infra-sidecar-view-paths
 
     DESCRIPTION
     ----------------------------------------------------------------
@@ -25,11 +25,14 @@ function _main()
     local NODE_ID=${1}
 
     if [ "$NODE_ID" = "all" ]; then
+        log "------------------------------------------------------------------------------------------------------"
+        log "SIDECAR PATHS"
+        log "------------------------------------------------------------------------------------------------------"
         for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
         do
             _display_paths "$NODE_ID"
+            log "------------------------------------------------------------------------------------------------------"
         done
-        log "------------------------------------------------------------------------------------------------------"
     else
         _display_paths "$NODE_ID"
         log "------------------------------------------------------------------------------------------------------"
@@ -39,27 +42,16 @@ function _main()
 function _display_paths()
 {
     local NODE_ID=${1}
-    local PATH_TO_NODE="$(get_path_to_node "$NODE_ID")"
+    local PATH_TO_SIDECAR="$(get_path_to_sidecar "$NODE_ID")"
 
-    log "------------------------------------------------------------------------------------------------------"
-    log "Paths of node-$NODE_ID assets:"
-    log "------------------------------------------------------------------------------------------------------"
-    log "binaries"
-    log "... $PATH_TO_NODE/bin/casper-node-launcher"
-    log "... $PATH_TO_NODE/bin/2_0_0/casper-node"
-    log "config"
-    log "... $PATH_TO_NODE/config/casper-node-launcher-state.toml"
-    log "... $PATH_TO_NODE/config/2_0_0/accounts.toml"
-    log "... $PATH_TO_NODE/config/2_0_0/chainspec.toml"
-    log "... $PATH_TO_NODE/config/2_0_0/config.toml"
-    log "keys"
-    log "... $PATH_TO_NODE/keys/public_key_hex"
-    log "... $PATH_TO_NODE/keys/public_key.pem"
-    log "... $PATH_TO_NODE/keys/secret_key.pem"
-    log "logs"
-    log "... $PATH_TO_NODE/logs/node-stderr.log"
-    log "... $PATH_TO_NODE/logs/node-stdout.log"
-    log "... $PATH_TO_NODE/storage/$CCTL_NET_NAME"
+    log "SIDECAR-$NODE_ID"
+    log "    binaries"
+    log "        $PATH_TO_SIDECAR/bin/casper-sidecar"
+    log "    config"
+    log "        $PATH_TO_SIDECAR/config/sidecar.toml"
+    log "    logs"
+    log "        $PATH_TO_SIDECAR/logs/sidecar-stderr.log"
+    log "        $PATH_TO_SIDECAR/logs/sidecar-stdout.log"
 }
 
 # ----------------------------------------------------------------
