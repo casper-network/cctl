@@ -25,16 +25,16 @@ function _main()
     local NODE_ID=${1}
 
     if [ "$NODE_ID" = "all" ]; then
-        for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
+        for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
         do
-            if [ $(get_node_is_up "$NODE_ID") = true ]; then
+            if [ $(get_is_node_up "$NODE_ID") = true ]; then
                 echo "------------------------------------------------------------------------------------------------------------------------------------"
                 _display_reactor_state "$NODE_ID"
             fi
         done
         echo "------------------------------------------------------------------------------------------------------------------------------------"
     else
-        if [ $(get_node_is_up "$NODE_ID") = true ]; then
+        if [ $(get_is_node_up "$NODE_ID") = true ]; then
             _display_reactor_state "$NODE_ID"
         else
             log_warning "node $NODE_ID is not running"
@@ -45,25 +45,20 @@ function _main()
 function _display_reactor_state()
 {
     local NODE_ID=${1}
-    local NODE_ADDRESS_CURL=$(get_node_address_rpc_for_curl "$NODE_ID")
-    local NODE_API_RESPONSE
-    
-    NODE_API_RESPONSE=$(
+
+    local API_ENDPOINT="$(get_address_of_node_rest_server "$NODE_ID")"/status
+    local API_RESPONSE=$(
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES --header 'Content-Type: application/json' \
-            --request POST "$NODE_ADDRESS_CURL" \
-            --data-raw '{
-                "id": 1,
-                "jsonrpc": "2.0",
-                "method": "info_get_status"
-            }' \
-            | jq '.result.reactor_state' \
+            --location \
+            --request GET "$API_ENDPOINT" \
+            | jq '.reactor_state' \
             | sed -e 's/^"//' -e 's/"$//'
     )
 
-    if [ -z "$NODE_API_RESPONSE" ]; then
+    if [ -z "$API_RESPONSE" ]; then
         log "node #$NODE_ID reactor state: N/A"
     else
-        log "node #$NODE_ID reactor state = $NODE_API_RESPONSE"
+        log "node #$NODE_ID reactor state = $API_RESPONSE"
     fi
 }
 

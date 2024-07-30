@@ -1,15 +1,18 @@
-version: '3.8'
 services:
   cctl:
     build:
       context: .
       args:
-        NODE_GITBRANCH: release-1.5.6
-        CLIENT_GITBRANCH: release-2.0.0
+        - NODE_GITBRANCH=release-2.0.0-rc3
+        - CLIENT_GITBRANCH=feat-track-node-2.0
+        - CLIENT_COMMIT=317051ddfb372d9404850c6a1787f225d6d32b4e
+        - SIDECAR_GITBRANCH=release-1.0.0rc2_node-2.0.0rc3
     container_name: cspr-cctl
-    image: cspr-cctl/release-1.5.6
+    image: cspr-cctl/release-2.0.0-rc3
     ports:
-      - 25101:25101
-      - 11101:11101
-      - 14101:14101
-      - 18101:18101
+      - 11101-11105:11101-11105
+      - 12101-12105:12101-12105
+      - 13101-13105:13101-13105
+      - 14101-14105:14101-14105
+      - 21101-21105:21101-21105
+      - 22101-22105:22101-22105

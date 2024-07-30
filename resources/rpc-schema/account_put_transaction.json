@@ -1,0 +1,123 @@
+{
+  "name": "account_put_transaction",
+  "summary": "receives a Transaction to be executed by the network",
+  "params": [
+    {
+      "name": "transaction",
+      "schema": {
+        "description": "The `Transaction`.",
+        "$ref": "#/components/schemas/Transaction"
+      },
+      "required": true
+    }
+  ],
+  "result": {
+    "name": "account_put_transaction_result",
+    "schema": {
+      "description": "Result for \"account_put_transaction\" RPC response.",
+      "type": "object",
+      "required": [
+        "api_version",
+        "transaction_hash"
+      ],
+      "properties": {
+        "api_version": {
+          "description": "The RPC API version.",
+          "type": "string"
+        },
+        "transaction_hash": {
+          "description": "The transaction hash.",
+          "$ref": "#/components/schemas/TransactionHash"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "examples": [
+    {
+      "name": "account_put_transaction_example",
+      "params": [
+        {
+          "name": "transaction",
+          "value": {
+            "Version1": {
+              "hash": "52a75f3651e450cc2c3ed534bf130bae2515950707d70bb60067aada30b97ca8",
+              "header": {
+                "chain_name": "casper-example",
+                "timestamp": "2020-11-17T00:39:24.072Z",
+                "ttl": "1h",
+                "body_hash": "8c36f401d829378219b676ac6cceef90b08171499f5f5726ab5021df46d8b824",
+                "pricing_mode": {
+                  "Fixed": {
+                    "gas_price_tolerance": 5
+                  }
+                },
+                "initiator_addr": {
+                  "PublicKey": "01d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c"
+                }
+              },
+              "body": {
+                "args": [
+                  [
+                    "source",
+                    {
+                      "cl_type": {
+                        "Option": "URef"
+                      },
+                      "bytes": "010a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a07",
+                      "parsed": "uref-0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a-007"
+                    }
+                  ],
+                  [
+                    "target",
+                    {
+                      "cl_type": "URef",
+                      "bytes": "1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b00",
+                      "parsed": "uref-1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b-000"
+                    }
+                  ],
+                  [
+                    "amount",
+                    {
+                      "cl_type": "U512",
+                      "bytes": "0500ac23fc06",
+                      "parsed": "30000000000"
+                    }
+                  ],
+                  [
+                    "id",
+                    {
+                      "cl_type": {
+                        "Option": "U64"
+                      },
+                      "bytes": "01e703000000000000",
+                      "parsed": 999
+                    }
+                  ]
+                ],
+                "target": "Native",
+                "entry_point": "Transfer",
+                "scheduling": "Standard"
+              },
+              "approvals": [
+                {
+                  "signer": "01d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c",
+                  "signature": "012eaaf83b1ed367ed424c859974bc5115a62d6b10d635f4b39d380414c4abcb2d54c01b7b96e0d27e00ed913f05f06d7bee9c25c31bbd8e9215961e61f835250d"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "result": {
+        "name": "account_put_transaction_example_result",
+        "value": {
+          "api_version": "2.0.0",
+          "transaction_hash": {
+            "Version1": "52a75f3651e450cc2c3ed534bf130bae2515950707d70bb60067aada30b97ca8"
+          }
+        }
+      }
+    }
+  ]
+}

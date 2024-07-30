@@ -54,16 +54,16 @@ function _main()
     local GAS_PAYMENT=$CCTL_DEFAULT_GAS_PAYMENT
     local NODE_ADDRESS
     local OUTPUT
-    local PATH_TO_CLIENT=$(get_path_to_client)
+    local PATH_TO_CLIENT=$(get_path_to_node_client)
     local PATH_TO_CONTRACT="$(get_path_to_assets)"/bin/transfer_to_account_u512.wasm
     local SUCCESSFUL_DISPATCH_COUNT=0
 
     if [ "$NODE_ID" == "random" ]; then
         unset NODE_ADDRESS
     elif [ "$NODE_ID" -eq 0 ]; then
-        NODE_ADDRESS=$(get_node_address_rpc)
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server)
     else
-        NODE_ADDRESS=$(get_node_address_rpc "$NODE_ID")
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server "$NODE_ID")
     fi
 
     if [ $VERBOSE == true ]; then
@@ -83,7 +83,7 @@ function _main()
     while [ $DISPATCH_ATTEMPTS -lt "$TRANSFERS" ]; do
         # Increment counts.
         DISPATCH_ATTEMPTS=$((DISPATCH_ATTEMPTS + 1))
-        DISPATCH_NODE_ADDRESS=${NODE_ADDRESS:-$(get_node_address_rpc)}
+        DISPATCH_NODE_ADDRESS=${NODE_ADDRESS:-$(get_address_of_sidecar_main_server)}
 
         # Dispatch deploy.
         if [ $TYPEOF == "wasm" ]; then

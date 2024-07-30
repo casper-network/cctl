@@ -97,21 +97,17 @@ docker exec -t -i  cspr-cctl /bin/bash
 cctl-chain-view-genesis-chainspec
 ```
 
-[TODO: Add a deploy example]
-
 To view how cctl can be used within a project view the following Terminus SDK test projects:
 
-[TODO: Add the links once the Terminus project have migrated to CCTL]
+- [Java](https://github.com/casper-sdks/terminus-java-tests)
 
-- Java
+- [Python](https://github.com/casper-sdks/terminus-python-tests)
 
-- Python
+- [Go](https://github.com/casper-sdks/terminus-go-tests)
 
-- Go
+- [JS](https://github.com/casper-sdks/terminus-js-tests)
 
-- JS
-
-- C#
+- [C#](https://github.com/casper-sdks/terminus-dotnet-tests)
 
 ### Pre-built images
 

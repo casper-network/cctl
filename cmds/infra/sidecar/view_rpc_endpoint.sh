@@ -4,7 +4,7 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-node-view-rpc-endpoint
+    cctl-infra-sidecar-view-rpc-endpoint
 
     DESCRIPTION
     ----------------------------------------------------------------
@@ -19,18 +19,19 @@ function _main()
     if [ "$ENDPOINT" = "all" ]; then
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \
-            --request POST "$(get_node_address_rpc_for_curl)" \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
             --data-raw '{
                 "id": 1,
                 "jsonrpc": "2.0",
                 "method": "rpc.discover"
             }' \
             | jq '.result.schema.methods[].name' \
-            | sed -e 's/^"//' -e 's/"$//'
+            | sed -e 's/^"//' -e 's/"$//' \
+            | sort
     else
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \
-            --request POST "$(get_node_address_rpc_for_curl)" \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
             --data-raw '{
                 "id": 1,
                 "jsonrpc": "2.0",

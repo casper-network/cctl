@@ -4,21 +4,19 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-chain-view-account-balance
+    cctl-infra-net-status
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Displays an account balance at a state root hash.
-
-    ARGS
-    ----------------------------------------------------------------
-    root        State root hash at a specific block height, defaults to tip.  Optional.
+    Displays process status of each network node.
     "
 }
 
 function _main()
 {
-    echo 123
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+
+    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" status all || true
 }
 
 # ----------------------------------------------------------------
@@ -28,7 +26,6 @@ function _main()
 source "$CCTL"/utils/main.sh
 
 unset _HELP
-unset _STATE_ROOT_HASH
 
 for ARGUMENT in "$@"
 do
@@ -36,7 +33,6 @@ do
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
     case "$KEY" in
         help) _HELP="show" ;;
-        root) _STATE_ROOT_HASH=${VALUE} ;;
         *)
     esac
 done
@@ -44,5 +40,5 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    _main "$_STATE_ROOT_HASH"
+    _main
 fi

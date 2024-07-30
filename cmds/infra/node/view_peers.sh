@@ -25,14 +25,14 @@ function _main()
     local NODE_ID=${1}
 
     if [ "$NODE_ID" = "all" ]; then
-        for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
+        for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
         do
-            if [ $(get_node_is_up "$NODE_ID") = true ]; then
+            if [ $(get_is_node_up "$NODE_ID") = true ]; then
                 _display_peers "$NODE_ID"
             fi
         done
     else
-        if [ $(get_node_is_up "$NODE_ID") = true ]; then
+        if [ $(get_is_node_up "$NODE_ID") = true ]; then
             _display_peers "$NODE_ID"
         else
             log_warning "node $NODE_ID is not running"
@@ -43,26 +43,19 @@ function _main()
 function _display_peers()
 {
     local NODE_ID=${1}
-    local NODE_ADDRESS_CURL
-    local NODE_API_RESPONSE
-    
-    NODE_ADDRESS_CURL=$(get_node_address_rpc_for_curl "$NODE_ID")
-    NODE_API_RESPONSE=$(
-        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
-            -s \
-            --header 'Content-Type: application/json' \
-            --request POST "$NODE_ADDRESS_CURL" \
-            --data-raw '{
-                "id": 1,
-                "jsonrpc": "2.0",
-                "method": "info_get_peers"
-            }' | jq '.result.peers | sort_by(.address)'
+
+    local API_ENDPOINT="$(get_address_of_node_rest_server "$NODE_ID")"/status
+    local API_RESPONSE=$(
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES --header 'Content-Type: application/json' \
+            --location \
+            --request GET "$API_ENDPOINT" \
+            | jq '.peers | sort_by(.address)'
     )
 
     log "------------------------------------------------------------------------------------------------------"
     log "peers of node $NODE_ID"
     log "------------------------------------------------------------------------------------------------------"
-    echo "$NODE_API_RESPONSE" | jq
+    echo "$API_RESPONSE" | jq
 }
 
 # ----------------------------------------------------------------

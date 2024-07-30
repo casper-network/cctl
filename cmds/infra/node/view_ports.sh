@@ -23,9 +23,9 @@ function _help() {
 function _main()
 {
     local NODE_ID=${1}
-    
+
     if [ "$NODE_ID" = "all" ]; then
-        for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
+        for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
         do
             log "------------------------------------------------------------------------------------------------------"
             _display_ports "$NODE_ID"
@@ -39,18 +39,17 @@ function _main()
 function _display_ports()
 {
     local NODE_ID=${1}
-    local PORT_REST
-    local PORT_RPC
-    local PORT_SSE
-    local PORT_SPECULATIVE_EXEC
 
-    PORT_BIND=$(get_node_port_bind "$NODE_ID")
-    PORT_REST=$(get_node_port_rest "$NODE_ID")
-    PORT_RPC=$(get_node_port_rpc "$NODE_ID")
-    PORT_SSE=$(get_node_port_sse "$NODE_ID")
-    PORT_SPECULATIVE_EXEC=$(get_node_port_speculative_exec "$NODE_ID")
+    local PORT_NODE_BINARY=$(get_port_of_node_binary_server "$NODE_ID")
+    local PORT_NODE_NET_BIND=$(get_port_of_node_to_net_bind "$NODE_ID")
+    local PORT_NODE_REST=$(get_port_of_node_rest_server "$NODE_ID")
+    local PORT_NODE_SSE=$(get_port_of_node_sse_server "$NODE_ID")
 
-    log "node-$NODE_ID -> CONSENSUS @ $PORT_BIND :: RPC @ $PORT_RPC :: REST @ $PORT_REST :: SSE @ $PORT_SSE :: SPECULATIVE_EXEC @ $PORT_SPECULATIVE_EXEC"
+    log "NODE-$NODE_ID"
+    log "    PROTOCOL ----> $PORT_NODE_NET_BIND"
+    log "    BINARY ------> $PORT_NODE_BINARY"
+    log "    REST --------> $PORT_NODE_REST"
+    log "    SSE ---------> $PORT_NODE_SSE"
 }
 
 # ----------------------------------------------------------------

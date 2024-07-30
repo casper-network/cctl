@@ -4,19 +4,31 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-net-status
+    cctl-infra-node-clean
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Displays process status of each network node.
+    Cleans node logs & data.
+
+    ARGS
+    ----------------------------------------------------------------
+    node        Ordinal identifier of node to be cleaned.
     "
 }
 
 function _main()
 {
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
+    local NODE_ID=${1}
 
-    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" status all || true
+    if [ "$(get_is_node_up "$NODE_ID")" = true ]; then
+        log "Node $NODE_ID -> currently running ... please stop prior to cleaning"
+    else
+        do_node_clean_logs "$NODE_ID"
+        log "Node $NODE_ID -> logs cleaned"
+
+        do_node_clean_storage "$NODE_ID"
+        log "Node $NODE_ID -> storage cleaned"
+    fi
 }
 
 # ----------------------------------------------------------------
@@ -26,6 +38,7 @@ function _main()
 source "$CCTL"/utils/main.sh
 
 unset _HELP
+unset _NODE_ID
 
 for ARGUMENT in "$@"
 do
@@ -33,6 +46,7 @@ do
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
     case "$KEY" in
         help) _HELP="show" ;;
+        node) _NODE_ID=${VALUE} ;;
         *)
     esac
 done
@@ -40,6 +54,7 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    _main
+    log_break
+    _main "$_NODE_ID"
+    log_break
 fi
-

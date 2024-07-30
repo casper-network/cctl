@@ -20,8 +20,8 @@ function _help() {
     DEFAULTS
     ----------------------------------------------------------------
     accounts    static
-    chainspec   $(get_path_to_casper_node_resources)/local/chainspec.toml.in
-    config      $(get_path_to_casper_node_resources)/local/config.toml
+    chainspec   $(get_path_to_config_templates_of_node)/local/chainspec.toml.in
+    config      $(get_path_to_config_templates_of_node)/local/config.toml
     delay       30 seconds
 
     NOTES
@@ -36,42 +36,48 @@ function _main()
     local GENESIS_ACCOUNTS_TYPE=${1}
     local GENESIS_DELAY=${2}
     local PATH_TO_CHAINSPEC=${3}
-    local PATH_TO_NODE_CONFIG_TEMPLATE=${4}
+    local PATH_TO_CONFIG_TEMPLATE_OF_NODE=${4}
+    local PATH_TO_CONFIG_TEMPLATE_OF_SIDECAR=${5}
 
     local NODE_COUNT=10
     local NODE_COUNT_AT_GENESIS=5
     local USER_COUNT=10
 
-    log "network setup begins ... please wait"
+    log "Network setup begins"
+    log_break
 
-    log "... tearing down existing"
     _teardown
+    log "Network -> tore down existing"
 
-    log "... setting assets directory"
     _setup_fs "$NODE_COUNT" "$USER_COUNT"
+    log "Assets directory -> initialised"
 
-    log "... setting binaries"
     _setup_binaries "$NODE_COUNT"
+    log "Binaries -> assigned"
 
-    log "... setting wasm payloads"
     _setup_wasm
+    log "Wasm payloads -> assigned"
 
-    log "... setting cryptographic keys"
     _setup_keys "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$USER_COUNT"
+    log "Cryptographic keys -> assigned"
 
-    log "... setting supervisor config"
     _setup_supervisor "$NODE_COUNT"
+    log "Daemon supervisor -> assigned"
 
-    log "... setting genesis chainspec.toml"
     _setup_genesis_chainspec "$GENESIS_DELAY" "$NODE_COUNT" "$PATH_TO_CHAINSPEC"
+    log "Genesis chainspec.toml -> assigned"
 
-    log "... setting genesis accounts.toml"
     _setup_genesis_accounts "$GENESIS_ACCOUNTS_TYPE" "$NODE_COUNT" "$NODE_COUNT_AT_GENESIS" "$USER_COUNT"
+    log "Genesis accounts.toml -> assigned"
 
-    log "... setting node configs"
-    _setup_node_configs "$NODE_COUNT" "$PATH_TO_NODE_CONFIG_TEMPLATE"
+    _setup_config_of_nodes "$NODE_COUNT" "$PATH_TO_CONFIG_TEMPLATE_OF_NODE"
+    log "Node configuration files -> assigned"
 
-    log "network setup complete"
+    _setup_config_of_sidecars "$NODE_COUNT" "$PATH_TO_CONFIG_TEMPLATE_OF_SIDECAR"
+    log "Sidecar configuration files -> assigned"
+
+    log_break
+    log "Network setup complete"
 }
 
 function _setup_binaries()
@@ -79,17 +85,52 @@ function _setup_binaries()
     local NODE_COUNT=${1}
 
     local NODE_ID
-    local PATH_TO_BINARY_OF_CASPER_CLIENT=$(get_path_to_binary_of_casper_client)
-    local PATH_TO_BINARY_OF_CASPER_NODE=$(get_path_to_binary_of_casper_node)
-    local PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER=$(get_path_to_binary_of_casper_node_launcher)
+    local PATH_TO_BINARY_OF_CLIENT=$(get_path_to_compiled_client)
+    local PATH_TO_BINARY_OF_NODE=$(get_path_to_compiled_node)
+    local PATH_TO_BINARY_OF_NODE_LAUNCHER=$(get_path_to_compiled_node_launcher)
+    local PATH_TO_BINARY_OF_SIDECAR=$(get_path_to_compiled_sidecar)
     local PATH_TO_NODE_BIN
-    
-    cp "$PATH_TO_BINARY_OF_CASPER_CLIENT" "$(get_path_to_assets)"/bin
+    local PATH_TO_SIDECAR_BIN
+
+    cp "$PATH_TO_BINARY_OF_CLIENT" "$(get_path_to_assets)"/bin
+
     for NODE_ID in $(seq 1 "$NODE_COUNT")
     do
         PATH_TO_NODE_BIN="$(get_path_to_node "$NODE_ID")"/bin
-        cp "$PATH_TO_BINARY_OF_CASPER_NODE" "$PATH_TO_NODE_BIN/1_0_0"
-        cp "$PATH_TO_BINARY_OF_CASPER_NODE_LAUNCHER" "$PATH_TO_NODE_BIN"
+        cp "$PATH_TO_BINARY_OF_NODE" "$PATH_TO_NODE_BIN/2_0_0"
+        cp "$PATH_TO_BINARY_OF_NODE_LAUNCHER" "$PATH_TO_NODE_BIN"
+        cp "$PATH_TO_BINARY_OF_SIDECAR" "$PATH_TO_NODE_BIN/2_0_0"
+    done
+
+    for NODE_ID in $(seq 1 "$NODE_COUNT")
+    do
+        PATH_TO_SIDECAR_BIN="$(get_path_to_sidecar "$NODE_ID")"/bin
+        cp "$PATH_TO_BINARY_OF_SIDECAR" "$PATH_TO_SIDECAR_BIN"
+    done
+}
+
+function _setup_config_of_nodes()
+{
+    local NODE_COUNT=${1}
+    local PATH_TO_TEMPLATE_OF_CONFIG=${2}
+    local NODE_ID
+
+    for NODE_ID in $(seq 1 "$NODE_COUNT")
+    do
+        _setup_node_genesis_config $NODE_ID
+        _setup_node_binary_config $NODE_ID $PATH_TO_TEMPLATE_OF_CONFIG
+    done
+}
+
+function _setup_config_of_sidecars()
+{
+    local NODE_COUNT=${1}
+    local PATH_TO_TEMPLATE_OF_CONFIG=${2}
+    local NODE_ID
+
+    for NODE_ID in $(seq 1 "$NODE_COUNT")
+    do
+        _setup_sidecar_config $NODE_ID $PATH_TO_TEMPLATE_OF_CONFIG
     done
 }
 
@@ -100,6 +141,7 @@ function _setup_fs()
 
     local PATH_TO_ASSETS=$(get_path_to_assets)
     local PATH_TO_NODE
+    local PATH_TO_SIDECAR
     local IDX
 
     mkdir -p "$PATH_TO_ASSETS"
@@ -111,6 +153,7 @@ function _setup_fs()
     mkdir "$PATH_TO_ASSETS/faucet"
     mkdir "$PATH_TO_ASSETS/genesis"
     mkdir "$PATH_TO_ASSETS/nodes"
+    mkdir "$PATH_TO_ASSETS/sidecars"
     mkdir "$PATH_TO_ASSETS/users"
 
     for IDX in $(seq 1 "$NODE_COUNT")
@@ -118,12 +161,21 @@ function _setup_fs()
         PATH_TO_NODE="$PATH_TO_ASSETS"/nodes/node-"$IDX"
         mkdir "$PATH_TO_NODE"
         mkdir "$PATH_TO_NODE/bin"
-        mkdir "$PATH_TO_NODE/bin/1_0_0"
+        mkdir "$PATH_TO_NODE/bin/2_0_0"
         mkdir "$PATH_TO_NODE/config"
-        mkdir "$PATH_TO_NODE/config/1_0_0"
+        mkdir "$PATH_TO_NODE/config/2_0_0"
         mkdir "$PATH_TO_NODE/keys"
         mkdir "$PATH_TO_NODE/logs"
         mkdir "$PATH_TO_NODE/storage"
+    done
+
+    for IDX in $(seq 1 "$NODE_COUNT")
+    do
+        PATH_TO_SIDECAR="$PATH_TO_ASSETS"/sidecars/sidecar-"$IDX"
+        mkdir "$PATH_TO_SIDECAR"
+        mkdir "$PATH_TO_SIDECAR/bin"
+        mkdir "$PATH_TO_SIDECAR/config"
+        mkdir "$PATH_TO_SIDECAR/logs"
     done
 
     for IDX in $(seq 1 "$USER_COUNT")
@@ -216,7 +268,7 @@ EOM
 function _setup_genesis_accounts_static()
 {
     cp \
-        "$CCTL"/resources/static/accounts/accounts.toml \
+        "$CCTL"/resources/accounts/accounts.toml \
         "$(get_path_to_assets)"/genesis/accounts.toml
 }
 
@@ -228,7 +280,7 @@ function _setup_genesis_chainspec()
 
     local ACTIVATION_POINT=$(get_genesis_timestamp "$GENESIS_DELAY")
     local PATH_TO_CHAINSPEC="$(get_path_to_assets)/genesis/chainspec.toml"
-    local PROTOCOL_VERSION=1.0.0
+    local PROTOCOL_VERSION=2.0.0
     local SCRIPT
 
     cp "$PATH_TO_CHAINSPEC_TEMPLATE" "$PATH_TO_CHAINSPEC"
@@ -266,21 +318,18 @@ function _setup_keys_dynamic()
 
     local PATH_TO_ASSETS=$(get_path_to_assets)
     local IDX
-    local CASPER_CLIENT="$(get_path_to_client)"
+    local CASPER_CLIENT="$(get_path_to_node_client)"
 
-    "$CASPER_CLIENT" \
-        keygen -f "$PATH_TO_ASSETS/faucet" > /dev/null 2>&1
+    "$CASPER_CLIENT" keygen -f "$PATH_TO_ASSETS/faucet" > /dev/null 2>&1
 
     for IDX in $(seq 1 "$NODE_COUNT")
     do
-        "$CASPER_CLIENT" \
-            keygen -f "$PATH_TO_ASSETS/nodes/node-$IDX/keys" > /dev/null 2>&1
+        "$CASPER_CLIENT" keygen -f "$PATH_TO_ASSETS/nodes/node-$IDX/keys" > /dev/null 2>&1
     done
 
     for IDX in $(seq 1 "$USER_COUNT")
     do
-        "$CASPER_CLIENT" \
-            keygen -f "$PATH_TO_ASSETS/users/user-$IDX" > /dev/null 2>&1
+        "$CASPER_CLIENT" keygen -f "$PATH_TO_ASSETS/users/user-$IDX" > /dev/null 2>&1
     done
 }
 
@@ -289,70 +338,59 @@ function _setup_keys_static()
     local IDX
 
     cp \
-        "$CCTL"/resources/static/accounts/faucet/* \
+        "$CCTL"/resources/accounts/faucet/* \
         "$(get_path_to_assets)"/faucet
 
     for IDX in $(seq 1 "$NODE_COUNT")
     do
         cp \
-            "$CCTL"/resources/static/accounts/nodes/node-$IDX/* \
+            "$CCTL"/resources/accounts/nodes/node-$IDX/* \
             "$(get_path_to_assets)"/nodes/node-$IDX/keys
     done
 
     for IDX in $(seq 1 "$USER_COUNT")
     do
         cp \
-            "$CCTL"/resources/static/accounts/users/user-$IDX/* \
+            "$CCTL"/resources/accounts/users/user-$IDX/* \
             "$(get_path_to_assets)"/users/user-$IDX
     done
 }
 
-function _setup_node_configs()
-{
-    local NODE_COUNT=${1}
-    local PATH_TO_NODE_CONFIG_TEMPLATE=${2}
-
-    local NODE_ID
-    local PATH_TO_ASSETS=$(get_path_to_assets)
-
-    for NODE_ID in $(seq 1 "$NODE_COUNT")
-    do
-        _setup_node_config $NODE_ID $PATH_TO_NODE_CONFIG_TEMPLATE
-    done
-}
-
-function _setup_node_config()
+function _setup_node_genesis_config()
 {
     local NODE_ID=${1}
-    local PATH_TO_NODE_CONFIG_TEMPLATE=${2}
 
-    local PATH_TO_ASSETS=$(get_path_to_assets)
-    local PATH_TO_NODE_CONFIG
+    local PATH_TO_NODE_CONFIG_DIR="$(get_path_to_node "$NODE_ID")/config/2_0_0"
+
+    cp "$(get_path_to_assets)/genesis/accounts.toml" "$PATH_TO_NODE_CONFIG_DIR"
+    cp "$(get_path_to_assets)/genesis/chainspec.toml" "$PATH_TO_NODE_CONFIG_DIR"
+}
+
+function _setup_node_binary_config()
+{
+    local NODE_ID=${1}
+    local PATH_TO_TEMPLATE_OF_CONFIG=${2}
+
+    local PATH_TO_CONFIG
     local SCRIPT
 
-    PATH_TO_NODE_CONFIG_DIR="$(get_path_to_node "$NODE_ID")/config/1_0_0"
-    PATH_TO_NODE_CONFIG="$PATH_TO_NODE_CONFIG_DIR/config.toml"
-
-    cp "$PATH_TO_ASSETS/genesis/accounts.toml" "$PATH_TO_NODE_CONFIG_DIR"
-    cp "$PATH_TO_ASSETS/genesis/chainspec.toml" "$PATH_TO_NODE_CONFIG_DIR"
-
-    cp "$PATH_TO_NODE_CONFIG_TEMPLATE" "$PATH_TO_NODE_CONFIG"
-    chmod 644 "$PATH_TO_NODE_CONFIG"
+    PATH_TO_CONFIG="$(get_path_to_node "$NODE_ID")/config/2_0_0/config.toml"
+    cp "$PATH_TO_TEMPLATE_OF_CONFIG" "$PATH_TO_CONFIG"
+    chmod 644 "$PATH_TO_CONFIG"
 
     SCRIPT=(
         "import toml;"
-        "cfg=toml.load('$PATH_TO_NODE_CONFIG');"
+        "cfg=toml.load('$PATH_TO_TEMPLATE_OF_CONFIG');"
+        "cfg['binary_port_server']['address']='0.0.0.0:$(get_port_of_node_binary_server "$NODE_ID")';"
         "cfg['consensus']['secret_key_path']='../../keys/secret_key.pem';"
-        "cfg['logging']['format']='json';"
-        "cfg['network']['bind_address']='$(get_network_bind_address "$NODE_ID")';"
-        "cfg['network']['known_addresses']=[$(get_network_known_addresses "$NODE_ID")];"
-        "cfg['storage']['path']='../../storage';"
-        "cfg['rest_server']['address']='0.0.0.0:$(get_node_port_rest "$NODE_ID")';"
-        "cfg['rpc_server']['address']='0.0.0.0:$(get_node_port_rpc "$NODE_ID")';"
-        "cfg['event_stream_server']['address']='0.0.0.0:$(get_node_port_sse "$NODE_ID")';"
         "cfg['diagnostics_port']['enabled']=False;"
-        "cfg['speculative_exec_server']['address']='0.0.0.0:$(get_node_port_speculative_exec "$NODE_ID")';"
-        "toml.dump(cfg, open('$PATH_TO_NODE_CONFIG', 'w'));"
+        "cfg['event_stream_server']['address']='0.0.0.0:$(get_port_of_node_sse_server "$NODE_ID")';"
+        "cfg['logging']['format']='json';"
+        "cfg['network']['bind_address']='$(get_address_of_node_net_bind "$NODE_ID")';"
+        "cfg['network']['known_addresses']=[$(get_network_known_addresses "$NODE_ID")];"
+        "cfg['rest_server']['address']='0.0.0.0:$(get_port_of_node_rest_server "$NODE_ID")';"
+        "cfg['storage']['path']='../../storage';"
+        "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
     )
     python3 -c "${SCRIPT[*]}"
 }
@@ -375,16 +413,47 @@ function _get_node_pos_stake_weight()
     echo $POS_WEIGHT
 }
 
+function _setup_sidecar_config()
+{
+    local NODE_ID=${1}
+    local PATH_TO_TEMPLATE=${2}
+
+    local PATH_TO_CONFIG="$(get_path_to_sidecar "$NODE_ID")/config/sidecar.toml"
+    local SCRIPT
+
+    if [ "$(get_os)" = "macosx" ]; then
+        cp "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
+    else
+        cp --no-preserve=mode "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
+    fi
+
+    SCRIPT=(
+        "import toml;"
+        "cfg=toml.load('$PATH_TO_CONFIG');"
+        "cfg['rpc_server']['main_server']['address']='0.0.0.0:$(get_port_of_sidecar_main_server  "$NODE_ID")';"
+        "cfg['rpc_server']['speculative_exec_server']['address']='0.0.0.0:$(get_port_of_sidecar_speculative_exec_server "$NODE_ID")';"
+        "cfg['rpc_server']['node_client']['address']='0.0.0.0:$(get_port_of_node_binary_server "$NODE_ID")';"
+        "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
+    )
+    python3 -c "${SCRIPT[*]}"
+}
+
 function _setup_supervisor()
 {
     local NODE_COUNT=${1}
 
     local PATH_TO_ASSETS=$(get_path_to_assets)
+    local PATH_TO_NODE
     local PATH_TO_NODE_BIN
     local PATH_TO_NODE_CONFIG
     local PATH_TO_NODE_LOGS
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCK=$(get_path_to_net_supervisord_sock)
+
+    local PATH_TO_SIDECAR_BIN
+    local PATH_TO_SIDECAR_CONFIG
+    local PATH_TO_SIDECAR_LOGS
+
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCK=$(get_path_to_supervisord_sock)
 
     touch "$PATH_TO_SUPERVISOR_CONFIG"
 
@@ -407,12 +476,16 @@ supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 serverurl=unix:///$PATH_TO_SUPERVISOR_SOCK ;
 EOM
 
-# Set supervisord.conf app sections.
+# Set supervisord.conf node application sections.
 for IDX in $(seq 1 "$NODE_COUNT")
 do
+    PATH_TO_NODE="$(get_path_to_node "$IDX")"
     PATH_TO_NODE_BIN="$(get_path_to_node "$IDX")"/bin
     PATH_TO_NODE_CONFIG="$(get_path_to_node "$IDX")"/config
     PATH_TO_NODE_LOGS=$(get_path_to_node_logs "$IDX")
+    PATH_TO_SIDECAR_BIN="$(get_path_to_sidecar "$IDX")"/bin
+    PATH_TO_SIDECAR_CONFIG="$(get_path_to_sidecar "$IDX")"/config
+    PATH_TO_SIDECAR_LOGS="$(get_path_to_sidecar "$IDX")"/logs
 
     cat >> "$PATH_TO_SUPERVISOR_CONFIG" <<- EOM
 
@@ -427,10 +500,28 @@ startsecs=0
 stopsignal=TERM
 stopwaitsecs=5
 stopasgroup=true
-stderr_logfile=$PATH_TO_NODE_LOGS/stderr.log ;
+stderr_logfile=$PATH_TO_NODE_LOGS/node-stderr.log ;
 stderr_logfile_backups=5 ;
 stderr_logfile_maxbytes=500MB ;
-stdout_logfile=$PATH_TO_NODE_LOGS/stdout.log ;
+stdout_logfile=$PATH_TO_NODE_LOGS/node-stdout.log ;
+stdout_logfile_backups=5 ;
+stdout_logfile_maxbytes=500MB ;
+
+[program:cctl-node-$IDX-sidecar]
+autostart=false
+autorestart=false
+command=$PATH_TO_SIDECAR_BIN/casper-sidecar --path-to-config $PATH_TO_SIDECAR_CONFIG/sidecar.toml
+environment=NODE_DIR="$PATH_TO_NODE"
+numprocs=1
+numprocs_start=0
+startsecs=0
+stopsignal=TERM
+stopwaitsecs=5
+stopasgroup=true
+stderr_logfile=$PATH_TO_SIDECAR_LOGS/sidecar-stderr.log ;
+stderr_logfile_backups=5 ;
+stderr_logfile_maxbytes=500MB ;
+stdout_logfile=$PATH_TO_SIDECAR_LOGS/sidecar-stdout.log ;
 stdout_logfile_backups=5 ;
 stdout_logfile_maxbytes=500MB ;
 EOM
@@ -455,7 +546,7 @@ EOM
 function _setup_wasm()
 {
     local PATH_TO_ASSETS=$(get_path_to_assets)
-    local PATH_TO_WASM_OF_CASPER_NODE=$(get_path_to_wasm_of_casper_node)
+    local PATH_TO_WASM_OF_CASPER_NODE=$(get_path_to_compiled_wasm)
 
     for CONTRACT in "${CCTL_SMART_CONTRACTS[@]}"
     do
@@ -473,8 +564,8 @@ function _teardown()
 
 function _teardown_net()
 {
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_net_supervisord_sock)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_supervisord_sock)
 
     if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
         supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" shutdown > /dev/null 2>&1 || true
@@ -501,6 +592,8 @@ unset _GENESIS_ACCOUNTS_TYPE
 unset _GENESIS_DELAY
 unset _HELP
 unset _PATH_TO_CHAINSPEC
+unset _PATH_TO_CONFIG_OF_NODE
+unset _PATH_TO_CONFIG_OF_SIDECAR
 
 for ARGUMENT in "$@"
 do
@@ -511,7 +604,8 @@ do
         delay) _GENESIS_DELAY=${VALUE} ;;
         help) _HELP="show" ;;
         chainspec) _PATH_TO_CHAINSPEC=${VALUE} ;;
-        config) _PATH_TO_CONFIG_TOML=${VALUE} ;;
+        config) _PATH_TO_CONFIG_OF_NODE=${VALUE} ;;
+        sidecar) _PATH_TO_CONFIG_OF_SIDECAR=${VALUE} ;;
         *)
     esac
 done
@@ -519,11 +613,12 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    # echo $(get_path_to_casper_node_resources)
-
+    log_break
     _main \
         "${_GENESIS_ACCOUNTS_TYPE:-"static"}" \
         "${_GENESIS_DELAY:-30}" \
-        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_casper_node_resources)/local/chainspec.toml.in"}" \
-        "${_PATH_TO_CONFIG_TOML:-"$(get_path_to_casper_node_resources)/local/config.toml"}"
+        "${_PATH_TO_CHAINSPEC:-"$(get_path_to_config_templates_of_node)/local/chainspec.toml.in"}" \
+        "${_PATH_TO_CONFIG_OF_NODE:-"$(get_path_to_config_templates_of_node)/local/config.toml"}" \
+        "${_PATH_TO_CONFIG_OF_SIDECAR:-"$(get_path_to_config_templates_of_sidecar)/example_configs/default_rpc_only_config.toml"}"
+    log_break
 fi
