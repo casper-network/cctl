@@ -53,7 +53,7 @@
       "result": {
         "name": "chain_get_state_root_hash_example_result",
         "value": {
-          "api_version": "1.5.6",
+          "api_version": "2.0.0",
           "state_root_hash": "0808080808080808080808080808080808080808080808080808080808080808"
         }
       }

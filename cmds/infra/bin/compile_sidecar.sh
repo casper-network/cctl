@@ -4,30 +4,39 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-chain-view-account-address
+    cctl-infra-bin-compile-sidecar
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Displays an account hash from a given public key
+    Compiles L1 node sidecar.
 
     ARGS
     ----------------------------------------------------------------
-    key        Asymmetric public key associated with an on-chain account.
+    mode        Compilation mode: debug | release. Optional.
+
+    DEFAULTS
+    ----------------------------------------------------------------
+    mode        release
     "
 }
 
 function _main()
 {
-    local PUBLIC_KEY=${1}
-    local ADDRESS
-    
-    ADDRESS=$($(get_path_to_client) account-address --public-key "$PUBLIC_KEY")
-    ADDRESS=${ADDRESS:13}
+    local MODE=${1}
 
-    log_break
-    log "a/c public key  : $PUBLIC_KEY"
-    log "a/c address     : $ADDRESS"
-    log_break
+    local PATH_TO_REPO=$(get_path_to_working_directory)/casper-sidecar
+
+    if [ ! -d "$PATH_TO_REPO" ]; then
+        log "ERROR: casper-sidecar repo must be cloned into $(get_path_to_working_directory) before compilation can occur"
+    else
+        pushd "$PATH_TO_REPO"
+        if [ "$MODE" = "debug" ]; then
+            cargo build
+        else
+            cargo build --release
+        fi
+        popd || exit
+    fi
 }
 
 # ----------------------------------------------------------------
@@ -37,7 +46,7 @@ function _main()
 source "$CCTL"/utils/main.sh
 
 unset _HELP
-unset _KEY
+unset _MODE
 
 for ARGUMENT in "$@"
 do
@@ -45,7 +54,7 @@ do
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
     case "$KEY" in
         help) _HELP="show" ;;
-        key) _KEY=${VALUE} ;;
+        mode) _MODE=${VALUE} ;;
         *)
     esac
 done
@@ -53,5 +62,5 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    _main "$_KEY"
+    _main "${_MODE:-"release"}"
 fi

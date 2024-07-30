@@ -4,24 +4,25 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-node-view-rpc-schema
+    cctl-infra-sidecar-view-config
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Prints to stdout the node JSON RPC schema.
+    Displays a sidecar's configuration toml file.
+
+    ARGS
+    ----------------------------------------------------------------
+    node        Ordinal identifier of a node.
     "
 }
 
 function _main()
 {
-    curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
-        --header 'Content-Type: application/json' \
-        --request POST "$(get_node_address_rpc_for_curl)" \
-        --data-raw '{
-            "id": 1,
-            "jsonrpc": "2.0",
-            "method": "rpc.discover"
-        }' | jq '.result.schema'
+    local NODE_ID=${1}
+
+    local PATH_TO_CONFIG="$(get_path_to_sidecar "$NODE_ID")/config/sidecar.toml"
+
+    less $PATH_TO_CONFIG
 }
 
 # ----------------------------------------------------------------
@@ -31,6 +32,7 @@ function _main()
 source "$CCTL"/utils/main.sh
 
 unset _HELP
+unset _NODE_ID
 
 for ARGUMENT in "$@"
 do
@@ -38,6 +40,7 @@ do
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
     case "$KEY" in
         help) _HELP="show" ;;
+        node) _NODE_ID=${VALUE} ;;
         *)
     esac
 done
@@ -45,5 +48,5 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    _main
+    _main "$_NODE_ID"
 fi

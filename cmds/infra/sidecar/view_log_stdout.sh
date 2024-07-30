@@ -4,15 +4,15 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-node-clean
+    cctl-infra-sidecar-view-log-stdout
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Cleans node logs & data.
+    Displays a sidecar's log file.
 
     ARGS
     ----------------------------------------------------------------
-    node        Ordinal identifier of node to be cleaned.
+    node        Ordinal identifier of a node.
     "
 }
 
@@ -20,27 +20,7 @@ function _main()
 {
     local NODE_ID=${1}
 
-    if [ "$(get_node_is_up "$NODE_ID")" = true ]; then
-        log "Node $NODE_ID is currently running ... please stop prior to cleaning."
-    else
-        log "cleaning node $NODE_ID ... please wait"
-        _clean_node "$NODE_ID"
-        log "node $NODE_ID cleaned"
-    fi
-}
-
-function _clean_node()
-{
-    local NODE_ID=${1}
-
-    local NODE_LOGS=$(get_path_to_node_logs "$NODE_ID")
-    local NODE_STORAGE=$(get_path_to_node_storage "$NODE_ID")
-
-    log "... cleaning logs"
-    rm "$NODE_LOGS"/*.log > /dev/null 2>&1
-
-    log "... cleaning storage"
-    rm -rf "$NODE_STORAGE"/"$CCTL_NET_NAME" > /dev/null 2>&1
+    less "$(get_path_to_sidecar "${NODE_ID:-1}")"/logs/sidecar-stdout.log
 }
 
 # ----------------------------------------------------------------

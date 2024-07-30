@@ -16,9 +16,9 @@ function _main()
 {
     local NODE_ID
 
-    for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
+    for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
     do
-        if [ $(get_node_is_up "$NODE_ID") = true ]; then
+        if [ $(get_is_node_up "$NODE_ID") = true ]; then
             log_break
             log "TIP INFO @ NODE-$NODE_ID"
             log_break
@@ -30,7 +30,7 @@ function _main()
 function _render()
 {
     local NODE_ID=${1}
-    local NODE_ADDRESS_CURL=$(get_node_address_rpc_for_curl "$NODE_ID")
+    local NODE_ADDRESS_CURL=$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")
     local NODE_API_RESPONSE
     
     curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \

@@ -4,15 +4,15 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-node-stop
+    cctl-infra-sidecar-start
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Stops a node.
+    Starts a sidecar.
 
     ARGS
     ----------------------------------------------------------------
-    node        Ordinal identifier of node to be stopped.
+    node        Ordinal identifier of node sidecar to be started.
     "
 }
 
@@ -20,30 +20,20 @@ function _main()
 {
     local NODE_ID=${1}
 
-    if [ "$(get_net_is_up)" = true ]; then
-        if [ "$(get_node_is_up "$NODE_ID")" = true ]; then
-            log "stopping node $NODE_ID ... please wait"
-            _stop_node "$NODE_ID"
-            log "$NODE_ID stopped"
+    if [ "$(get_is_net_up)" = true ]; then
+        if [ "$(get_is_node_up "$NODE_ID")" = true ]; then
+            if [ "$(get_is_sidecar_up "$NODE_ID")" = false ]; then
+                do_sidecar_start "$NODE_ID"
+                log "Sidecar $NODE_ID -> started"
+            else
+                log_warning "Node $NODE_ID -> not running, no need to start sidecar"
+            fi
         else
-            log_warning "node $NODE_ID is already stopped"
+            log_warning "Node $NODE_ID -> not running, no need to start sidecar"
         fi
     else
-        log_warning "network not running - no need to stop node"
+        log_warning "Network not running - no need to start sidecar"
     fi
-}
-
-function _stop_node()
-{
-    local NODE_ID=${1}
-
-    local NODE_PROCESS_NAME=$(get_process_name_of_node_in_group "$NODE_ID")
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
-    
-    supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" stop "$NODE_PROCESS_NAME" > /dev/null 2>&1
-    sleep 1.0
-
-    log "... node $NODE_ID stopped"
 }
 
 # ----------------------------------------------------------------
@@ -69,5 +59,7 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
+    log_break
     _main "$_NODE_ID"
+    log_break
 fi

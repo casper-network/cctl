@@ -4,26 +4,36 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-view-chain-deploy
+    cctl-infra-node-stop
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Renders on-chain deploy information.
+    Stops a node.
 
     ARGS
     ----------------------------------------------------------------
-    deploy       Identifier of a deploy (hash).
+    node        Ordinal identifier of node to be stopped.
     "
 }
 
 function _main()
 {
-    local DEPLOY_ID=${1}
+    local NODE_ID=${1}
 
-    $(get_path_to_client) get-deploy \
-        --node-address "$(get_node_address_rpc)" \
-        "$DEPLOY_ID" \
-        | jq '.result'
+    if [ "$(get_is_net_up)" = true ]; then
+        if [ "$(get_is_node_up "$NODE_ID")" = true ]; then
+            if [ "$(get_is_sidecar_up "$NODE_ID")" = true ]; then
+                do_sidecar_stop "$NODE_ID"
+                log "Sidecar $NODE_ID -> stopped"
+            fi
+            do_node_stop "$NODE_ID"
+            log "Node $NODE_ID -> stopped"
+        else
+            log_warning "Node $NODE_ID -> already stopped"
+        fi
+    else
+        log_warning "Network not running - no need to stop node"
+    fi
 }
 
 # ----------------------------------------------------------------
@@ -32,16 +42,16 @@ function _main()
 
 source "$CCTL"/utils/main.sh
 
-unset _DEPLOY_ID
 unset _HELP
+unset _NODE_ID
 
 for ARGUMENT in "$@"
 do
     KEY=$(echo "$ARGUMENT" | cut -f1 -d=)
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
     case "$KEY" in
-        deploy) _DEPLOY_ID=${VALUE} ;;
         help) _HELP="show" ;;
+        node) _NODE_ID=${VALUE} ;;
         *)
     esac
 done
@@ -49,5 +59,7 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    _main $_DEPLOY_ID
+    log_break
+    _main "$_NODE_ID"
+    log_break
 fi

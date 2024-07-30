@@ -4,49 +4,26 @@ function _help() {
     echo "
     COMMAND
     ----------------------------------------------------------------
-    cctl-infra-net-teardown
+    cctl-infra-net-stop
 
     DESCRIPTION
     ----------------------------------------------------------------
-    Tears down network assets - including active processes.
-
-    NOTES
-    ----------------------------------------------------------------
-    Both static (e.g. config files) and dynamic (e.g. active processes)
-    assets will be torn down.
+    Stops a network by halting all nodes.
     "
 }
 
 function _main()
 {
-    log "teardown begins ... please wait"
-
-    log "... stopping network"
-    _teardown_net
-
-    log "... deleting assets"
-    _teardown_assets
-
-    log "teardown complete"
-}
-
-function _teardown_net()
-{
-    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_net_supervisord_cfg)
-    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_net_supervisord_sock)
+    local PATH_TO_SUPERVISOR_CONFIG=$(get_path_to_supervisord_cfg)
+    local PATH_TO_SUPERVISOR_SOCKET=$(get_path_to_supervisord_sock)
 
     if [ -e "$PATH_TO_SUPERVISOR_SOCKET" ]; then
+        log "Daemon supervisor -> stopping"
         supervisorctl -c "$PATH_TO_SUPERVISOR_CONFIG" shutdown > /dev/null 2>&1 || true
         sleep 2.0
-    fi
-}
-
-function _teardown_assets()
-{
-    local _PATH_TO_ASSETS=$(get_path_to_assets)
-
-    if [ -d "$_PATH_TO_ASSETS" ]; then
-        rm -rf "$_PATH_TO_ASSETS"
+        log "Network stopped"
+    else
+        log "Network not running - no need to stop"
     fi
 }
 
@@ -71,5 +48,7 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
+    log_break
     _main
+    log_break
 fi

@@ -25,16 +25,16 @@ function _main()
     local NODE_ID=${1}
 
     if [ "$NODE_ID" = "all" ]; then
-        for NODE_ID in $(seq 1 "$(get_count_of_nodes)")
+        for NODE_ID in $(seq 1 "$CCTL_COUNT_OF_NODES")
         do
-            if [ $(get_node_is_up "$NODE_ID") = true ]; then
+            if [ $(get_is_node_up "$NODE_ID") = true ]; then
                 echo "------------------------------------------------------------------------------------------------------------------------------------"
                 _display_storage "$NODE_ID"
             fi
         done
         echo "------------------------------------------------------------------------------------------------------------------------------------"
     else
-        if [ $(get_node_is_up "$NODE_ID") = true ]; then
+        if [ $(get_is_node_up "$NODE_ID") = true ]; then
             _display_storage "$NODE_ID"
         else
             log_warning "node $NODE_ID is not running"

@@ -35,7 +35,7 @@ function _main()
 
     local DISPATCH_NODE_ADDRESS
     local NODE_ADDRESS
-    local PATH_TO_CLIENT=$(get_path_to_client)
+    local PATH_TO_CLIENT=$(get_path_to_node_client)
     local PATH_TO_TX
     local PATH_TO_TX_BATCH
     local PATH_TO_TX_ROOT="$(get_path_to_assets)"/transactions
@@ -45,9 +45,9 @@ function _main()
     if [ "$NODE_ID" == "random" ]; then
         unset NODE_ADDRESS
     elif [ "$NODE_ID" -eq 0 ]; then
-        NODE_ADDRESS=$(get_node_address_rpc)
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server)
     else
-        NODE_ADDRESS=$(get_node_address_rpc "$NODE_ID")
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server "$NODE_ID")
     fi
 
     log_break
@@ -60,7 +60,7 @@ function _main()
         log "ERROR: no batch exists on file system - have you written it ?"
     else
         TX_ID=0
-        for USER_ID in $(seq 1 "$(get_count_of_users)")
+        for USER_ID in $(seq 1 "$CCTL_COUNT_OF_USERS")
         do
             for TRANSFER_ID in $(seq 1 100000)
             do
@@ -69,7 +69,7 @@ function _main()
                     break
                 else
                     TX_ID=$((TX_ID + 1)) 
-                    DISPATCH_NODE_ADDRESS=${NODE_ADDRESS:-$(get_node_address_rpc)}
+                    DISPATCH_NODE_ADDRESS=${NODE_ADDRESS:-$(get_address_of_sidecar_main_server)}
                     DEPLOY_HASH=$(
                         $PATH_TO_CLIENT send-deploy \
                             --node-address "$DISPATCH_NODE_ADDRESS" \

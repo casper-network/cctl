@@ -26,10 +26,32 @@ function _main()
     local NODE_ID=${1}
     local BLOCK_ID=${2}
 
-    $(get_path_to_client) get-era-summary \
-        --node-address "$(get_node_address_rpc "$NODE_ID")" \
-        --block-identifier "$BLOCK_ID" \
-        | jq '.result'
+    if [ "$BLOCK_ID" ]; then
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+            --header 'Content-Type: application/json' \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+            --data-raw '{
+                "id": 1,
+                "jsonrpc": "2.0",
+                "method": "chain_get_era_summary",
+                "params": {
+                    "block_identifier": {
+                        "Hash": "'"$BLOCK_ID"'"
+                    }
+                }
+            }' \
+        | jq
+    else
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+            --header 'Content-Type: application/json' \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+            --data-raw '{
+                "id": 1,
+                "jsonrpc": "2.0",
+                "method": "chain_get_era_summary"
+            }' \
+        | jq
+    fi
 }
 
 # ----------------------------------------------------------------

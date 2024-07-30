@@ -34,7 +34,7 @@ function _main()
     local CHAIN_NAME=$CCTL_NET_NAME
     local GAS_PAYMENT=$CCTL_DEFAULT_GAS_PAYMENT
     local NODE_ADDRESS
-    local PATH_TO_CLIENT=$(get_path_to_client)
+    local PATH_TO_CLIENT=$(get_path_to_node_client)
     local PATH_TO_CONTRACT="$(get_path_to_assets)/bin/undelegate.wasm"
     local TX_HASH
     local USER_ACCOUNT_KEY=$(get_account_key "$CCTL_ACCOUNT_TYPE_USER" "$USER_ID")
@@ -43,11 +43,11 @@ function _main()
     local VALIDATOR_SECRET_KEY=$(get_path_to_secret_key "$CCTL_ACCOUNT_TYPE_NODE" "$VALIDATOR_ID")
 
     if [ "$NODE_ID" == "random" ]; then
-        NODE_ADDRESS=$(get_node_address_rpc)
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server)
     elif [ "$NODE_ID" -eq 0 ]; then
-        NODE_ADDRESS=$(get_node_address_rpc)
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server)
     else
-        NODE_ADDRESS=$(get_node_address_rpc "$NODE_ID")
+        NODE_ADDRESS=$(get_address_of_sidecar_main_server "$NODE_ID")
     fi
 
     log_break

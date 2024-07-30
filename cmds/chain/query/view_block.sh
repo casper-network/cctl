@@ -22,14 +22,30 @@ function _main()
     local BLOCK_ID=${1}
 
     if [ "$BLOCK_ID" ]; then
-        $(get_path_to_client) get-block \
-            --node-address "$(get_node_address_rpc)" \
-            --block-identifier "$BLOCK_ID" \
-            | jq '.result.block'
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+            --header 'Content-Type: application/json' \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+            --data-raw '{
+                "id": 1,
+                "jsonrpc": "2.0",
+                "method": "chain_get_block",
+                "params": {
+                    "block_identifier": {
+                        "Hash": "'"$BLOCK_ID"'"
+                    }
+                }
+            }' \
+        | jq '.result.block_with_signatures'
     else
-        $(get_path_to_client) get-block \
-            --node-address "$(get_node_address_rpc)" \
-            | jq '.result.block'
+        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+            --header 'Content-Type: application/json' \
+            --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+            --data-raw '{
+                "id": 1,
+                "jsonrpc": "2.0",
+                "method": "chain_get_block"
+            }' \
+        | jq '.result.block_with_signatures'
     fi
 }
 

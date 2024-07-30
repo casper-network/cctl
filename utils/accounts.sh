@@ -3,27 +3,27 @@
 #######################################
 # Returns an on-chain account balance.
 # Arguments:
-#   Purse URef.
-#   State root hash at a certain block height.
+#   Identifier of an account.
 #######################################
 function get_account_balance()
 {
-    local PURSE_UREF=${1}
-    local STATE_ROOT_HASH=${2:-$(get_state_root_hash)}
+    local ACCOUNT_ID=${1}
 
-    local ACCOUNT_BALANCE
-    local NODE_ADDRESS=$(get_node_address_rpc)
-
-    ACCOUNT_BALANCE=$(
-        $(get_path_to_client) query-balance \
-            --node-address "$NODE_ADDRESS" \
-            --state-root-hash "$STATE_ROOT_HASH" \
-            --purse-uref "$PURSE_UREF" \
-            | jq '.result.balance' \
-            | sed -e 's/^"//' -e 's/"$//'
-        )
-
-    echo "$ACCOUNT_BALANCE"
+    curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+        --header 'Content-Type: application/json' \
+        --request POST "$(get_address_of_sidecar_main_server_for_curl "1")" \
+        --data-raw '{
+            "id": 1,
+            "jsonrpc": "2.0",
+            "method": "query_balance",
+            "params": {
+                "purse_identifier": {
+                    "main_purse_under_account_hash": "account-hash-'"$ACCOUNT_ID"'"
+                }
+            }
+        }' \
+    | jq '.result.balance' \
+    | sed -e 's/^"//' -e 's/"$//'
 }
 
 #######################################
@@ -70,27 +70,4 @@ function get_account_key()
     elif [ "$ACCOUNT_TYPE" = "$CCTL_ACCOUNT_TYPE_USER" ]; then
         cat "$(get_path_to_user "$ACCOUNT_IDX")"/public_key_hex
     fi
-}
-
-#######################################
-# Returns a main purse uref.
-# Globals:
-#   CCTL - path to cctl home directory.
-# Arguments:
-#   Account key.
-#   State root hash.
-#######################################
-function get_main_purse_uref()
-{
-    local ACCOUNT_HASH=${1}
-    local STATE_ROOT_HASH=${2:-$(get_state_root_hash)}
-
-    echo $(
-        $(get_path_to_client) query-global-state \
-            --node-address "$(get_node_address_rpc)" \
-            --key "account-hash-$ACCOUNT_HASH" \
-            --state-root-hash "$STATE_ROOT_HASH" \
-            | jq '.result.stored_value.Account.main_purse' \
-            | sed -e 's/^"//' -e 's/"$//'
-        )
 }

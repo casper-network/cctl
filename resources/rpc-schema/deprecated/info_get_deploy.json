@@ -1,6 +1,6 @@
 {
   "name": "info_get_deploy",
-  "summary": "returns a Deploy from the network",
+  "summary": "returns a Deploy from the network (DEPRECATED: use `info_get_transaction` instead)",
   "params": [
     {
       "name": "deploy_hash",
@@ -27,8 +27,7 @@
       "type": "object",
       "required": [
         "api_version",
-        "deploy",
-        "execution_results"
+        "deploy"
       ],
       "properties": {
         "api_version": {
@@ -39,22 +38,16 @@
           "description": "The deploy.",
           "$ref": "#/components/schemas/Deploy"
         },
-        "execution_results": {
-          "description": "The map of block hash to execution result.",
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/JsonExecutionResult"
-          }
-        },
-        "block_hash": {
-          "description": "The hash of this deploy's block.",
-          "$ref": "#/components/schemas/BlockHash"
-        },
-        "block_height": {
-          "description": "The height of this deploy's block.",
-          "type": "integer",
-          "format": "uint64",
-          "minimum": 0.0
+        "execution_info": {
+          "description": "Execution info, if available.",
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/ExecutionInfo"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false
@@ -76,7 +69,7 @@
       "result": {
         "name": "info_get_deploy_example_result",
         "value": {
-          "api_version": "1.5.6",
+          "api_version": "2.0.0",
           "deploy": {
             "hash": "5c9b3b099c1378aa8e4a5f07f59ff1fcdc69a83179427c7e67ae0377d94d93fa",
             "header": {
@@ -127,44 +120,57 @@
               }
             ]
           },
-          "execution_results": [
-            {
-              "block_hash": "13c2d7a68ecdd4b74bf4393c88915c836c863fc4bf11d7f2bd930a1bbccacdcb",
-              "result": {
-                "Success": {
-                  "effect": {
-                    "operations": [
-                      {
-                        "key": "account-hash-2c4a11c062a8a337bfc97e27fd66291caeb2c65865dcb5d3ef3759c4c97efecb",
-                        "kind": "Write"
+          "execution_info": {
+            "block_hash": "40fa940e609972313a6d598712fcb9cced789ed237bdac67aa1fe546e624c884",
+            "block_height": 10,
+            "execution_result": {
+              "Version2": {
+                "initiator": {
+                  "PublicKey": "01d9bf2148748a85c89da5aad8ee0b0fc2d105fd39d41a4c796536354f0ae2900c"
+                },
+                "error_message": null,
+                "limit": "123456",
+                "consumed": "100000",
+                "cost": "246912",
+                "payment": [
+                  {
+                    "source": "uref-0101010101010101010101010101010101010101010101010101010101010101-001"
+                  }
+                ],
+                "transfers": [
+                  {
+                    "Version2": {
+                      "transaction_hash": {
+                        "Version1": "0101010101010101010101010101010101010101010101010101010101010101"
                       },
-                      {
-                        "key": "deploy-af684263911154d26fa05be9963171802801a0b6aff8f199b7391eacb8edc9e1",
-                        "kind": "Read"
-                      }
-                    ],
-                    "transforms": [
-                      {
-                        "key": "uref-2c4a11c062a8a337bfc97e27fd66291caeb2c65865dcb5d3ef3759c4c97efecb-007",
-                        "transform": {
-                          "AddUInt64": 8
-                        }
+                      "from": {
+                        "AccountHash": "account-hash-0202020202020202020202020202020202020202020202020202020202020202"
                       },
-                      {
-                        "key": "deploy-af684263911154d26fa05be9963171802801a0b6aff8f199b7391eacb8edc9e1",
-                        "transform": "Identity"
-                      }
-                    ]
+                      "to": "account-hash-0303030303030303030303030303030303030303030303030303030303030303",
+                      "source": "uref-0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a-007",
+                      "target": "uref-1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b-000",
+                      "amount": "1000000000000",
+                      "gas": "2500000000",
+                      "id": 999
+                    }
+                  }
+                ],
+                "size_estimate": 186,
+                "effects": [
+                  {
+                    "key": "account-hash-2c4a11c062a8a337bfc97e27fd66291caeb2c65865dcb5d3ef3759c4c97efecb",
+                    "kind": {
+                      "AddUInt64": 8
+                    }
                   },
-                  "transfers": [
-                    "transfer-5959595959595959595959595959595959595959595959595959595959595959",
-                    "transfer-8282828282828282828282828282828282828282828282828282828282828282"
-                  ],
-                  "cost": "123456"
-                }
+                  {
+                    "key": "deploy-af684263911154d26fa05be9963171802801a0b6aff8f199b7391eacb8edc9e1",
+                    "kind": "Identity"
+                  }
+                ]
               }
             }
-          ]
+          }
         }
       }
     }
