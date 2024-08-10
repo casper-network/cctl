@@ -30,7 +30,7 @@ make setup-rs
 
 ## Step 3: Extend .bashrc file (optional)
 
-```
+```bash copy
 cd YOUR_WORKING_DIRECTORY/cctl
 
 cat >> $HOME/.bashrc <<- EOM
