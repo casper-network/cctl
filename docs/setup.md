@@ -12,7 +12,7 @@ Plus the requirements to build [casper-node](https://github.com/CasperLabs/caspe
 
 ## Step 2: Setup System
 
-```
+```bash copy
 # Install python dependencies.
 python3 -m pip install supervisor toml tomlkit
 
