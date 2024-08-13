@@ -1,3 +1,3 @@
 final: prev: {
-  cctl = final.callPackage ./package.nix { };
+  cctl = final.callPackage ./package.nix { casper-node = final.casper-node_2; };
 }

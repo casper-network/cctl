@@ -18,7 +18,7 @@ function get_path_to_assets()
 function get_path_to_config_templates_of_node()
 {
     if ((${#CSPR_PATH_TO_RESOURCES[@]})); then
-        echo $CSPR_PATH_TO_RESOURCES
+        echo $CSPR_PATH_TO_RESOURCES/casper-node
     else
         echo $(get_path_to_working_directory)/casper-node/resources
     fi
@@ -32,7 +32,7 @@ function get_path_to_config_templates_of_node()
 function get_path_to_config_templates_of_sidecar()
 {
     if ((${#CSPR_PATH_TO_RESOURCES[@]})); then
-        echo $CSPR_PATH_TO_RESOURCES
+        echo $CSPR_PATH_TO_RESOURCES/casper-sidecar
     else
         echo $(get_path_to_working_directory)/casper-sidecar/resources
     fi
