@@ -22,7 +22,7 @@ function _main()
     local CURRENT=$(get_chain_height)
     log "current block height = $CURRENT :: future block height = $FUTURE"
 
-    while [ "$CURRENT" -lt "$FUTURE" ];
+    while [ "$CURRENT" != "N/A" && "$CURRENT" -lt "$FUTURE" ];
     do
         log "awaiting future block :: sleeping 2 seconds"
         sleep 2.0
