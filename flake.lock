@@ -31,11 +31,11 @@
         "rust-overlay": "rust-overlay"
       },
       "locked": {
-        "lastModified": 1724854505,
-        "narHash": "sha256-ax1Jxgd47kmK6ZY7lm0KheDLm6DyqZRZlGY+3f9XYWU=",
+        "lastModified": 1725966511,
+        "narHash": "sha256-efgD6Ia/q7Q7V7m4HcujzZwK8Q2wcktE2JVdNNrxf6c=",
         "owner": "cspr-rad",
         "repo": "csprpkgs",
-        "rev": "3bc835d3b73a5d5a5829f3b8506f51a9cd098abd",
+        "rev": "ffd1c29015183c6134365d7f4a18e7d2357bba65",
         "type": "github"
       },
       "original": {
