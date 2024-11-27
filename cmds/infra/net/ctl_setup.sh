@@ -130,8 +130,36 @@ function _setup_config_of_sidecars()
 
     for NODE_ID in $(seq 1 "$NODE_COUNT")
     do
-        _setup_sidecar_config $NODE_ID $PATH_TO_TEMPLATE_OF_CONFIG
+        _setup_config_of_sidecar $NODE_ID $PATH_TO_TEMPLATE_OF_CONFIG
     done
+}
+
+function _setup_config_of_sidecar()
+{
+    local NODE_ID=${1}
+    local PATH_TO_TEMPLATE=${2}
+
+    local PATH_TO_CONFIG="$(get_path_to_sidecar "$NODE_ID")/config/sidecar.toml"
+    local SCRIPT
+
+    if [ "$(get_os)" = "macosx" ]; then
+        cp "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
+    else
+        cp --no-preserve=mode "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
+    fi
+
+    SCRIPT=(
+        "import toml;"
+        "cfg=toml.load('$PATH_TO_CONFIG');"
+        "cfg['rpc_server']['main_server']['ip_address']='0.0.0.0';"
+        "cfg['rpc_server']['main_server']['port']=$(get_port_of_sidecar_main_server  "$NODE_ID");"
+        "cfg['rpc_server']['speculative_exec_server']['ip_address']='0.0.0.0';"
+        "cfg['rpc_server']['speculative_exec_server']['port']=$(get_port_of_sidecar_speculative_exec_server  "$NODE_ID");"
+        "cfg['rpc_server']['node_client']['ip_address']='0.0.0.0';"
+        "cfg['rpc_server']['node_client']['port']=$(get_port_of_node_binary_server  "$NODE_ID");"
+        "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
+    )
+    python3 -c "${SCRIPT[*]}"
 }
 
 function _setup_fs()
@@ -415,31 +443,6 @@ function _get_node_pos_stake_weight()
     fi
 
     echo $POS_WEIGHT
-}
-
-function _setup_sidecar_config()
-{
-    local NODE_ID=${1}
-    local PATH_TO_TEMPLATE=${2}
-
-    local PATH_TO_CONFIG="$(get_path_to_sidecar "$NODE_ID")/config/sidecar.toml"
-    local SCRIPT
-
-    if [ "$(get_os)" = "macosx" ]; then
-        cp "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
-    else
-        cp --no-preserve=mode "$PATH_TO_TEMPLATE" "$PATH_TO_CONFIG"
-    fi
-
-    SCRIPT=(
-        "import toml;"
-        "cfg=toml.load('$PATH_TO_CONFIG');"
-        "cfg['rpc_server']['main_server']['address']='0.0.0.0:$(get_port_of_sidecar_main_server  "$NODE_ID")';"
-        "cfg['rpc_server']['speculative_exec_server']['address']='0.0.0.0:$(get_port_of_sidecar_speculative_exec_server "$NODE_ID")';"
-        "cfg['rpc_server']['node_client']['address']='0.0.0.0:$(get_port_of_node_binary_server "$NODE_ID")';"
-        "toml.dump(cfg, open('$PATH_TO_CONFIG', 'w'));"
-    )
-    python3 -c "${SCRIPT[*]}"
 }
 
 function _setup_supervisor()

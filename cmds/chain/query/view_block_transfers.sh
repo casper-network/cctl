@@ -21,19 +21,35 @@ function _main()
     local BLOCK_ID=${1}
 
     if [ "$BLOCK_ID" ]; then
-        curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
-            --header 'Content-Type: application/json' \
-            --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
-            --data-raw '{
-                "id": 1,
-                "jsonrpc": "2.0",
-                "method": "chain_get_block_transfers",
-                "params": {
-                    "block_identifier": {
-                        "Hash": "'"$BLOCK_ID"'"
+        if [ $(get_is_numeric "$BLOCK_ID") = true ]; then
+            curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+                --header 'Content-Type: application/json' \
+                --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
+                --data-raw '{
+                    "id": 1,
+                    "jsonrpc": "2.0",
+                    "method": "chain_get_block_transfers",
+                    "params": {
+                        "block_identifier": {
+                            "Height": "'"$BLOCK_ID"'"
+                        }
                     }
-                }
-            }' | jq '.result.transfers'
+                }' | jq '.result.transfers'
+        else
+            curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
+                --header 'Content-Type: application/json' \
+                --request POST "$(get_address_of_sidecar_main_server_for_curl)" \
+                --data-raw '{
+                    "id": 1,
+                    "jsonrpc": "2.0",
+                    "method": "chain_get_block_transfers",
+                    "params": {
+                        "block_identifier": {
+                            "Hash": "'"$BLOCK_ID"'"
+                        }
+                    }
+                }' | jq '.result.transfers'
+        fi
     else
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \
