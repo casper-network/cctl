@@ -19,14 +19,16 @@ function _help() {
 
 function _main()
 {
-    local BLOCK_ID=${1}
+    local NODE_ID=${1}
+    local BLOCK_ID=${2}
+    local NODE_ADDRESS_CURL=$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")
     local is_block_height
 
     if [ "$BLOCK_ID" ]; then
         if [ $(get_is_numeric "$BLOCK_ID") = true ]; then
             curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
                 --header 'Content-Type: application/json' \
-                --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+                --request POST "$NODE_ADDRESS_CURL" \
                 --data-raw '{
                     "id": 1,
                     "jsonrpc": "2.0",
@@ -37,11 +39,11 @@ function _main()
                         }
                     }
                 }' \
-            | jq '.result.block_with_signatures'
+            | jq '.result'
         else
             curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
                 --header 'Content-Type: application/json' \
-                --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+                --request POST "$NODE_ADDRESS_CURL" \
                 --data-raw '{
                     "id": 1,
                     "jsonrpc": "2.0",
@@ -52,18 +54,18 @@ function _main()
                         }
                     }
                 }' \
-            | jq '.result.block_with_signatures'
+            | jq '.result'
         fi
     else
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \
-            --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+            --request POST "$NODE_ADDRESS_CURL" \
             --data-raw '{
                 "id": 1,
                 "jsonrpc": "2.0",
                 "method": "chain_get_block"
             }' \
-        | jq '.result.block_with_signatures'
+        | jq '.result'
     fi
 }
 
@@ -75,6 +77,7 @@ source "$CCTL"/utils/main.sh
 
 unset _BLOCK_ID
 unset _HELP
+unset _NODE_ID
 
 for ARGUMENT in "$@"
 do
@@ -83,6 +86,7 @@ do
     case "$KEY" in
         block) _BLOCK_ID=${VALUE} ;;
         help) _HELP="show" ;;
+        node) _NODE_ID=${VALUE} ;;
         *)
     esac
 done
@@ -90,5 +94,5 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    _main $_BLOCK_ID
+    _main "${_NODE_ID:-"1"}" "${_BLOCK_ID:-""}"
 fi
