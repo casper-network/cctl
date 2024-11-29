@@ -9,24 +9,16 @@ function _help() {
     DESCRIPTION
     ----------------------------------------------------------------
     Displays validator change set.
-
-    ARGS
-    ----------------------------------------------------------------
-    node        Identifier of a node. Optional.
-
-    DEFAULTS
-    ----------------------------------------------------------------
-    node        1
     "
 }
 
 function _main()
 {
-    local NODE_ID=${1}
+    local NODE_ADDRESS_CURL=$(get_address_of_sidecar_main_server_for_curl)
 
     curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
         --header 'Content-Type: application/json' \
-        --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+        --request POST "$NODE_ADDRESS_CURL" \
         --data-raw '{
             "id": 1,
             "jsonrpc": "2.0",
@@ -42,7 +34,6 @@ function _main()
 source "$CCTL"/utils/main.sh
 
 unset _HELP
-unset _NODE_ID
 
 for ARGUMENT in "$@"
 do
@@ -50,7 +41,6 @@ do
     VALUE=$(echo "$ARGUMENT" | cut -f2 -d=)
     case "$KEY" in
         help) _HELP="show" ;;
-        node) _NODE_ID=${VALUE} ;;
         *)
     esac
 done
@@ -58,5 +48,5 @@ done
 if [ "${_HELP:-""}" = "show" ]; then
     _help
 else
-    _main "${_NODE_ID:-"1"}"
+    _main
 fi

@@ -19,10 +19,11 @@ function _help() {
 function _main()
 {
     local ACCOUNT_ID=${1}
+    local NODE_ADDRESS_CURL=$(get_address_of_sidecar_main_server_for_curl)
 
     curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
         --header 'Content-Type: application/json' \
-        --request POST "$(get_address_of_sidecar_main_server_for_curl "1")" \
+        --request POST "$NODE_ADDRESS_CURL" \
         --data-raw "$(_get_json_rpc_request_data "$ACCOUNT_ID")" \
     | jq
 }
@@ -42,7 +43,6 @@ function _get_json_rpc_request_data()
         }
     }'
 }
-
 
 # ----------------------------------------------------------------
 # ENTRY POINT

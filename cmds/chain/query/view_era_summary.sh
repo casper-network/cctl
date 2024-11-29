@@ -25,11 +25,12 @@ function _main()
 {
     local NODE_ID=${1}
     local BLOCK_ID=${2}
+    local NODE_ADDRESS_CURL=$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")
 
     if [ "$BLOCK_ID" ]; then
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \
-            --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+            --request POST "$NODE_ADDRESS_CURL" \
             --data-raw '{
                 "id": 1,
                 "jsonrpc": "2.0",
@@ -44,7 +45,7 @@ function _main()
     else
         curl $CCTL_CURL_ARGS_FOR_NODE_RELATED_QUERIES \
             --header 'Content-Type: application/json' \
-            --request POST "$(get_address_of_sidecar_main_server_for_curl "$NODE_ID")" \
+            --request POST "$NODE_ADDRESS_CURL" \
             --data-raw '{
                 "id": 1,
                 "jsonrpc": "2.0",
