@@ -9,15 +9,17 @@ FROM debian:buster AS build
 # Allow users to specify forked node, or specific commit
 # If not fallback to release branch (or alternatively just specify branch)
 ARG NODE_REPO=https://github.com/casper-network/casper-node.git
-ARG CLIENT_REPO=https://github.com/casper-ecosystem/casper-client-rs.git
-ARG SIDECAR_REPO=https://github.com/casper-network/casper-sidecar.git
-
 ARG NODE_COMMIT=
-ARG NODE_GITBRANCH=release-2.0.0-rc3
-ARG CLIENT_GITBRANCH=feat-track-node-2.0
-ARG CLIENT_COMMIT=317051ddfb372d9404850c6a1787f225d6d32b4e
-ARG SIDECAR_GITBRANCH=release-1.0.0rc2_node-2.0.0rc3
+ARG NODE_GITBRANCH=feat-2.0
+
+ARG CLIENT_REPO=https://github.com/casper-ecosystem/casper-client-rs.git
+ARG CLIENT_GITBRANCH=
+ARG CLIENT_COMMIT=609ac2892140e664663e69f12185a62c247fd566
+
+ARG SIDECAR_REPO=https://github.com/casper-network/casper-sidecar.git
+ARG SIDECAR_GITBRANCH=feat-2.0
 ARG SIDECAR_COMMIT=
+
 
 RUN apt-get update \
     && DEBIAN_FRONTEND="noninteractive" \
