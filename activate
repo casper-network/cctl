@@ -87,6 +87,8 @@ alias cctl-chain-view-tx='source $CCTL/cmds/chain/query/view_tx.sh'
 alias cctl-chain-view-tip-info='source $CCTL/cmds/chain/query/view_tip_info.sh'
 alias cctl-chain-view-validator-changes='source $CCTL/cmds/chain/query/view_validator_changes.sh'
 
+alias cctl-chain-io-write-block-range='source $CCTL/cmds/chain/io/write_block_range.sh'
+
 # Transaction commands:
 # ... system auction
 alias cctl-tx-auction-activate-bid='source $CCTL/cmds/tx/auction/activate_bid.sh'

@@ -180,6 +180,7 @@ function _setup_fs()
     mkdir "$PATH_TO_ASSETS/daemon/socket"
     mkdir "$PATH_TO_ASSETS/faucet"
     mkdir "$PATH_TO_ASSETS/genesis"
+    mkdir "$PATH_TO_ASSETS/io"
     mkdir "$PATH_TO_ASSETS/nodes"
     mkdir "$PATH_TO_ASSETS/sidecars"
     mkdir "$PATH_TO_ASSETS/users"
